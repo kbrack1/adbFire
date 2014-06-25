@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>adbFire</title></head><body>
+
+<u><b>adbFire</b></u> is a companion program for FireTV XBMC, (Gotham and later only). It allows you to
+sideload XBMC and other apps without the hassle of downloading the Android SDK and other tools. <p>Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the FireTV and more. <p>
+
+
+At startup you should see "ADB running" on the status bar. If you don't, click "Start" in the ADB server group.
+<p>
+Enter your device IP or name into the text box (e.g. 192.168.1.110 or mydevice). This address is "sticky", it will be remembered for future runs.<p>
+<p>
+Click "Connect". You should see "Device connected" on the status bar. If you don't, double-check your entry in the text box.
+
+<p><b>If you're unable
+ to start the ADB server and connect to the Fire TV, this program will be non-functional.
+</b><p>
+
+
+<b><u>ADB Server</u></b><br>
+The "Start" button starts the adb server<br>
+The "Stop" button stops the adb server
+<p>
+
+<b><u>Push/Pull</u></b><p>
+<b>NOTE: Before pushing/pulling data, XBMC <u>MUST</u> have been run for the first time on the Android device. XBMC sets up its inner directory structure when first run.</b><p>
+
+To push files to XBMC select the destination folder from the dropdown widget, then press "Push". Next, choose and confirm the file to push from your PC to XBMC. The source folder is "sticky", it will be remembered for future runs.
+<p>
+To pull files from XBMC select the source folder from the dropdown widget, then press "Pull". Enter a filename into the text area to pull from XBMC to your home folder on the PC.
+<p>
+
+
+
+
+
+<b><u>Application processes</u></b><br>
+The <b>"Install APK" </b> button installs or "sideloads"  apps. Click it and choose the APK file you want to installed. The apk folder is "sticky", it will be remembered for future runs.
+<p>
+To uninstall apps from the Fire TV press <b>"Uninstall APK"</b>, then enter the package name (e.g. org.xbmc.xbmc) to be uninstalled.
+<p>
+The <b>"Backup XBMC"</b> button backs up the org.xbmc.xbmc folder on the Fire TV. Please note that XBMC <u>MUST</u> have been run for the first time before using this function. Empty directories are not backed up.
+<p>
+
+The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc to the the Fire TV.
+<p>
+The <b>"Push Remote"</b> button installs an xml file defining a particular remote.<p> The remote xml files are located in a folder called "xml",located wherever adbFire is installed under Windows 7.<p> The OS X version stores its xml folder in the /Applications/adbFire/xml directory.<p> Three xml files for the Fire TV remote are included with adbFire (source: XBMC Wiki). Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
+<p>
+The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>
+<p>
+The <b>"Root Fire TV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 1.0 to the FireTV. You must complete the process by going to FireTV settings and running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
+<p>
+<p>
+External files required by adbFire are located in folder "adbfiles", located wherever adbFire is installed under Windows. The OS X version stores its ancillary folder in the /Applications/adbFire directory. The adb binaries and dlls are part of the Android SDK.
+<p>
+adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire
+
+If you have questions or comments, please email jocala@jocala.com
+</body></html>

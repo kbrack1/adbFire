@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/adbfire.html</file>
+    </qresource>
+</RCC>
