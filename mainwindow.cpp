@@ -301,6 +301,7 @@ void MainWindow::on_uninstall_Button_clicked()
 
 QString package = "";
 QString cstring;
+bool keepbox = false;
 
     if (!isConnected)
            { QMessageBox::critical(
@@ -318,6 +319,7 @@ QString cstring;
     {
 
     package = dialog.packageName();
+    keepbox = dialog.keepBox();
 
     }
 
@@ -341,8 +343,10 @@ QString cstring;
                       QProcess *uninstall_package=new QProcess;
                       uninstall_package->setProcessChannelMode(QProcess::MergedChannels);
 
-                      cstring = adb + " -s " +daddr+port+ " uninstall " + package;
-
+                      if (!keepbox)
+                      cstring = adb + " -s " +daddr+port+ " shell pm uninstall " + package;
+                      else
+                      cstring = adb + " -s " +daddr+port+ " shell pm uninstall -k " + package;
 
                       uninstall_package->start(cstring);
 
@@ -350,13 +354,13 @@ QString cstring;
                       command=uninstall_package->readAll();
                       delete uninstall_package;
 
-                      if (command.contains("Failure"))
+                      if (!command.contains("Success"))
                        QMessageBox::critical(
                                       this,
                                      "",
                                       "Uninstall failed");
                           else
-                           QMessageBox::information(
+                          QMessageBox::information(
                                       this,
                                       "",
                                       "Uninstalled");

@@ -18,6 +18,11 @@ public:
 public:
    QString packageName();
 
+public:
+   bool keepBox();
+
+private slots:
+   void on_pushButton_clicked();
 
 private:
     Ui::uninstallDialog *ui;

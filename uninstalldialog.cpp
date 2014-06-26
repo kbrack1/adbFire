@@ -5,6 +5,10 @@ QString uninstallDialog::packageName() {
    return ui->packagename->text();
 }
 
+bool uninstallDialog::keepBox() {
+   return ui->keepBox->isChecked();
+}
+
 uninstallDialog::uninstallDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::uninstallDialog)
@@ -20,3 +24,8 @@ uninstallDialog::~uninstallDialog()
     delete ui;
 }
 
+
+void uninstallDialog::on_pushButton_clicked()
+{
+
+}

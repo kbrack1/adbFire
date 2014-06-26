@@ -282,9 +282,9 @@
      </rect>
     </property>
     <property name="title">
-     <string>Application actions</string>
+     <string>Application processes</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -359,13 +359,6 @@
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
-   <zorder>consoleButton</zorder>
-   <zorder>sideload_Button</zorder>
-   <zorder>uninstall_Button</zorder>
-   <zorder>backupButton</zorder>
-   <zorder>restoreButton</zorder>
-   <zorder>pushRemote</zorder>
-   <zorder>rootButton</zorder>
    <zorder>groupBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
