@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>322</width>
-    <height>176</height>
+    <width>305</width>
+    <height>171</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Uninstall APK</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>31</x>
-     <y>21</y>
+     <x>33</x>
+     <y>24</y>
      <width>232</width>
-     <height>121</height>
+     <height>128</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -27,13 +27,13 @@
      <widget class="QLabel" name="label">
       <property name="font">
        <font>
-        <pointsize>18</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="text">
-       <string>Uninstall APK</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;Uninstall APK&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
@@ -45,11 +45,25 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QLineEdit" name="packagename">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLineEdit" name="packagename">
+          <property name="toolTip">
+           <string>enter package name</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="keepBox">
         <property name="toolTip">
-         <string>enter package name</string>
+         <string>keep application data</string>
+        </property>
+        <property name="text">
+         <string>-k</string>
         </property>
        </widget>
       </item>
@@ -74,22 +88,6 @@
      </layout>
     </item>
    </layout>
-  </widget>
-  <widget class="QCheckBox" name="keepBox">
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>80</y>
-     <width>41</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>keep application data</string>
-   </property>
-   <property name="text">
-    <string>-k</string>
-   </property>
   </widget>
  </widget>
  <resources/>

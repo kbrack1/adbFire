@@ -23,6 +23,7 @@ bool isConnected = false;
 bool serverRunning = false;
 bool  is_packageInstalled = false;
 bool ok = false;
+bool firstrun=true;
 
 QString filename = "";
 QString command = "";
@@ -39,6 +40,7 @@ QString sldir = "";
 QString pushdir = "";
 QString port = ":5555";
 
+int tsvalue = 4000;
 
 QString dbstring;
 bool dbexists = false;
@@ -210,19 +212,19 @@ void readTables()
 
  if (os == 1)
     {
-     adbdir = "./adbfiles/";
-     adb = "./adbfiles/adb.exe";
-     dbstring = "./adbfiles/adbfire.db";
-     xmldir = "./adbfiles/xml/";
+     adbdir = "./";
+     adb = "./adb.exe";
+     dbstring = "./adbfire.db";
+     xmldir = "./xml/";
     }
 
 
   if (os == 2)
     {
-     adb = "/Applications/adbFire/adbfiles/adb";
-     adbdir = "/Applications/adbFire/adbfiles/";
-     dbstring = "/Applications/adbFire/adbfiles/adbfire.db";
-     xmldir = "/Applications/adbFire/adbfiles/xml/";
+     adb = "/Applications/adbFire-beta3/adb";
+     adbdir = "/Applications/adbFire-beta3/";
+     dbstring = "/Applications/adbFire-beta3/adbfire.db";
+     xmldir = "/Applications/adbFire-beta3/xml/";
     }
 
   hdir = QDir::homePath();
@@ -274,8 +276,10 @@ void readTables()
     if (serverRunning)
      { ui->server_running->setText(adbstr1);
 
-       if (!daddr.isEmpty())
-            on_connButton_clicked();
+       if (!daddr.isEmpty() && firstrun)
+          {  on_connButton_clicked();
+
+           }
     }
 
     else
@@ -340,6 +344,14 @@ bool keepbox = false;
                      QMessageBox::Yes|QMessageBox::No);
                   if (reply == QMessageBox::Yes) {
 
+                      ui->progressBar->setHidden(false);
+                      ui->progressBar->setValue(0);
+
+                      QTimer *timer = new QTimer(this);
+                      connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+                      timer->start(tsvalue);
+
+
                       QProcess *uninstall_package=new QProcess;
                       uninstall_package->setProcessChannelMode(QProcess::MergedChannels);
 
@@ -350,23 +362,25 @@ bool keepbox = false;
 
                       uninstall_package->start(cstring);
 
-                      uninstall_package->waitForFinished(-1);
+                      while(uninstall_package->state() != QProcess::NotRunning)
+                          qApp->processEvents();
+
                       command=uninstall_package->readAll();
                       delete uninstall_package;
+                      ui->progressBar->setHidden(true);
 
                       if (!command.contains("Success"))
                        QMessageBox::critical(
                                       this,
                                      "",
                                       "Uninstall failed");
-                          else
-                          QMessageBox::information(
+                          else                
+                             QMessageBox::information(
                                       this,
                                       "",
                                       "Uninstalled");
 
                   }
-
 }
 
 
@@ -411,12 +425,14 @@ void MainWindow::on_connButton_clicked()
      }
        else
         { ui->device_connected->setText("  Device not connected.");
+         if (!firstrun)
          QMessageBox::critical(
                       this,
                       tr("adbFire"),
                       tr("Device not connected"));
      }
 
+        firstrun=false;
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -471,7 +487,7 @@ void MainWindow::on_sideload_Button_clicked()
 
           QTimer *timer = new QTimer(this);
           connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-          timer->start(300);
+          timer->start(tsvalue);
 
 
           QProcess *install_apk=new QProcess;
@@ -484,24 +500,24 @@ void MainWindow::on_sideload_Button_clicked()
 
            command=install_apk->readAll();
            delete install_apk;
+           ui->progressBar->setHidden(true);
 
-          if (command.contains("Success"))
-           QMessageBox::information(
+           if (command.contains("Success"))
+              QMessageBox::information(
                           this,
                          "",
                           "Installed");
               else
-               QMessageBox::critical(
+              QMessageBox::critical(
                           this,
                           "",
                           "Install failed");
-
 
           }
 
  }
 
-ui->progressBar->setHidden(true);
+
 
       }
 
@@ -666,7 +682,7 @@ QString hdir = QDir::homePath();
 
        QTimer *timer = new QTimer(this);
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-       timer->start(600);
+       timer->start(tsvalue);
 
 
        QProcess *pull_adb=new QProcess;
@@ -716,8 +732,8 @@ QString hdir = QDir::homePath();
 
      if (os == 1)
         {
-         rootfile1 = "./adbfiles/tr.apk";
-         rootfile2 = "./adbfiles/su.apk";
+         rootfile1 = "./tr.apk";
+         rootfile2 = "./su.apk";
         }
 
 
@@ -774,7 +790,7 @@ QString hdir = QDir::homePath();
 
                               QTimer *timer = new QTimer(this);
                               connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-                              timer->start(600);
+                              timer->start(tsvalue);
 
 
 
@@ -814,6 +830,7 @@ QString hdir = QDir::homePath();
 
                                      command=install_apk2->readAll();
                                      delete install_apk2;
+                                     ui->progressBar->setHidden(true);
 
                                      if (!command.contains("Success"))
                                         { QMessageBox::information(
@@ -833,7 +850,7 @@ QString hdir = QDir::homePath();
  }
 
 
-  ui->progressBar->setHidden(true);
+
 
 
  }
@@ -1134,14 +1151,17 @@ void MainWindow::on_restoreButton_clicked()
 
        QTimer *timer = new QTimer(this);
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-       timer->start(600);
+       timer->start(tsvalue);
 
 
        QProcess *rm_dir=new QProcess;
        rm_dir->setProcessChannelMode(QProcess::MergedChannels);
        cstring = adb + " -s " + daddr + port + " shell rm -r "+xpath +"org.xbmc.xbmc";
        rm_dir->start(cstring);
-       rm_dir->waitForFinished(-1);
+
+       while(rm_dir->state() != QProcess::NotRunning)
+           qApp->processEvents();
+
        command = rm_dir->readAll();
        delete rm_dir;
 
@@ -1152,13 +1172,12 @@ void MainWindow::on_restoreButton_clicked()
 
        restore_xbmc->start(cstring);
 
-       // push_adb->waitForFinished(-1);
-
         while(restore_xbmc->state() != QProcess::NotRunning)
             qApp->processEvents();
 
         command = restore_xbmc->readAll();
         delete restore_xbmc;
+        ui->progressBar->setHidden(true);
 
        if (command.contains("bytes"))
         QMessageBox::information(
@@ -1176,7 +1195,7 @@ void MainWindow::on_restoreButton_clicked()
 
    }
 
- ui->progressBar->setHidden(true);
+
 
 }
 
@@ -1275,28 +1294,28 @@ QString  xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/keymap
 void MainWindow::on_consoleButton_clicked()
 {
 
-
     if (!isConnected)
           { QMessageBox::critical(
                 this,
                 "adbFire",
                 devstr2);
-             return;
+          return;
        }
 
-
-  QString program = "";
+QString cstring = "";
 
     if (os == 1)
        {
-       program =  "cmd.exe /c adb shell";
+       cstring = "cmd /k adb -s "  + daddr + port + " shell";
+       QProcess::startDetached(cstring);
        }
 
 
      if (os == 2)
        {
-         program =  "open -a /Applications/adbFire/adbfiles/startadb.app";
+         cstring =  "open /Applications/adbFire-beta3/startadb.app";
+         QProcess::startDetached(cstring);
        }
 
-      QProcess::startDetached(program);
+
 }

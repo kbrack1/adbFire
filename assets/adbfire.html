@@ -1,18 +1,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire</b></u> is a companion program for FireTV XBMC, (Gotham and later only). It allows you to
-sideload XBMC and other apps without the hassle of downloading the Android SDK and other tools. <p>Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the FireTV and more. <p>
+<u><b>adbFire</b></u> is a companion program for Android XBMC, (13.X Gotham and later only). It allows you to
+install XBMC and other apps to your Android device without the hassle of downloading the Android SDK. <p>
 
+Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the Amazon Fire TV (51.1.1.0 or earlier) and more. <p>
+<b><u>adbFire</u></b> has been successfully tested on Samsung cell phones and tablets and the Amazon Fire TV.<p>
 
-At startup you should see "ADB running" on the status bar. If you don't, click "Start" in the ADB server group.
+At startup  "ADB running" is displayed the status bar. If it's not, click "Start" in the ADB server group.
 <p>
-Enter your device IP or name into the text box (e.g. 192.168.1.110 or mydevice). This address is "sticky", it will be remembered for future runs.<p>
+Enter the Android device IP or name into the text box (e.g. 192.168.1.110, or mydevice, if you have assigned your device a name). This address is "sticky", it will be remembered for future runs.<p>
 <p>
-Click "Connect". You should see "Device connected" on the status bar. If you don't, double-check your entry in the text box. When you establish a successful connection, adbFire will remember it for your next session.
+Click "Connect". You should see "Device connected" on the status bar. If you don't, double-check your entry in the text box. When you establish a successful connection, <b><u>adbFire</b></u> will remember it for your next session.
 
 <p><b>If you're unable
- to start the ADB server and connect to the Fire TV, this program will be non-functional.
+ to start the ADB server and connect to your Android device, this program will be non-functional. Please contact the author, jocala@jocala.com so your problem can be fixed!
 </b><p>
 
 
@@ -34,23 +36,28 @@ To pull files from XBMC select the source folder from the dropdown widget, then 
 
 
 <b><u>Application processes</u></b><br>
-The <b>"Install APK" </b> button installs or "sideloads"  apps. Click it and choose the APK file you want to installed. The apk folder is "sticky", it will be remembered for future runs.
+The <b>"Install APK" </b> button installs or "sideloads"  apps. Click it and choose the APK file you want installed. All installs are done with the "-r" flag. <p>
+This has the effect of preserving a previously installed app's data. It has no effect when installing a new app. If you require a "clean" install of an existing app, uninstall it first.
 <p>
-To uninstall apps from the Fire TV press <b>"Uninstall APK"</b>, then enter the package name (e.g. org.xbmc.xbmc) to be uninstalled. To retain application data tick the "-k" checkbox. Data retention has only been tested with XBMC.
+The apk folder is "sticky", it will be remembered for future runs.
+<p>
+The  <b>"Uninstall APK"</b> button uninstalls apps from yout Android device. Enter the package name (e.g. org.xbmc.xbmc) to be uninstalled. To retain application data tick the "-k" checkbox. Data retention has only been tested with XBMC.
 <p>
 The <b>"Backup XBMC"</b> button backs up the org.xbmc.xbmc folder on the Fire TV. Please note that XBMC <u>MUST</u> have been run for the first time before using this function. Empty directories are not backed up.
 <p>
 
 The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc to the the Fire TV.
 <p>
-The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder called "xml",located wherever adbFire is installed under Windows 7.<p> The OS X version stores its xml folder in the /Applications/adbFire/xml directory.<p> Three xml files for the Fire TV remote are included with adbFire (source: XBMC Wiki). Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
+The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbFire</b></u> installation folder, Three xml files for the Fire TV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
-The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>
+The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a Fire TV. <p>
 <p>
-The <b>"Root Fire TV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 1.0 to the FireTV. You must complete the process by going to FireTV settings and running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
+The <b>"Root Fire TV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 1.0. You must complete the process by going to FireTV settings and running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
 <p>
 <p>
-External files required by adbFire are located in folder "adbfiles", located wherever adbFire is installed under Windows. The OS X version stores its ancillary folder in the /Applications/adbFire directory. The adb binaries and dlls are part of the Android SDK.
+The <b><u>adbFire</b></u> binary and its external files are located in adbFire's installation folder. For beta 3, the folder is adbfire-beta3.  Under OS X, the folder adbfire-beta3 must be located in the standard location /Applications.  Don't move the folder from /Applications, the program will fail.<p>
+<p>
+The adb binaries and dlls are part of the Android SDK.
 <p>
 adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire
 
