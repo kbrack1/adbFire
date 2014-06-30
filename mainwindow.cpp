@@ -17,6 +17,8 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
+#include <preferencesdialog.h>
+
 // #include <QDebug>
 
 bool isConnected = false;
@@ -39,6 +41,7 @@ QString daddr="";
 QString sldir = "";
 QString pushdir = "";
 QString port = ":5555";
+QString xbmcpackage ="";
 
 int tsvalue = 4000;
 
@@ -128,8 +131,8 @@ void createTables()
 {
 
     QSqlQuery query;
-    query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100) )");
-    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"')");
+    query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),xbmcpackage varchar(50) )");
+    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','org.xbmc.xbmc')");
 
 
 
@@ -148,6 +151,9 @@ void updateTables()
 
      sqlstatement = "UPDATE device SET pushdir='"+pushdir+"' WHERE Id=1";
       query.exec(sqlstatement);
+
+      sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"' WHERE Id=1";
+       query.exec(sqlstatement);
 
 }
 
@@ -175,8 +181,23 @@ void readTables()
            }
 
 
-           // qDebug() << query.isSelect();
-    // qDebug() << query.isValid();
+            while (query.next()) {
+                  xbmcpackage = query.value(0).toString();
+            }
+
+
+     if (sldir.isEmpty())
+         sldir = hdir;
+
+     if (sldir.isEmpty())
+      pushdir = hdir;
+
+     if (xbmcpackage.isEmpty())
+         xbmcpackage = "org.xbmc.xbmc";
+
+
+   // qDebug() << query.isSelect();
+   // qDebug() << query.isValid();
 
 }
 
@@ -213,18 +234,19 @@ void readTables()
  if (os == 1)
     {
      adbdir = "./";
-     adb = "./adb.exe";
-     dbstring = "./adbfire.db";
-     xmldir = "./xml/";
+     adb = adbdir+"adb.exe";
+     dbstring = adbdir+"adbfire.db";
+     xmldir = adbdir+"xml/";
     }
 
 
   if (os == 2)
     {
-     adb = "/Applications/adbFire-beta3/adb";
-     adbdir = "/Applications/adbFire-beta3/";
-     dbstring = "/Applications/adbFire-beta3/adbfire.db";
-     xmldir = "/Applications/adbFire-beta3/xml/";
+     adbdir = "/Applications/adbFire/";
+     adb = adbdir+"adb";
+
+     dbstring = adbdir+"adbfire.db";
+     xmldir = adbdir+"xml/";
     }
 
   hdir = QDir::homePath();
@@ -246,8 +268,8 @@ void readTables()
 
   if (!db.open()) {
       QMessageBox::critical(0, qApp->tr("Cannot open database"),
-          qApp->tr("Unable to establish a database connection.\n"
-                   ), QMessageBox::Cancel);
+          "Database error:\n"+dbstring
+                   , QMessageBox::Cancel);
 
   }
 
@@ -646,7 +668,7 @@ void MainWindow::on_backupButton_clicked()
           return;
     }
 
-    is_package("org.xbmc.xbmc");
+    is_package(xbmcpackage);
 
    if (!is_packageInstalled)
       { QMessageBox::critical(
@@ -659,7 +681,7 @@ void MainWindow::on_backupButton_clicked()
 
 QString hdir = QDir::homePath();
  command = "";
- QString xpath = "/sdcard/Android/data/org.xbmc.xbmc";
+ QString xpath = "/sdcard/Android/data/"+xbmcpackage;
 
  QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Destination"),
                                               hdir,
@@ -727,23 +749,8 @@ QString hdir = QDir::homePath();
  void MainWindow::on_rootButton_clicked()
  {
 
-     QString rootfile1;
-     QString rootfile2;
-
-     if (os == 1)
-        {
-         rootfile1 = "./tr.apk";
-         rootfile2 = "./su.apk";
-        }
-
-
-     if (os == 2)
-       {
-         rootfile1 = "/Applications/adbFire/adbfiles/tr.apk";
-         rootfile2 = "/Applications/adbFire/adbfiles/su.apk";
-        }
-
-
+     QString rootfile1 = adbdir+"tr.apk";
+     QString rootfile2 = adbdir+"su.apk";
 
      bool file1 = false;
      bool file2 = false;
@@ -869,7 +876,7 @@ void MainWindow::on_fpushButton_clicked()
           return;
     }
 
-    is_package("org.xbmc.xbmc");
+    is_package(xbmcpackage);
 
    if (!is_packageInstalled)
       { QMessageBox::critical(
@@ -887,19 +894,19 @@ void MainWindow::on_fpushButton_clicked()
 
 switch(ui->comboBox->currentIndex() ){
 case 0:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/addons/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
 break;
 
 case 1:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/keymaps";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps";
 break;
 
 case 2:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/media/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
 break;
 
 case 3:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/sounds/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/sounds/";
 break;
 
 case 4:
@@ -907,15 +914,15 @@ xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/system/";
 break;
 
 case 5:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/";
 break;
 
 case 6:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/temp/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
 break;
 
 default:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/addons/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
 break;
 }
 
@@ -1006,7 +1013,7 @@ void MainWindow::on_fpullButton_clicked()
              return;
        }
 
-       is_package("org.xbmc.xbmc");
+       is_package(xbmcpackage);
 
       if (!is_packageInstalled)
          { QMessageBox::critical(
@@ -1022,35 +1029,35 @@ void MainWindow::on_fpullButton_clicked()
 
      switch(ui->comboBox->currentIndex() ){
      case 0:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
      break;
 
      case 1:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/keymaps/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps/";
      break;
 
      case 2:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/media/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
      break;
 
      case 3:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/sounds/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/sounds/";
      break;
 
      case 4:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/system/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/system/";
      break;
 
      case 5:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/";
      break;
 
      case 6:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/temp/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
      break;
 
      default:
-     xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
      break;
      }
 
@@ -1113,7 +1120,7 @@ void MainWindow::on_restoreButton_clicked()
           return;
     }
 
-    is_package("org.xbmc.xbmc");
+    is_package(xbmcpackage);
 
    if (!is_packageInstalled)
       { QMessageBox::critical(
@@ -1156,7 +1163,7 @@ void MainWindow::on_restoreButton_clicked()
 
        QProcess *rm_dir=new QProcess;
        rm_dir->setProcessChannelMode(QProcess::MergedChannels);
-       cstring = adb + " -s " + daddr + port + " shell rm -r "+xpath +"org.xbmc.xbmc";
+       cstring = adb + " -s " + daddr + port + " shell rm -r "+xpath +xbmcpackage;
        rm_dir->start(cstring);
 
        while(rm_dir->state() != QProcess::NotRunning)
@@ -1168,7 +1175,7 @@ void MainWindow::on_restoreButton_clicked()
        QProcess *restore_xbmc=new QProcess;
        restore_xbmc->setProcessChannelMode(QProcess::MergedChannels);
 
-       cstring = adb + " -s " + daddr + port +  " push "+'"'+dir+'"'+ " "+xpath+"/org.xbmc.xbmc";
+       cstring = adb + " -s " + daddr + port +  " push "+'"'+dir+'"'+ " "+xpath+xbmcpackage;
 
        restore_xbmc->start(cstring);
 
@@ -1212,7 +1219,7 @@ void MainWindow::on_pushRemote_clicked()
           return;
     }
 
-    is_package("org.xbmc.xbmc");
+    is_package(xbmcpackage);
 
    if (!is_packageInstalled)
       { QMessageBox::critical(
@@ -1223,7 +1230,7 @@ void MainWindow::on_pushRemote_clicked()
    }
 
 
-QString  xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/userdata/keymaps/";
+QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps/";
 
 
  QString fileName = QFileDialog::getOpenFileName(this,
@@ -1313,9 +1320,29 @@ QString cstring = "";
 
      if (os == 2)
        {
-         cstring =  "open /Applications/adbFire-beta3/startadb.app";
+         cstring =  "open "+adbdir+"startadb.app";
          QProcess::startDetached(cstring);
        }
 
+
+}
+
+//////////////////////////////////////////////////
+void MainWindow::on_actionPreferences_triggered()
+{
+    preferencesDialog dialog;
+    dialog.setPackagename(xbmcpackage);
+    dialog.setModal(true);
+
+
+    if(dialog.exec() == QDialog::Accepted)
+    {
+
+    xbmcpackage = dialog.xbmcpackageName();
+
+
+    }
+
+   else return;
 
 }

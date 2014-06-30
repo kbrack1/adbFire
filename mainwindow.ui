@@ -367,13 +367,14 @@
      <x>0</x>
      <y>0</y>
      <width>562</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionPreferences"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
@@ -417,6 +418,14 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+   <property name="toolTip">
+    <string>Preferences</string>
    </property>
   </action>
  </widget>

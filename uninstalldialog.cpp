@@ -24,8 +24,3 @@ uninstallDialog::~uninstallDialog()
     delete ui;
 }
 
-
-void uninstallDialog::on_pushButton_clicked()
-{
-
-}

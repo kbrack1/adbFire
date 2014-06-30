@@ -15,19 +15,22 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     dialog2.cpp \
     helpdialog.cpp \
-    uninstalldialog.cpp
+    uninstalldialog.cpp \
+    preferencesdialog.cpp
 
 RESOURCES = adbFire.qrc
 
 HEADERS  += mainwindow.h \
     dialog2.h \
     helpdialog.h \
-    uninstalldialog.h
+    uninstalldialog.h \
+    preferencesdialog.h
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
     helpdialog.ui \
-    uninstalldialog.ui
+    uninstalldialog.ui \
+    preferencesdialog.ui
 
 RC_FILE = adbFire.rc
 

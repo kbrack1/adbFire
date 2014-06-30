@@ -51,6 +51,8 @@ private slots:
 
     void on_consoleButton_clicked();
 
+    void on_actionPreferences_triggered();
+
 private:
     Ui::MainWindow *ui;
 };
