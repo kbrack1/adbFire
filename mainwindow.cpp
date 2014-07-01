@@ -132,7 +132,7 @@ void createTables()
 
     QSqlQuery query;
     query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),xbmcpackage varchar(50) )");
-    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','org.xbmc.xbmc')");
+    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','.xbmc')");
 
 
 
@@ -181,6 +181,7 @@ void readTables()
            }
 
 
+            query.exec("SELECT xbmcpackage FROM device");
             while (query.next()) {
                   xbmcpackage = query.value(0).toString();
             }
@@ -1320,7 +1321,7 @@ QString cstring = "";
 
      if (os == 2)
        {
-         cstring =  "open "+adbdir+"startadb.app";
+        cstring =  "open "+adbdir+"startadb.app";
          QProcess::startDetached(cstring);
        }
 
@@ -1340,6 +1341,9 @@ void MainWindow::on_actionPreferences_triggered()
 
     xbmcpackage = dialog.xbmcpackageName();
 
+    QSqlQuery query;
+    QString sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"' WHERE Id=1";
+    query.exec(sqlstatement);
 
     }
 
