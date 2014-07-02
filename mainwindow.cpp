@@ -40,6 +40,7 @@ QString hdir = "";
 QString daddr="";
 QString sldir = "";
 QString pushdir = "";
+QString pulldir = "";
 QString port = ":5555";
 QString xbmcpackage ="";
 
@@ -131,10 +132,8 @@ void createTables()
 {
 
     QSqlQuery query;
-    query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),xbmcpackage varchar(50) )");
-    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','.xbmc')");
-
-
+    query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) )");
+    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc' )");
 
 }
 
@@ -143,6 +142,7 @@ void createTables()
 void updateTables()
 {
     QSqlQuery query;
+
     QString sqlstatement = "UPDATE device SET name='"+daddr+"' WHERE Id=1";
     query.exec(sqlstatement);
 
@@ -152,8 +152,13 @@ void updateTables()
      sqlstatement = "UPDATE device SET pushdir='"+pushdir+"' WHERE Id=1";
       query.exec(sqlstatement);
 
+      sqlstatement = "UPDATE device SET pulldir='"+pulldir+"' WHERE Id=1";
+       query.exec(sqlstatement);
+
       sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"' WHERE Id=1";
        query.exec(sqlstatement);
+
+
 
 }
 
@@ -181,6 +186,11 @@ void readTables()
            }
 
 
+            query.exec("SELECT pulldir FROM device");
+            while (query.next()) {
+                  pulldir = query.value(0).toString();
+            }
+
             query.exec("SELECT xbmcpackage FROM device");
             while (query.next()) {
                   xbmcpackage = query.value(0).toString();
@@ -190,8 +200,11 @@ void readTables()
      if (sldir.isEmpty())
          sldir = hdir;
 
-     if (sldir.isEmpty())
+     if (pushdir.isEmpty())
       pushdir = hdir;
+
+     if (pulldir.isEmpty())
+      pulldir = hdir;
 
      if (xbmcpackage.isEmpty())
          xbmcpackage = "org.xbmc.xbmc";
@@ -307,9 +320,6 @@ void readTables()
 
     else
      ui->server_running->setText(adbstr2);
-
-
-
 
 }
 
@@ -955,7 +965,7 @@ break;
        { QMessageBox::critical(
                       this,
                      "",
-                      "Destination path missing");
+                      "Destination path missing. Has XBMC had its first run to set up internal folders?");
                       return;
       }
 
@@ -1024,7 +1034,8 @@ void MainWindow::on_fpullButton_clicked()
             return;
          }
 
-     QString pulldir = QDir::homePath();
+     // QString pulldir = QDir::homePath();
+
      QString xpath = "";
      QString cname = ui->comboBox->currentText();
 
@@ -1321,7 +1332,8 @@ QString cstring = "";
 
      if (os == 2)
        {
-        cstring =  "open "+adbdir+"startadb.app";
+         cstring =  "open "+adbdir+"startadb.app";
+        // cstring =  "ssh bignas1";
          QProcess::startDetached(cstring);
        }
 
@@ -1333,6 +1345,7 @@ void MainWindow::on_actionPreferences_triggered()
 {
     preferencesDialog dialog;
     dialog.setPackagename(xbmcpackage);
+    dialog.setPulldir(pulldir);
     dialog.setModal(true);
 
 
@@ -1340,10 +1353,8 @@ void MainWindow::on_actionPreferences_triggered()
     {
 
     xbmcpackage = dialog.xbmcpackageName();
-
-    QSqlQuery query;
-    QString sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"' WHERE Id=1";
-    query.exec(sqlstatement);
+    pulldir = dialog.pulldir();
+    updateTables();
 
     }
 
