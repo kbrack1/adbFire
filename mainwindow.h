@@ -53,6 +53,23 @@ private slots:
 
     void on_actionPreferences_triggered();
 
+    void on_actionReboot_triggered();
+
+    void on_actionRecovery_triggered();
+
+    void on_screenshotButton_clicked();
+
+    void on_actionUpdates_on_triggered();
+
+    void on_actionUpdates_off_triggered();
+
+    void on_actionMount_system_rw_triggered();
+
+    void on_actionMount_systen_ro_triggered();
+
+
+    void on_actionInstall_busybox_triggered();
+
 private:
     Ui::MainWindow *ui;
 };

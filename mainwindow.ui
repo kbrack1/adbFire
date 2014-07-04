@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>398</height>
+    <width>583</width>
+    <height>444</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -45,8 +45,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>410</y>
+      <x>40</x>
+      <y>470</y>
       <width>118</width>
       <height>16</height>
      </rect>
@@ -61,8 +61,8 @@
    <widget class="QLabel" name="server_running">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>410</y>
+      <x>180</x>
+      <y>470</y>
       <width>148</width>
       <height>16</height>
      </rect>
@@ -74,8 +74,8 @@
    <widget class="QLabel" name="device_connected">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>410</y>
+      <x>320</x>
+      <y>470</y>
       <width>136</width>
       <height>16</height>
      </rect>
@@ -94,7 +94,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>Fire TV address</string>
+     <string>Device address</string>
     </property>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
@@ -150,7 +150,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>240</y>
+      <y>250</y>
       <width>311</width>
       <height>71</height>
      </rect>
@@ -231,7 +231,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>150</y>
+      <y>160</y>
       <width>231</width>
       <height>71</height>
      </rect>
@@ -276,21 +276,21 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>40</y>
-      <width>161</width>
-      <height>271</height>
+      <y>30</y>
+      <width>151</width>
+      <height>331</height>
      </rect>
     </property>
     <property name="title">
      <string>Application processes</string>
     </property>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>30</y>
        <width>130</width>
-       <height>240</height>
+       <height>270</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -336,6 +336,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="screenshotButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Screen shot</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="consoleButton">
         <property name="text">
          <string>ADB Shell</string>
@@ -360,13 +370,21 @@
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
+   <zorder>sideload_Button</zorder>
+   <zorder>uninstall_Button</zorder>
+   <zorder>backupButton</zorder>
+   <zorder>restoreButton</zorder>
+   <zorder>pushRemote</zorder>
+   <zorder>screenshotButton</zorder>
+   <zorder>consoleButton</zorder>
+   <zorder>rootButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>562</width>
+     <width>583</width>
      <height>22</height>
     </rect>
    </property>
@@ -376,6 +394,13 @@
     </property>
     <addaction name="actionPreferences"/>
     <addaction name="actionQuit"/>
+    <addaction name="actionReboot"/>
+    <addaction name="actionRecovery"/>
+    <addaction name="actionUpdates_on"/>
+    <addaction name="actionUpdates_off"/>
+    <addaction name="actionMount_system_rw"/>
+    <addaction name="actionMount_systen_ro"/>
+    <addaction name="actionInstall_busybox"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -426,6 +451,50 @@
    </property>
    <property name="toolTip">
     <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionReboot">
+   <property name="text">
+    <string>Reboot device</string>
+   </property>
+  </action>
+  <action name="actionRecovery">
+   <property name="text">
+    <string>Reboot recovery</string>
+   </property>
+   <property name="toolTip">
+    <string>Reboot Recovery</string>
+   </property>
+  </action>
+  <action name="actionUpdates_on">
+   <property name="text">
+    <string>Fire TV updates on</string>
+   </property>
+   <property name="toolTip">
+    <string>Amazon updates on</string>
+   </property>
+  </action>
+  <action name="actionUpdates_off">
+   <property name="text">
+    <string>Fire TV updates off</string>
+   </property>
+   <property name="toolTip">
+    <string>Amazon updates off</string>
+   </property>
+  </action>
+  <action name="actionMount_system_rw">
+   <property name="text">
+    <string>Mount system r/w</string>
+   </property>
+  </action>
+  <action name="actionMount_systen_ro">
+   <property name="text">
+    <string>Mount system r/o</string>
+   </property>
+  </action>
+  <action name="actionInstall_busybox">
+   <property name="text">
+    <string>Install busybox</string>
    </property>
   </action>
  </widget>

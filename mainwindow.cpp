@@ -24,6 +24,8 @@
 bool isConnected = false;
 bool serverRunning = false;
 bool  is_packageInstalled = false;
+bool  mounted_op = false;
+
 bool ok = false;
 bool firstrun=true;
 
@@ -125,6 +127,67 @@ bool is_package(QString package)
 
         return  is_packageInstalled;
 }
+
+
+
+
+/////////////////////////////////////////////////////
+bool mount_system(QString mnt)
+{
+
+
+    QProcess *mount_system=new QProcess;
+       mount_system->setProcessChannelMode(QProcess::MergedChannels);
+       QString cstring = adb + " -s " +daddr+port+ " shell su -c mount -o remount,"+mnt+ " /system";
+       mount_system->start(cstring);
+       mount_system->waitForFinished(-1);
+       command=mount_system->readAll();
+       delete mount_system;
+
+
+
+
+
+        if (command.isEmpty())
+           return true;
+            else
+            return false;
+
+        // return  mounted_op;
+
+
+}
+
+
+/////////////////////////////////////////////////////
+bool amazon_updates(QString onoff)
+{
+
+       QProcess *update_policy=new QProcess;
+       update_policy->setProcessChannelMode(QProcess::MergedChannels);
+       QString cstring = adb + " -s " + daddr+port + " shell su -c pm "+ onoff + " com.amazon.dcp";
+       update_policy->start(cstring);
+       update_policy->waitForFinished(-1);
+       command=update_policy->readAll();
+       delete update_policy;
+
+
+        if (onoff == "enable")
+           { if (command.contains("enabled"))
+               return true;
+            else return false;
+           }
+
+        if (onoff == "disable")
+           { if (command.contains("disabled"))
+               return true;
+            else return false;
+           }
+
+        return false;
+}
+
+
 
 
 ////////////////////////////////
@@ -1332,10 +1395,9 @@ QString cstring = "";
 
      if (os == 2)
        {
-         cstring =  "open "+adbdir+"startadb.app";
-        // cstring =  "ssh bignas1";
-         QProcess::startDetached(cstring);
-       }
+        cstring = "open -a Terminal.app /Applications/adbFire/console.sh";
+        QProcess::startDetached(cstring);
+        }
 
 
 }
@@ -1359,5 +1421,401 @@ void MainWindow::on_actionPreferences_triggered()
     }
 
    else return;
+
+}
+
+/////////////////////////////////////////////
+void MainWindow::on_actionReboot_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+   QMessageBox::StandardButton reply;
+     reply = QMessageBox::question(this, "Reboot Device", "Reboot Device?",
+         QMessageBox::Yes|QMessageBox::No);
+     if (reply == QMessageBox::Yes) {
+         isConnected=false;
+         ui->device_connected->setText(devstr2);
+         QString cstring = adb + " reboot";
+         QProcess::startDetached(cstring);
+     }
+
+}
+
+///////////////////////////////////////////////
+void MainWindow::on_actionRecovery_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+   QMessageBox::StandardButton reply;
+     reply = QMessageBox::question(this, "Reboot Recovery", "Reboot to Recovery?",
+         QMessageBox::Yes|QMessageBox::No);
+     if (reply == QMessageBox::Yes) {
+
+         isConnected=false;
+         ui->device_connected->setText(devstr2);
+
+         QString cstring = adb + " reboot recovery";
+         QProcess::startDetached(cstring);
+     }
+
+
+
+}
+
+///////////////////////////////////////////////
+void MainWindow::on_screenshotButton_clicked()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    QProcess *screen_shot=new QProcess;
+    screen_shot->setProcessChannelMode(QProcess::MergedChannels);
+    QString cstring = adb +" -s " + daddr+port +" shell screencap -p /sdcard/screen.png";
+    screen_shot->start(cstring);
+    screen_shot->waitForFinished(-1);
+    command=screen_shot->readAll();
+    delete screen_shot;
+
+    if (!command.isEmpty())
+     QMessageBox::critical(
+                    this,
+                   "",
+                    "Screenshot failed");
+
+}
+
+
+
+////////////////////////////////////////////////
+void MainWindow::on_actionUpdates_on_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+   if (amazon_updates("enable"))
+    QMessageBox::information(
+                   this,
+                  "",
+                   "com.amazon.dcp enabled");
+    else
+
+       QMessageBox::critical(
+                      this,
+                     "",
+                      "com.amazon.dcp not enabled!");
+
+
+}
+
+
+/////////////////////////////////////////////////
+void MainWindow::on_actionUpdates_off_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+
+
+
+   if (amazon_updates("disable"))
+    QMessageBox::information(
+                   this,
+                  "",
+                   "com.amazon.dcp disabled");
+    else
+
+       QMessageBox::critical(
+                      this,
+                     "",
+                      "com.amazon.dcp not disabled!");
+
+
+}
+
+
+/////////////////////////////////////////////////////
+void MainWindow::on_actionMount_system_rw_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+
+
+   if (mount_system("rw"))
+    QMessageBox::information(
+                   this,
+                  "",
+                   "/system mounted r/w");
+    else
+
+       QMessageBox::critical(
+                      this,
+                     "",
+                      "/system not remounted!!");
+
+
+}
+
+
+
+
+/////////////////////////////////////////////////////
+void MainWindow::on_actionMount_systen_ro_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+   if (mount_system("ro"))
+    QMessageBox::information(
+                   this,
+                  "",
+                   "/system mounted r/o");
+    else
+
+       QMessageBox::critical(
+                      this,
+                     "",
+                      "/system not remounted!!");
+
+
+
+}
+
+
+//////////////////////////////////////////////////////
+void MainWindow::on_actionInstall_busybox_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+   QString busybox1  = adbdir+"binstall.sh";
+    QString busybox2 = adbdir+"busybox";
+
+
+        bool file1 = false;
+        bool file2 = false;
+
+
+                           QFile Fout1(busybox1);
+
+                           if(!Fout1.exists())
+                           {
+
+                               QMessageBox::critical(
+                                  this,
+                                  tr("adbFire"),
+                                  busybox1+" not found.");
+                                  return;
+                           }
+
+
+                           QFile Fout2(busybox2);
+
+                           if(!Fout2.exists())
+                           {
+
+                               QMessageBox::critical(
+                                  this,
+                                  tr("adbFire"),
+                                  busybox2+" not found.");
+                                  return;
+                           }
+
+
+                           command = "";
+
+
+                                 QProcess *install_apk1=new QProcess;
+                                 QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
+                                  install_apk1->start(cstring);
+
+
+                                   install_apk1->waitForFinished(-1);
+
+                                  command=install_apk1->readAll();
+                                  delete install_apk1;
+
+                                 if (!command.isEmpty())
+                                    { QMessageBox::critical(
+                                                 this,
+                                                 "",
+                                                 "busybox install failed "+command);
+                                      ui->progressBar->setHidden(true);
+                                      return;
+                                    }
+                                 else
+                                     file1 = true;
+
+
+                                     command = "";
+
+
+
+                                       QProcess *install_apk2=new QProcess;
+                                        cstring = adb + " -s " + daddr + port + " push "+busybox2+ " /sdcard/";
+                                        install_apk2->start(cstring);
+
+                                        install_apk2->waitForFinished(-1);
+
+                                        command=install_apk2->readAll();
+                                        delete install_apk2;
+                                        ui->progressBar->setHidden(true);
+
+                                        if (!command.isEmpty())
+                                           { QMessageBox::information(
+                                                        this,
+                                                        "",
+                                                        "busybox install failed2");
+
+                                           }
+                                        else
+                                            file2 = true;
+
+
+
+
+
+
+
+                                        if (file1 && file2)
+    {
+
+     QMessageBox::information( this,"","Busybox installed to system/xbin");
+
+    }
+
+
 
 }
