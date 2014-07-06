@@ -950,15 +950,6 @@ void MainWindow::on_fpushButton_clicked()
           return;
     }
 
-    is_package(xbmcpackage);
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            "XBMC not installed");
-         return;
-   }
 
 
  QString xpath = "";
@@ -1003,6 +994,19 @@ default:
 xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
 break;
 }
+
+
+is_package(xbmcpackage);
+
+if (xpath != "/sdcard/")
+   if (!is_packageInstalled)
+     { QMessageBox::critical(
+           this,
+           "",
+           "XBMC not installed");
+        return;
+     }
+
 
 
  QString fileName = QFileDialog::getOpenFileName(this,
@@ -1091,15 +1095,7 @@ void MainWindow::on_fpullButton_clicked()
              return;
        }
 
-       is_package(xbmcpackage);
 
-      if (!is_packageInstalled)
-         { QMessageBox::critical(
-               this,
-               "",
-               "XBMC not installed");
-            return;
-         }
 
      // QString pulldir = QDir::homePath();
 
@@ -1144,6 +1140,16 @@ void MainWindow::on_fpullButton_clicked()
      break;
      }
 
+     is_package(xbmcpackage);
+
+     if (xpath != "/sdcard/")
+        if (!is_packageInstalled)
+          { QMessageBox::critical(
+                this,
+                "",
+                "XBMC not installed");
+             return;
+          }
 
 
       QString pullfile = QInputDialog::getText(this,"" ,
@@ -1963,7 +1969,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
      command=run_script1->readAll();
      delete run_script1;
 
-/*
+
 
       QProcess *check_dir=new QProcess;
       check_dir->setProcessChannelMode(QProcess::MergedChannels);
@@ -1972,14 +1978,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
       check_dir->waitForFinished(-1);
       command=check_dir->readAll();
       delete check_dir;
-*/
 
-      QProcess check_dir;
-      check_dir.setProcessChannelMode(QProcess::MergedChannels);
-      cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/which";
-      check_dir.start(cstring);
-      check_dir.waitForFinished(-1);
-      command=check_dir.readAll();
 
 
 
@@ -2068,15 +2067,6 @@ void MainWindow::on_fdellButton_clicked()
              return;
        }
 
-       is_package(xbmcpackage);
-
-      if (!is_packageInstalled)
-         { QMessageBox::critical(
-               this,
-               "",
-               "XBMC not installed");
-            return;
-         }
 
 
      QString xpath = "";
@@ -2119,6 +2109,21 @@ void MainWindow::on_fdellButton_clicked()
      xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
      break;
      }
+
+
+
+  is_package(xbmcpackage);
+
+  if (xpath != "/sdcard/")
+     if (!is_packageInstalled)
+       { QMessageBox::critical(
+             this,
+             "",
+             "XBMC not installed");
+          return;
+       }
+
+
 
 
 
