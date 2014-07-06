@@ -6,8 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
+<<<<<<< HEAD
     <width>618</width>
     <height>381</height>
+=======
+    <width>583</width>
+    <height>444</height>
+>>>>>>> parent of 8835d33... changelog to follow
    </rect>
   </property>
   <property name="sizePolicy">
@@ -149,9 +154,9 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>240</y>
-      <width>381</width>
+      <x>30</x>
+      <y>250</y>
+      <width>311</width>
       <height>71</height>
      </rect>
     </property>
@@ -166,7 +171,7 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>339</width>
+       <width>282</width>
        <height>32</height>
       </rect>
      </property>
@@ -208,11 +213,6 @@
           <string>temp</string>
          </property>
         </item>
-        <item>
-         <property name="text">
-          <string>sdcard</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
@@ -226,13 +226,6 @@
        <widget class="QPushButton" name="fpullButton">
         <property name="text">
          <string>Pull</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="fdellButton">
-        <property name="text">
-         <string>Delete</string>
         </property>
        </widget>
       </item>
@@ -287,10 +280,17 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
+<<<<<<< HEAD
       <x>290</x>
       <y>40</y>
       <width>291</width>
       <height>191</height>
+=======
+      <x>360</x>
+      <y>30</y>
+      <width>151</width>
+      <height>331</height>
+>>>>>>> parent of 8835d33... changelog to follow
      </rect>
     </property>
     <property name="title">
@@ -301,8 +301,13 @@
       <rect>
        <x>20</x>
        <y>30</y>
+<<<<<<< HEAD
        <width>127</width>
        <height>134</height>
+=======
+       <width>130</width>
+       <height>270</height>
+>>>>>>> parent of 8835d33... changelog to follow
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -402,17 +407,24 @@
    <zorder>screenshotButton</zorder>
    <zorder>consoleButton</zorder>
    <zorder>rootButton</zorder>
+<<<<<<< HEAD
    <zorder>pushRemote</zorder>
    <zorder>sideload_Button</zorder>
    <zorder>uninstall_Button</zorder>
    <zorder>screenshotButton</zorder>
+=======
+>>>>>>> parent of 8835d33... changelog to follow
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
+<<<<<<< HEAD
      <width>618</width>
+=======
+     <width>583</width>
+>>>>>>> parent of 8835d33... changelog to follow
      <height>22</height>
     </rect>
    </property>
@@ -421,16 +433,14 @@
      <string>File</string>
     </property>
     <addaction name="actionPreferences"/>
+    <addaction name="actionQuit"/>
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
     <addaction name="actionUpdates_on"/>
     <addaction name="actionUpdates_off"/>
     <addaction name="actionMount_system_rw"/>
-    <addaction name="actionMount_system_ro"/>
+    <addaction name="actionMount_systen_ro"/>
     <addaction name="actionInstall_busybox"/>
-    <addaction name="actionUninstall_Busybox"/>
-    <addaction name="separator"/>
-    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -517,19 +527,14 @@
     <string>Mount system r/w</string>
    </property>
   </action>
-  <action name="actionMount_system_ro">
+  <action name="actionMount_systen_ro">
    <property name="text">
     <string>Mount system r/o</string>
    </property>
   </action>
   <action name="actionInstall_busybox">
    <property name="text">
-    <string>Install Busybox</string>
-   </property>
-  </action>
-  <action name="actionUninstall_Busybox">
-   <property name="text">
-    <string>Uninstall Busybox</string>
+    <string>Install busybox</string>
    </property>
   </action>
  </widget>

@@ -979,10 +979,6 @@ case 6:
 xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
 break;
 
-case 7:
-xpath = "/sdcard/";
-break;
-
 default:
 xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
 break;
@@ -1114,10 +1110,6 @@ void MainWindow::on_fpullButton_clicked()
 
      case 6:
      xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
-     break;
-
-     case 7:
-     xpath = "/sdcard/";
      break;
 
      default:
@@ -1509,6 +1501,7 @@ void MainWindow::on_screenshotButton_clicked()
                    "",
                     "Screenshot failed");
 
+<<<<<<< HEAD
     else
     {
 
@@ -1543,6 +1536,8 @@ void MainWindow::on_screenshotButton_clicked()
 
 
 
+=======
+>>>>>>> parent of 8835d33... changelog to follow
 }
 
 
@@ -1675,7 +1670,7 @@ void MainWindow::on_actionMount_system_rw_triggered()
 
 
 /////////////////////////////////////////////////////
-void MainWindow::on_actionMount_system_ro_triggered()
+void MainWindow::on_actionMount_systen_ro_triggered()
 {
 
     if (!isConnected)
@@ -1739,87 +1734,67 @@ void MainWindow::on_actionInstall_busybox_triggered()
    }
 
 
-   QMessageBox::StandardButton reply;
-         reply = QMessageBox::question(this, "Busybox", "Install Busybox?",
-            QMessageBox::Yes|QMessageBox::No);
-         if (reply == QMessageBox::No)
-         return;
-
-
-    QString busybox1  = adbdir+"binstall.sh";
-    QString busybox2 = adbdir+"buninstall.sh";
-    QString busybox3 = adbdir+"busybox";
+   QString busybox1  = adbdir+"binstall.sh";
+    QString busybox2 = adbdir+"busybox";
 
 
         bool file1 = false;
         bool file2 = false;
-        bool file3 = false;
-
-     QFile Fout1(busybox1);
-
-         if(!Fout1.exists())
-            {
-
-            QMessageBox::critical(
-            this,
-            tr("adbFire"),
-            busybox1+" not found.");
-             return;
-             }
 
 
-        QFile Fout2(busybox2);
+                           QFile Fout1(busybox1);
 
-       if(!Fout2.exists())
-          {
+                           if(!Fout1.exists())
+                           {
 
-            QMessageBox::critical(
-             this,
-             tr("adbFire"),
-              busybox2+" not found.");
-             return;
-           }
-
-
-       QFile Fout3(busybox3);
-
-      if(!Fout3.exists())
-         {
-
-           QMessageBox::critical(
-            this,
-            tr("adbFire"),
-             busybox3+" not found.");
-            return;
-          }
-
-    command = "";
+                               QMessageBox::critical(
+                                  this,
+                                  tr("adbFire"),
+                                  busybox1+" not found.");
+                                  return;
+                           }
 
 
+                           QFile Fout2(busybox2);
+
+                           if(!Fout2.exists())
+                           {
+
+                               QMessageBox::critical(
+                                  this,
+                                  tr("adbFire"),
+                                  busybox2+" not found.");
+                                  return;
+                           }
+
+<<<<<<< HEAD
       QProcess install_apk1;
        QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
         install_apk1.start(cstring);
+=======
+>>>>>>> parent of 8835d33... changelog to follow
 
+                           command = "";
 
+<<<<<<< HEAD
         install_apk1.waitForFinished(-1);
 
        command=install_apk1.readAll();
 
+=======
 
-         if (!command.isEmpty())
-           { QMessageBox::critical(
-            this,
-             "",
-             "busybox install failed ");
-              ui->progressBar->setHidden(true);
-             return;
-             }
-            else
-            file1 = true;
+                                 QProcess *install_apk1=new QProcess;
+                                 QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
+                                  install_apk1->start(cstring);
+>>>>>>> parent of 8835d33... changelog to follow
 
 
-             command = "";
+                                   install_apk1->waitForFinished(-1);
 
+                                  command=install_apk1->readAll();
+                                  delete install_apk1;
+
+<<<<<<< HEAD
              QProcess install_apk2;
               cstring = adb + " -s " + daddr + port + " push "+busybox2+ " /sdcard/";
               install_apk2.start(cstring);
@@ -1839,12 +1814,31 @@ void MainWindow::on_actionInstall_busybox_triggered()
                  }
               else
                   file2 = true;
+=======
+                                 if (!command.isEmpty())
+                                    { QMessageBox::critical(
+                                                 this,
+                                                 "",
+                                                 "busybox install failed "+command);
+                                      ui->progressBar->setHidden(true);
+                                      return;
+                                    }
+                                 else
+                                     file1 = true;
+
+
+                                     command = "";
+>>>>>>> parent of 8835d33... changelog to follow
 
 
 
+                                       QProcess *install_apk2=new QProcess;
+                                        cstring = adb + " -s " + daddr + port + " push "+busybox2+ " /sdcard/";
+                                        install_apk2->start(cstring);
 
-              command = "";
+                                        install_apk2->waitForFinished(-1);
 
+<<<<<<< HEAD
               QProcess install_apk3;
                cstring = adb + " -s " + daddr + port + " push "+busybox3+ " /sdcard/";
                install_apk3.start(cstring);
@@ -1854,22 +1848,29 @@ void MainWindow::on_actionInstall_busybox_triggered()
                command=install_apk3.readAll();
 
                ui->progressBar->setHidden(true);
+=======
+                                        command=install_apk2->readAll();
+                                        delete install_apk2;
+                                        ui->progressBar->setHidden(true);
 
-               if (!command.isEmpty())
-                  { QMessageBox::information(
-                               this,
-                               "",
-                               "busybox install failed");
+                                        if (!command.isEmpty())
+                                           { QMessageBox::information(
+                                                        this,
+                                                        "",
+                                                        "busybox install failed2");
 
-                  }
-               else
-                   file3 = true;
+                                           }
+                                        else
+                                            file2 = true;
+>>>>>>> parent of 8835d33... changelog to follow
 
 
 
 
- if (file1 && file2 && file3)
 
+
+
+<<<<<<< HEAD
  {
 
       mount_system("rw");
@@ -1955,20 +1956,17 @@ void MainWindow::on_actionInstall_busybox_triggered()
 mount_system("ro");
 
 }
+=======
+                                        if (file1 && file2)
+    {
+>>>>>>> parent of 8835d33... changelog to follow
 
-///////////////////////////////////////////////////////
-void MainWindow::on_actionUninstall_Busybox_triggered()
-{
+     QMessageBox::information( this,"","Busybox installed to system/xbin");
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
     }
 
 
+<<<<<<< HEAD
     is_package("eu.chainfire.supersu");
 
    if (!is_packageInstalled)
@@ -2120,5 +2118,7 @@ void MainWindow::on_fdellButton_clicked()
                              this,
                              "",
                              "Deletion of "+pullfile+" succeeded");
+=======
+>>>>>>> parent of 8835d33... changelog to follow
 
 }
