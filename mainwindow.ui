@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>583</width>
+    <width>635</width>
     <height>444</height>
    </rect>
   </property>
@@ -149,9 +149,9 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>250</y>
-      <width>311</width>
+      <x>20</x>
+      <y>240</y>
+      <width>381</width>
       <height>71</height>
      </rect>
     </property>
@@ -161,12 +161,12 @@
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
     </property>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>282</width>
+       <width>339</width>
        <height>32</height>
       </rect>
      </property>
@@ -208,6 +208,11 @@
           <string>temp</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>sdcard</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -221,6 +226,13 @@
        <widget class="QPushButton" name="fpullButton">
         <property name="text">
          <string>Pull</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="fdellButton">
+        <property name="text">
+         <string>Delete</string>
         </property>
        </widget>
       </item>
@@ -275,8 +287,8 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>30</y>
+      <x>430</x>
+      <y>10</y>
       <width>151</width>
       <height>331</height>
      </rect>
@@ -284,13 +296,13 @@
     <property name="title">
      <string>Application processes</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
        <width>130</width>
-       <height>270</height>
+       <height>275</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -370,21 +382,17 @@
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
-   <zorder>sideload_Button</zorder>
-   <zorder>uninstall_Button</zorder>
-   <zorder>backupButton</zorder>
-   <zorder>restoreButton</zorder>
-   <zorder>pushRemote</zorder>
-   <zorder>screenshotButton</zorder>
-   <zorder>consoleButton</zorder>
-   <zorder>rootButton</zorder>
+   <zorder>comboBox</zorder>
+   <zorder>fpushButton</zorder>
+   <zorder>fpullButton</zorder>
+   <zorder>fdellButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>583</width>
+     <width>635</width>
      <height>22</height>
     </rect>
    </property>
@@ -393,14 +401,16 @@
      <string>File</string>
     </property>
     <addaction name="actionPreferences"/>
-    <addaction name="actionQuit"/>
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
     <addaction name="actionUpdates_on"/>
     <addaction name="actionUpdates_off"/>
     <addaction name="actionMount_system_rw"/>
-    <addaction name="actionMount_systen_ro"/>
+    <addaction name="actionMount_system_ro"/>
     <addaction name="actionInstall_busybox"/>
+    <addaction name="actionUninstall_Busybox"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -487,14 +497,19 @@
     <string>Mount system r/w</string>
    </property>
   </action>
-  <action name="actionMount_systen_ro">
+  <action name="actionMount_system_ro">
    <property name="text">
     <string>Mount system r/o</string>
    </property>
   </action>
   <action name="actionInstall_busybox">
    <property name="text">
-    <string>Install busybox</string>
+    <string>Install Busybox</string>
+   </property>
+  </action>
+  <action name="actionUninstall_Busybox">
+   <property name="text">
+    <string>Uninstall Busybox</string>
    </property>
   </action>
  </widget>
