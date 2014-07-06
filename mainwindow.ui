@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>635</width>
-    <height>444</height>
+    <width>618</width>
+    <height>381</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>170</x>
       <y>10</y>
       <width>261</width>
       <height>16</height>
@@ -156,12 +156,12 @@
      </rect>
     </property>
     <property name="title">
-     <string>XBMC Push/Pull</string>
+     <string>Push/Pull/Delete Files</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -243,7 +243,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>160</y>
+      <y>150</y>
       <width>231</width>
       <height>71</height>
      </rect>
@@ -287,22 +287,22 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>10</y>
-      <width>151</width>
-      <height>331</height>
+      <x>290</x>
+      <y>40</y>
+      <width>291</width>
+      <height>191</height>
      </rect>
     </property>
     <property name="title">
      <string>Application processes</string>
     </property>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>30</y>
-       <width>130</width>
-       <height>275</height>
+       <width>127</width>
+       <height>134</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -317,6 +317,39 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="backupButton">
+        <property name="text">
+         <string>Backup XBMC</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushRemote">
+        <property name="text">
+         <string>Push Remote</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="rootButton">
+        <property name="text">
+         <string>Root FireTV</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>30</y>
+       <width>130</width>
+       <height>134</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
        <widget class="QPushButton" name="uninstall_Button">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -327,23 +360,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="backupButton">
-        <property name="text">
-         <string>Backup XBMC</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="restoreButton">
         <property name="text">
          <string>Restore XBMC</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushRemote">
-        <property name="text">
-         <string>Push Remote</string>
         </property>
        </widget>
       </item>
@@ -364,13 +383,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="rootButton">
-        <property name="text">
-         <string>Root FireTV</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </widget>
@@ -382,17 +394,25 @@
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
-   <zorder>comboBox</zorder>
-   <zorder>fpushButton</zorder>
-   <zorder>fpullButton</zorder>
-   <zorder>fdellButton</zorder>
+   <zorder>sideload_Button</zorder>
+   <zorder>uninstall_Button</zorder>
+   <zorder>backupButton</zorder>
+   <zorder>restoreButton</zorder>
+   <zorder>pushRemote</zorder>
+   <zorder>screenshotButton</zorder>
+   <zorder>consoleButton</zorder>
+   <zorder>rootButton</zorder>
+   <zorder>pushRemote</zorder>
+   <zorder>sideload_Button</zorder>
+   <zorder>uninstall_Button</zorder>
+   <zorder>screenshotButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>635</width>
+     <width>618</width>
      <height>22</height>
     </rect>
    </property>
