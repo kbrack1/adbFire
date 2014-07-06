@@ -75,26 +75,28 @@ int os=2;
  //////////////////////////////////////////
  void kill_server()
 {
- QProcess kill_adb;
- kill_adb.setProcessChannelMode(QProcess::MergedChannels);
+ QProcess *kill_adb=new QProcess;
+ kill_adb->setProcessChannelMode(QProcess::MergedChannels);
  QString cstring = adb + " kill-server";
- kill_adb.start(cstring);
-command=kill_adb.readAll();
- kill_adb.waitForFinished(-1);
+ kill_adb->start(cstring);
+command=kill_adb->readAll();
+ kill_adb->waitForFinished(-1);
  serverRunning = false;
-
+ delete kill_adb;
 }
 
 
  //////////////////////////////////////
 void start_server()
 {
- QProcess start_adb;
- start_adb.setProcessChannelMode(QProcess::MergedChannels);
+ QProcess *start_adb=new QProcess;
+ start_adb->setProcessChannelMode(QProcess::MergedChannels);
  QString cstring = adb + " start-server";
- start_adb.start(cstring);
- start_adb.waitForFinished(-1);
- command=start_adb.readAll();
+ start_adb->start(cstring);
+ start_adb->waitForFinished(-1);
+ command=start_adb->readAll();
+ delete start_adb;
+
 
      if (command.contains("daemon started successfully"))
          serverRunning = true;
@@ -108,12 +110,15 @@ void start_server()
 bool is_package(QString package)
 {
 
-    QProcess ispackage_adb;
-    ispackage_adb.setProcessChannelMode(QProcess::MergedChannels);
+    QProcess *ispackage_adb=new QProcess;
+    ispackage_adb->setProcessChannelMode(QProcess::MergedChannels);
     QString cstring = adb + " -s " + daddr + port + " shell pm list packages ";
-    ispackage_adb.start(cstring);
-    ispackage_adb.waitForFinished(-1);
-    command=ispackage_adb.readAll();
+    ispackage_adb->start(cstring);
+    ispackage_adb->waitForFinished(-1);
+    command=ispackage_adb->readAll();
+    delete ispackage_adb;
+
+
 
         if (command.contains(package))
             is_packageInstalled = true;
@@ -131,18 +136,24 @@ bool mount_system(QString mnt)
 {
 
 
-    QProcess mount_system;
-       mount_system.setProcessChannelMode(QProcess::MergedChannels);
+    QProcess *mount_system=new QProcess;
+       mount_system->setProcessChannelMode(QProcess::MergedChannels);
        QString cstring = adb + " -s " +daddr+port+ " shell su -c mount -o remount,"+mnt+ " /system";
-       mount_system.start(cstring);
-       mount_system.waitForFinished(-1);
-       command=mount_system.readAll();
+       mount_system->start(cstring);
+       mount_system->waitForFinished(-1);
+       command=mount_system->readAll();
+       delete mount_system;
+
+
+
+
 
         if (command.isEmpty())
            return true;
             else
             return false;
 
+        // return  mounted_op;
 
 
 }
@@ -152,12 +163,13 @@ bool mount_system(QString mnt)
 bool amazon_updates(QString onoff)
 {
 
-       QProcess update_policy;
-       update_policy.setProcessChannelMode(QProcess::MergedChannels);
+       QProcess *update_policy=new QProcess;
+       update_policy->setProcessChannelMode(QProcess::MergedChannels);
        QString cstring = adb + " -s " + daddr+port + " shell su -c pm "+ onoff + " com.amazon.dcp";
-       update_policy.start(cstring);
-       update_policy.waitForFinished(-1);
-       command=update_policy.readAll();
+       update_policy->start(cstring);
+       update_policy->waitForFinished(-1);
+       command=update_policy->readAll();
+       delete update_policy;
 
 
         if (onoff == "enable")
@@ -349,12 +361,12 @@ void readTables()
 
     if (!(os == 1))
       {  QString cstring = "chmod 0755 "+adb;
-         QProcess adb_chmod;
-         adb_chmod.setProcessChannelMode(QProcess::MergedChannels);
-         adb_chmod.start(cstring);
-         adb_chmod.waitForFinished(-1);
-         command=adb_chmod.readAll();
-
+         QProcess *adb_chmod=new QProcess;
+         adb_chmod->setProcessChannelMode(QProcess::MergedChannels);
+         adb_chmod->start(cstring);
+         adb_chmod->waitForFinished(-1);
+         command=adb_chmod->readAll();
+         delete adb_chmod;
        }
 
     kill_server();
@@ -423,7 +435,7 @@ bool keepbox = false;
             }
 
 
-                  QMessageBox::StandardButton reply;
+            QMessageBox::StandardButton reply;
                   reply = QMessageBox::question(this, "Uninstall", "Uninstall "+package+"?",
                      QMessageBox::Yes|QMessageBox::No);
                   if (reply == QMessageBox::Yes) {
@@ -436,21 +448,21 @@ bool keepbox = false;
                       timer->start(tsvalue);
 
 
-                      QProcess uninstall_package;
-                      uninstall_package.setProcessChannelMode(QProcess::MergedChannels);
+                      QProcess *uninstall_package=new QProcess;
+                      uninstall_package->setProcessChannelMode(QProcess::MergedChannels);
 
                       if (!keepbox)
                       cstring = adb + " -s " +daddr+port+ " shell pm uninstall " + package;
                       else
                       cstring = adb + " -s " +daddr+port+ " shell pm uninstall -k " + package;
 
-                      uninstall_package.start(cstring);
+                      uninstall_package->start(cstring);
 
-                      while(uninstall_package.state() != QProcess::NotRunning)
+                      while(uninstall_package->state() != QProcess::NotRunning)
                           qApp->processEvents();
 
-                      command=uninstall_package.readAll();
-
+                      command=uninstall_package->readAll();
+                      delete uninstall_package;
                       ui->progressBar->setHidden(true);
 
                       if (!command.contains("Success"))
@@ -487,11 +499,13 @@ void MainWindow::on_connButton_clicked()
 
     daddr = ui->device->text();
     QString cstring = adb + " connect " +daddr+port;
-    QProcess connect_device;
-    connect_device.setProcessChannelMode(QProcess::MergedChannels);
-    connect_device.start(cstring);
-    connect_device.waitForFinished(-1);
-    command=connect_device.readAll();
+    QProcess *connect_device=new QProcess;
+    connect_device->setProcessChannelMode(QProcess::MergedChannels);
+    connect_device->start(cstring);
+    connect_device->waitForFinished(-1);
+    command=connect_device->readAll();
+    delete connect_device;
+
 
        if (command.contains("connected to"))
            isConnected=true;
@@ -572,16 +586,16 @@ void MainWindow::on_sideload_Button_clicked()
           timer->start(tsvalue);
 
 
-          QProcess install_apk;
-          install_apk.setProcessChannelMode(QProcess::MergedChannels);
+          QProcess *install_apk=new QProcess;
+          install_apk->setProcessChannelMode(QProcess::MergedChannels);
           QString cstring = adb + " install -r " + '"'+ fileName+'"';
-          install_apk.start(cstring);
+          install_apk->start(cstring);
 
-           while(install_apk.state() != QProcess::NotRunning)
+           while(install_apk->state() != QProcess::NotRunning)
                qApp->processEvents();
 
-           command=install_apk.readAll();
-
+           command=install_apk->readAll();
+           delete install_apk;
            ui->progressBar->setHidden(true);
 
            if (command.contains("Success"))
@@ -634,11 +648,12 @@ void MainWindow::on_disButton_clicked()
 
         daddr = ui->device->text();
         QString cstring = adb + " disconnect "+daddr+port ;
-        QProcess disconnect_device;
-        disconnect_device.setProcessChannelMode(QProcess::MergedChannels);
-        disconnect_device.start(cstring);
-        disconnect_device.waitForFinished(-1);
-        command=disconnect_device.readAll();
+        QProcess *disconnect_device=new QProcess;
+        disconnect_device->setProcessChannelMode(QProcess::MergedChannels);
+        disconnect_device->start(cstring);
+        disconnect_device->waitForFinished(-1);
+        command=disconnect_device->readAll();
+        delete disconnect_device;
 
         isConnected=false;
          ui->device_connected->setText("  Device not connected.");
@@ -666,11 +681,12 @@ void MainWindow::on_akill_Button_clicked()
 
 
     QString cstring = adb + "  disconnect "+daddr+port ;
-    QProcess disconnect_device;
-    disconnect_device.setProcessChannelMode(QProcess::MergedChannels);
-    disconnect_device.start(cstring);
-    disconnect_device.waitForFinished(-1);
-    command=disconnect_device.readAll();
+    QProcess *disconnect_device=new QProcess;
+    disconnect_device->setProcessChannelMode(QProcess::MergedChannels);
+    disconnect_device->start(cstring);
+    disconnect_device->waitForFinished(-1);
+    command=disconnect_device->readAll();
+    delete disconnect_device;
 
     isConnected=false;
      ui->device_connected->setText(devstr2);
@@ -765,18 +781,18 @@ QString hdir = QDir::homePath();
        timer->start(tsvalue);
 
 
-       QProcess pull_adb;
-       pull_adb.setProcessChannelMode(QProcess::MergedChannels);
+       QProcess *pull_adb=new QProcess;
+       pull_adb->setProcessChannelMode(QProcess::MergedChannels);
 
        QString cstring = adb + " -s " + daddr + port + " pull "+xpath+" "+'"'+dir+'"';
 
-       pull_adb.start(cstring);
+       pull_adb->start(cstring);
 
-        while(pull_adb.state() != QProcess::NotRunning)
+        while(pull_adb->state() != QProcess::NotRunning)
             qApp->processEvents();
 
-        command = pull_adb.readAll();
-
+        command = pull_adb->readAll();
+        delete pull_adb;
 
        if (command.contains("bytes"))
         QMessageBox::information(
@@ -859,15 +875,15 @@ QString hdir = QDir::homePath();
 
 
 
-                              QProcess install_apk1;
+                              QProcess *install_apk1=new QProcess;
                               QString cstring = adb + " -s " + daddr + port + " install -r "+rootfile1;
-                               install_apk1.start(cstring);
+                               install_apk1->start(cstring);
 
-                               while(install_apk1.state() != QProcess::NotRunning)
+                               while(install_apk1->state() != QProcess::NotRunning)
                                    qApp->processEvents();
 
-                               command=install_apk1.readAll();
-
+                               command=install_apk1->readAll();
+                               delete install_apk1;
 
                               if (!command.contains("Success"))
                                  { QMessageBox::information(
@@ -886,15 +902,15 @@ QString hdir = QDir::homePath();
 
 
 
-                                    QProcess install_apk2;
+                                    QProcess *install_apk2=new QProcess;
                                      cstring = adb + " -s " + daddr + port + " install -r "+rootfile2;
-                                     install_apk2.start(cstring);
+                                     install_apk2->start(cstring);
 
-                                     while(install_apk2.state() != QProcess::NotRunning)
+                                     while(install_apk2->state() != QProcess::NotRunning)
                                          qApp->processEvents();
 
-                                     command=install_apk2.readAll();
-
+                                     command=install_apk2->readAll();
+                                     delete install_apk2;
                                      ui->progressBar->setHidden(true);
 
                                      if (!command.contains("Success"))
@@ -979,6 +995,10 @@ case 6:
 xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
 break;
 
+case 7:
+xpath = "/sdcard/";
+break;
+
 default:
 xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
 break;
@@ -1000,12 +1020,13 @@ break;
      pushdir = finfo.absolutePath();
 
 
-     QProcess check_dir;
-      check_dir.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *check_dir=new QProcess;
+      check_dir->setProcessChannelMode(QProcess::MergedChannels);
       QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath;
-      check_dir.start(cstring);
-      check_dir.waitForFinished(-1);
-      command=check_dir.readAll();
+      check_dir->start(cstring);
+      check_dir->waitForFinished(-1);
+      command=check_dir->readAll();
+      delete check_dir;
 
       if (command.contains("No such file or directory"))
        { QMessageBox::critical(
@@ -1021,18 +1042,20 @@ break;
            QMessageBox::Yes|QMessageBox::No);
        if (reply == QMessageBox::Yes) {
 
-           QProcess push_adb;
-           push_adb.setProcessChannelMode(QProcess::MergedChannels);
+           QProcess *push_adb=new QProcess;
+           push_adb->setProcessChannelMode(QProcess::MergedChannels);
 
            cstring = adb + " -s " + daddr + port +  " push "+'"'+fileName+'"'+ " "+xpath;
 
-           push_adb.start(cstring);
+           push_adb->start(cstring);
 
+           // push_adb->waitForFinished(-1);
 
-            while(push_adb.state() != QProcess::NotRunning)
+            while(push_adb->state() != QProcess::NotRunning)
                 qApp->processEvents();
 
-            command = push_adb.readAll();
+            command = push_adb->readAll();
+            delete push_adb;
 
            if (command.contains("bytes"))
             QMessageBox::information(
@@ -1112,6 +1135,10 @@ void MainWindow::on_fpullButton_clicked()
      xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
      break;
 
+     case 7:
+     xpath = "/sdcard/";
+     break;
+
      default:
      xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
      break;
@@ -1126,13 +1153,13 @@ void MainWindow::on_fpullButton_clicked()
              if (!ok)
                return;
 
-                         QProcess check_dir;
-                          check_dir.setProcessChannelMode(QProcess::MergedChannels);
+                         QProcess *check_dir=new QProcess;
+                          check_dir->setProcessChannelMode(QProcess::MergedChannels);
                           QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath+pullfile;
-                          check_dir.start(cstring);
-                          check_dir.waitForFinished(-1);
-                          command=check_dir.readAll();
-
+                          check_dir->start(cstring);
+                          check_dir->waitForFinished(-1);
+                          command=check_dir->readAll();
+                          delete check_dir;
 
                           if (command.contains("No such file or directory"))
                            { QMessageBox::critical(
@@ -1143,12 +1170,13 @@ void MainWindow::on_fpullButton_clicked()
                           }
 
 
-             QProcess pull_file;
-             pull_file.setProcessChannelMode(QProcess::MergedChannels);
+             QProcess *pull_file=new QProcess;
+             pull_file->setProcessChannelMode(QProcess::MergedChannels);
              cstring = adb + " -s " + daddr + port +  " pull "+xpath+pullfile+" "+pulldir;
-             pull_file.start(cstring);
-             pull_file.waitForFinished(-1);
-             command=pull_file.readAll();
+             pull_file->start(cstring);
+             pull_file->waitForFinished(-1);
+             command=pull_file->readAll();
+             delete pull_file;
 
              if (command.contains("exist"))
               QMessageBox::critical(
@@ -1216,29 +1244,29 @@ void MainWindow::on_restoreButton_clicked()
        timer->start(tsvalue);
 
 
-       QProcess rm_dir;
-       rm_dir.setProcessChannelMode(QProcess::MergedChannels);
+       QProcess *rm_dir=new QProcess;
+       rm_dir->setProcessChannelMode(QProcess::MergedChannels);
        cstring = adb + " -s " + daddr + port + " shell rm -r "+xpath +xbmcpackage;
-       rm_dir.start(cstring);
+       rm_dir->start(cstring);
 
-       while(rm_dir.state() != QProcess::NotRunning)
+       while(rm_dir->state() != QProcess::NotRunning)
            qApp->processEvents();
 
-       command = rm_dir.readAll();
+       command = rm_dir->readAll();
+       delete rm_dir;
 
-
-       QProcess restore_xbmc;
-       restore_xbmc.setProcessChannelMode(QProcess::MergedChannels);
+       QProcess *restore_xbmc=new QProcess;
+       restore_xbmc->setProcessChannelMode(QProcess::MergedChannels);
 
        cstring = adb + " -s " + daddr + port +  " push "+'"'+dir+'"'+ " "+xpath+xbmcpackage;
 
-       restore_xbmc.start(cstring);
+       restore_xbmc->start(cstring);
 
-        while(restore_xbmc.state() != QProcess::NotRunning)
+        while(restore_xbmc->state() != QProcess::NotRunning)
             qApp->processEvents();
 
-        command = restore_xbmc.readAll();
-
+        command = restore_xbmc->readAll();
+        delete restore_xbmc;
         ui->progressBar->setHidden(true);
 
        if (command.contains("bytes"))
@@ -1294,13 +1322,13 @@ QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keym
  if (!fileName.isEmpty() )
  {
 
-     QProcess check_dir;
-      check_dir.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *check_dir=new QProcess;
+      check_dir->setProcessChannelMode(QProcess::MergedChannels);
       QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath;
-      check_dir.start(cstring);
-      check_dir.waitForFinished(-1);
-      command=check_dir.readAll();
-
+      check_dir->start(cstring);
+      check_dir->waitForFinished(-1);
+      command=check_dir->readAll();
+      delete check_dir;
 
       if (command.contains("No such file or directory"))
        { QMessageBox::critical(
@@ -1316,18 +1344,20 @@ QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keym
            QMessageBox::Yes|QMessageBox::No);
        if (reply == QMessageBox::Yes) {
 
-           QProcess push_adb;
-           push_adb.setProcessChannelMode(QProcess::MergedChannels);
+           QProcess *push_adb=new QProcess;
+           push_adb->setProcessChannelMode(QProcess::MergedChannels);
 
            cstring = adb + " -s " + daddr + port +  " push "+'"'+fileName+'"'+ " "+xpath+"/keyboard.xml";
 
-           push_adb.start(cstring);
+           push_adb->start(cstring);
 
-            while(push_adb.state() != QProcess::NotRunning)
+           // push_adb->waitForFinished(-1);
+
+            while(push_adb->state() != QProcess::NotRunning)
                 qApp->processEvents();
 
-            command = push_adb.readAll();
-
+            command = push_adb->readAll();
+            delete push_adb;
 
            if (command.contains("bytes"))
             QMessageBox::information(
@@ -1488,12 +1518,13 @@ void MainWindow::on_screenshotButton_clicked()
     }
 
 
-    QProcess screen_shot;
-    screen_shot.setProcessChannelMode(QProcess::MergedChannels);
+    QProcess *screen_shot=new QProcess;
+    screen_shot->setProcessChannelMode(QProcess::MergedChannels);
     QString cstring = adb +" -s " + daddr+port +" shell screencap -p /sdcard/screen.png";
-    screen_shot.start(cstring);
-    screen_shot.waitForFinished(-1);
-    command=screen_shot.readAll();
+    screen_shot->start(cstring);
+    screen_shot->waitForFinished(-1);
+    command=screen_shot->readAll();
+    delete screen_shot;
 
     if (!command.isEmpty())
      QMessageBox::critical(
@@ -1501,16 +1532,17 @@ void MainWindow::on_screenshotButton_clicked()
                    "",
                     "Screenshot failed");
 
-<<<<<<< HEAD
     else
     {
 
-        QProcess get_shot;
-        get_shot.setProcessChannelMode(QProcess::MergedChannels);
+        QProcess *get_shot=new QProcess;
+        get_shot->setProcessChannelMode(QProcess::MergedChannels);
         QString cstring = adb +" -s " + daddr+port +" pull /sdcard/screen.png "+pulldir;
-        get_shot.start(cstring);
-        get_shot.waitForFinished(-1);
-        command=get_shot.readAll();
+        get_shot->start(cstring);
+        get_shot->waitForFinished(-1);
+        command=get_shot->readAll();
+        delete get_shot;
+
 
         if (!command.contains("bytes"))
          QMessageBox::critical(
@@ -1525,19 +1557,18 @@ void MainWindow::on_screenshotButton_clicked()
                            "Screenshot copied to "+pulldir);
 
 
-        QProcess del_shot;
-        del_shot.setProcessChannelMode(QProcess::MergedChannels);
+        QProcess *del_shot=new QProcess;
+        del_shot->setProcessChannelMode(QProcess::MergedChannels);
         cstring = adb +" -s " + daddr+port +" shell rm /sdcard/screen.png";
-        del_shot.start(cstring);
-        del_shot.waitForFinished(-1);
-        command=del_shot.readAll();
+        del_shot->start(cstring);
+        del_shot->waitForFinished(-1);
+        command=del_shot->readAll();
+        delete del_shot;
 
     }
 
 
 
-=======
->>>>>>> parent of 8835d33... changelog to follow
 }
 
 
@@ -1670,7 +1701,7 @@ void MainWindow::on_actionMount_system_rw_triggered()
 
 
 /////////////////////////////////////////////////////
-void MainWindow::on_actionMount_systen_ro_triggered()
+void MainWindow::on_actionMount_system_ro_triggered()
 {
 
     if (!isConnected)
@@ -1734,75 +1765,95 @@ void MainWindow::on_actionInstall_busybox_triggered()
    }
 
 
-   QString busybox1  = adbdir+"binstall.sh";
-    QString busybox2 = adbdir+"busybox";
+   QMessageBox::StandardButton reply;
+         reply = QMessageBox::question(this, "Busybox", "Install Busybox?",
+            QMessageBox::Yes|QMessageBox::No);
+         if (reply == QMessageBox::No)
+         return;
+
+
+    QString busybox1  = adbdir+"binstall.sh";
+    QString busybox2 = adbdir+"buninstall.sh";
+    QString busybox3 = adbdir+"busybox";
 
 
         bool file1 = false;
         bool file2 = false;
+        bool file3 = false;
+
+     QFile Fout1(busybox1);
+
+         if(!Fout1.exists())
+            {
+
+            QMessageBox::critical(
+            this,
+            tr("adbFire"),
+            busybox1+" not found.");
+             return;
+             }
 
 
-                           QFile Fout1(busybox1);
+        QFile Fout2(busybox2);
 
-                           if(!Fout1.exists())
-                           {
+       if(!Fout2.exists())
+          {
 
-                               QMessageBox::critical(
-                                  this,
-                                  tr("adbFire"),
-                                  busybox1+" not found.");
-                                  return;
-                           }
+            QMessageBox::critical(
+             this,
+             tr("adbFire"),
+              busybox2+" not found.");
+             return;
+           }
 
 
-                           QFile Fout2(busybox2);
+       QFile Fout3(busybox3);
 
-                           if(!Fout2.exists())
-                           {
+      if(!Fout3.exists())
+         {
 
-                               QMessageBox::critical(
-                                  this,
-                                  tr("adbFire"),
-                                  busybox2+" not found.");
-                                  return;
-                           }
+           QMessageBox::critical(
+            this,
+            tr("adbFire"),
+             busybox3+" not found.");
+            return;
+          }
 
-<<<<<<< HEAD
-      QProcess install_apk1;
+    command = "";
+
+
+      QProcess *install_apk1=new QProcess;
        QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
-        install_apk1.start(cstring);
-=======
->>>>>>> parent of 8835d33... changelog to follow
-
-                           command = "";
-
-<<<<<<< HEAD
-        install_apk1.waitForFinished(-1);
-
-       command=install_apk1.readAll();
-
-=======
-
-                                 QProcess *install_apk1=new QProcess;
-                                 QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
-                                  install_apk1->start(cstring);
->>>>>>> parent of 8835d33... changelog to follow
+        install_apk1->start(cstring);
 
 
-                                   install_apk1->waitForFinished(-1);
+        install_apk1->waitForFinished(-1);
 
-                                  command=install_apk1->readAll();
-                                  delete install_apk1;
+       command=install_apk1->readAll();
+        delete install_apk1;
 
-<<<<<<< HEAD
-             QProcess install_apk2;
+         if (!command.isEmpty())
+           { QMessageBox::critical(
+            this,
+             "",
+             "busybox install failed ");
+              ui->progressBar->setHidden(true);
+             return;
+             }
+            else
+            file1 = true;
+
+
+             command = "";
+
+             QProcess *install_apk2=new QProcess;
               cstring = adb + " -s " + daddr + port + " push "+busybox2+ " /sdcard/";
-              install_apk2.start(cstring);
+              install_apk2->start(cstring);
 
-              install_apk2.waitForFinished(-1);
+              install_apk2->waitForFinished(-1);
 
-              command=install_apk2.readAll();
-
+              command=install_apk2->readAll();
+              delete install_apk2;
               ui->progressBar->setHidden(true);
 
               if (!command.isEmpty())
@@ -1814,124 +1865,114 @@ void MainWindow::on_actionInstall_busybox_triggered()
                  }
               else
                   file2 = true;
-=======
-                                 if (!command.isEmpty())
-                                    { QMessageBox::critical(
-                                                 this,
-                                                 "",
-                                                 "busybox install failed "+command);
-                                      ui->progressBar->setHidden(true);
-                                      return;
-                                    }
-                                 else
-                                     file1 = true;
-
-
-                                     command = "";
->>>>>>> parent of 8835d33... changelog to follow
 
 
 
-                                       QProcess *install_apk2=new QProcess;
-                                        cstring = adb + " -s " + daddr + port + " push "+busybox2+ " /sdcard/";
-                                        install_apk2->start(cstring);
 
-                                        install_apk2->waitForFinished(-1);
+              command = "";
 
-<<<<<<< HEAD
-              QProcess install_apk3;
+              QProcess *install_apk3=new QProcess;
                cstring = adb + " -s " + daddr + port + " push "+busybox3+ " /sdcard/";
-               install_apk3.start(cstring);
+               install_apk3->start(cstring);
 
-               install_apk3.waitForFinished(-1);
+               install_apk3->waitForFinished(-1);
 
-               command=install_apk3.readAll();
-
+               command=install_apk3->readAll();
+               delete install_apk3;
                ui->progressBar->setHidden(true);
-=======
-                                        command=install_apk2->readAll();
-                                        delete install_apk2;
-                                        ui->progressBar->setHidden(true);
 
-                                        if (!command.isEmpty())
-                                           { QMessageBox::information(
-                                                        this,
-                                                        "",
-                                                        "busybox install failed2");
+               if (!command.isEmpty())
+                  { QMessageBox::information(
+                               this,
+                               "",
+                               "busybox install failed");
 
-                                           }
-                                        else
-                                            file2 = true;
->>>>>>> parent of 8835d33... changelog to follow
+                  }
+               else
+                   file3 = true;
 
 
 
 
+ if (file1 && file2 && file3)
 
-
-
-<<<<<<< HEAD
  {
 
       mount_system("rw");
 
-     QProcess copy_script1;
-     copy_script1.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *copy_script1=new QProcess;
+     copy_script1->setProcessChannelMode(QProcess::MergedChannels);
      QString cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/binstall.sh /system/xbin";
-     copy_script1.start(cstring);
-     copy_script1.waitForFinished(-1);
-     command=copy_script1.readAll();
+     copy_script1->start(cstring);
+     copy_script1->waitForFinished(-1);
+     command=copy_script1->readAll();
+     delete copy_script1;
 
 
-     QProcess copy_script2;
-     copy_script2.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *copy_script2=new QProcess;
+     copy_script2->setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/buninstall.sh /system/xbin";
-     copy_script2.start(cstring);
-     copy_script2.waitForFinished(-1);
-     command=copy_script2.readAll();
+     copy_script2->start(cstring);
+     copy_script2->waitForFinished(-1);
+     command=copy_script2->readAll();
+     delete copy_script2;
 
 
-     QProcess copy_script3;
-     copy_script3.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *copy_script3=new QProcess;
+     copy_script3->setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/busybox /system/xbin";
-     copy_script3.start(cstring);
-     copy_script3.waitForFinished(-1);
-     command=copy_script3.readAll();
+     copy_script3->start(cstring);
+     copy_script3->waitForFinished(-1);
+     command=copy_script3->readAll();
+     delete copy_script3;
 
-     QProcess chmod_script1;
-     chmod_script1.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *chmod_script1=new QProcess;
+     chmod_script1->setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/binstall.sh";
-     chmod_script1.start(cstring);
-     chmod_script1.waitForFinished(-1);
-     command=chmod_script1.readAll();
-     chmod_script1.readAll();
+     chmod_script1->start(cstring);
+     chmod_script1->waitForFinished(-1);
+     command=chmod_script1->readAll();
+     chmod_script1->readAll();
+     delete chmod_script1;
 
 
-     QProcess chmod_script2;
-     chmod_script2.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *chmod_script2=new QProcess;
+     chmod_script2->setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/buninstall.sh";
-     chmod_script2.start(cstring);
-     chmod_script2.waitForFinished(-1);
-     command=chmod_script2.readAll();
-     chmod_script2.readAll();
+     chmod_script2->start(cstring);
+     chmod_script2->waitForFinished(-1);
+     command=chmod_script2->readAll();
+     chmod_script2->readAll();
+     delete chmod_script2;
 
 
-     QProcess chmod_script3;
-     chmod_script3.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *chmod_script3=new QProcess;
+     chmod_script3->setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/busybox";
-     chmod_script3.start(cstring);
-     chmod_script3.waitForFinished(-1);
-     command=chmod_script3.readAll();
-     chmod_script3.readAll();
+     chmod_script3->start(cstring);
+     chmod_script3->waitForFinished(-1);
+     command=chmod_script3->readAll();
+     chmod_script3->readAll();
+     delete chmod_script3;
 
-
-     QProcess run_script1;
-     run_script1.setProcessChannelMode(QProcess::MergedChannels);
+     QProcess *run_script1=new QProcess;
+     run_script1->setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/binstall.sh";
-     run_script1.start(cstring);
-     run_script1.waitForFinished(-1);
-     command=run_script1.readAll();
+     run_script1->start(cstring);
+     run_script1->waitForFinished(-1);
+     command=run_script1->readAll();
+     delete run_script1;
 
+/*
+
+      QProcess *check_dir=new QProcess;
+      check_dir->setProcessChannelMode(QProcess::MergedChannels);
+      cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/which";
+      check_dir->start(cstring);
+      check_dir->waitForFinished(-1);
+      command=check_dir->readAll();
+      delete check_dir;
+*/
 
       QProcess check_dir;
       check_dir.setProcessChannelMode(QProcess::MergedChannels);
@@ -1956,17 +1997,20 @@ void MainWindow::on_actionInstall_busybox_triggered()
 mount_system("ro");
 
 }
-=======
-                                        if (file1 && file2)
-    {
->>>>>>> parent of 8835d33... changelog to follow
 
-     QMessageBox::information( this,"","Busybox installed to system/xbin");
+///////////////////////////////////////////////////////
+void MainWindow::on_actionUninstall_Busybox_triggered()
+{
 
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
     }
 
 
-<<<<<<< HEAD
     is_package("eu.chainfire.supersu");
 
    if (!is_packageInstalled)
@@ -1986,21 +2030,22 @@ mount_system("ro");
 
         mount_system("rw");
 
-         QProcess run_script1;
-         run_script1.setProcessChannelMode(QProcess::MergedChannels);
+         QProcess *run_script1=new QProcess;
+         run_script1->setProcessChannelMode(QProcess::MergedChannels);
          QString cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/buninstall.sh";
-         run_script1.start(cstring);
-         run_script1.waitForFinished(-1);
-
+         run_script1->start(cstring);
+         run_script1->waitForFinished(-1);
+         delete run_script1;
 
         command = "";
 
-        QProcess check_dir;
-         check_dir.setProcessChannelMode(QProcess::MergedChannels);
+        QProcess *check_dir=new QProcess;
+         check_dir->setProcessChannelMode(QProcess::MergedChannels);
          cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/which";
-         check_dir.start(cstring);
-         check_dir.waitForFinished(-1);
-         command=check_dir.readAll();
+         check_dir->start(cstring);
+         check_dir->waitForFinished(-1);
+         command=check_dir->readAll();
+         delete check_dir;
 
            if (command.contains("No such file or directory"))
              QMessageBox::information( this,"","Busybox uninstalled");
@@ -2084,13 +2129,13 @@ void MainWindow::on_fdellButton_clicked()
              if (!ok)
                return;
 
-                         QProcess check_dir;
-                          check_dir.setProcessChannelMode(QProcess::MergedChannels);
+                         QProcess *check_dir=new QProcess;
+                          check_dir->setProcessChannelMode(QProcess::MergedChannels);
                           QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath+pullfile;
-                          check_dir.start(cstring);
-                          check_dir.waitForFinished(-1);
-                          command=check_dir.readAll();
-
+                          check_dir->start(cstring);
+                          check_dir->waitForFinished(-1);
+                          command=check_dir->readAll();
+                          delete check_dir;
 
                           if (command.contains("No such file or directory"))
                            { QMessageBox::critical(
@@ -2101,12 +2146,13 @@ void MainWindow::on_fdellButton_clicked()
                           }
 
 
-             QProcess pull_file;
-             pull_file.setProcessChannelMode(QProcess::MergedChannels);
+             QProcess *pull_file=new QProcess;
+             pull_file->setProcessChannelMode(QProcess::MergedChannels);
              cstring = adb + " -s " + daddr + port +  " shell rm "+xpath+pullfile;
-             pull_file.start(cstring);
-             pull_file.waitForFinished(-1);
-             command=pull_file.readAll();
+             pull_file->start(cstring);
+             pull_file->waitForFinished(-1);
+             command=pull_file->readAll();
+             delete pull_file;
 
              if (command.contains("exist"))
               QMessageBox::critical(
@@ -2118,7 +2164,5 @@ void MainWindow::on_fdellButton_clicked()
                              this,
                              "",
                              "Deletion of "+pullfile+" succeeded");
-=======
->>>>>>> parent of 8835d33... changelog to follow
 
 }

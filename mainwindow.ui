@@ -6,13 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-<<<<<<< HEAD
-    <width>618</width>
-    <height>381</height>
-=======
-    <width>583</width>
+    <width>635</width>
     <height>444</height>
->>>>>>> parent of 8835d33... changelog to follow
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,7 +29,7 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>120</x>
       <y>10</y>
       <width>261</width>
       <height>16</height>
@@ -154,24 +149,24 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>250</y>
-      <width>311</width>
+      <x>20</x>
+      <y>240</y>
+      <width>381</width>
       <height>71</height>
      </rect>
     </property>
     <property name="title">
-     <string>Push/Pull/Delete Files</string>
+     <string>XBMC Push/Pull</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
     </property>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>282</width>
+       <width>339</width>
        <height>32</height>
       </rect>
      </property>
@@ -213,6 +208,11 @@
           <string>temp</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>sdcard</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -229,6 +229,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="fdellButton">
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </widget>
@@ -236,7 +243,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>150</y>
+      <y>160</y>
       <width>231</width>
       <height>71</height>
      </rect>
@@ -280,34 +287,22 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-<<<<<<< HEAD
-      <x>290</x>
-      <y>40</y>
-      <width>291</width>
-      <height>191</height>
-=======
-      <x>360</x>
-      <y>30</y>
+      <x>430</x>
+      <y>10</y>
       <width>151</width>
       <height>331</height>
->>>>>>> parent of 8835d33... changelog to follow
      </rect>
     </property>
     <property name="title">
      <string>Application processes</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>30</y>
-<<<<<<< HEAD
-       <width>127</width>
-       <height>134</height>
-=======
        <width>130</width>
-       <height>270</height>
->>>>>>> parent of 8835d33... changelog to follow
+       <height>275</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -322,39 +317,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="backupButton">
-        <property name="text">
-         <string>Backup XBMC</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushRemote">
-        <property name="text">
-         <string>Push Remote</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="rootButton">
-        <property name="text">
-         <string>Root FireTV</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>30</y>
-       <width>130</width>
-       <height>134</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
        <widget class="QPushButton" name="uninstall_Button">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -365,9 +327,23 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="backupButton">
+        <property name="text">
+         <string>Backup XBMC</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="restoreButton">
         <property name="text">
          <string>Restore XBMC</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushRemote">
+        <property name="text">
+         <string>Push Remote</string>
         </property>
        </widget>
       </item>
@@ -388,6 +364,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="rootButton">
+        <property name="text">
+         <string>Root FireTV</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </widget>
@@ -399,32 +382,17 @@
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
-   <zorder>sideload_Button</zorder>
-   <zorder>uninstall_Button</zorder>
-   <zorder>backupButton</zorder>
-   <zorder>restoreButton</zorder>
-   <zorder>pushRemote</zorder>
-   <zorder>screenshotButton</zorder>
-   <zorder>consoleButton</zorder>
-   <zorder>rootButton</zorder>
-<<<<<<< HEAD
-   <zorder>pushRemote</zorder>
-   <zorder>sideload_Button</zorder>
-   <zorder>uninstall_Button</zorder>
-   <zorder>screenshotButton</zorder>
-=======
->>>>>>> parent of 8835d33... changelog to follow
+   <zorder>comboBox</zorder>
+   <zorder>fpushButton</zorder>
+   <zorder>fpullButton</zorder>
+   <zorder>fdellButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-<<<<<<< HEAD
-     <width>618</width>
-=======
-     <width>583</width>
->>>>>>> parent of 8835d33... changelog to follow
+     <width>635</width>
      <height>22</height>
     </rect>
    </property>
@@ -433,14 +401,16 @@
      <string>File</string>
     </property>
     <addaction name="actionPreferences"/>
-    <addaction name="actionQuit"/>
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
     <addaction name="actionUpdates_on"/>
     <addaction name="actionUpdates_off"/>
     <addaction name="actionMount_system_rw"/>
-    <addaction name="actionMount_systen_ro"/>
+    <addaction name="actionMount_system_ro"/>
     <addaction name="actionInstall_busybox"/>
+    <addaction name="actionUninstall_Busybox"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -527,14 +497,19 @@
     <string>Mount system r/w</string>
    </property>
   </action>
-  <action name="actionMount_systen_ro">
+  <action name="actionMount_system_ro">
    <property name="text">
     <string>Mount system r/o</string>
    </property>
   </action>
   <action name="actionInstall_busybox">
    <property name="text">
-    <string>Install busybox</string>
+    <string>Install Busybox</string>
+   </property>
+  </action>
+  <action name="actionUninstall_Busybox">
+   <property name="text">
+    <string>Uninstall Busybox</string>
    </property>
   </action>
  </widget>

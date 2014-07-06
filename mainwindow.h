@@ -65,10 +65,14 @@ private slots:
 
     void on_actionMount_system_rw_triggered();
 
-    void on_actionMount_systen_ro_triggered();
-
+    void on_actionMount_system_ro_triggered();
 
     void on_actionInstall_busybox_triggered();
+
+
+    void on_actionUninstall_Busybox_triggered();
+
+    void on_fdellButton_clicked();
 
 private:
     Ui::MainWindow *ui;
