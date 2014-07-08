@@ -18,6 +18,7 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 #include <preferencesdialog.h>
+#include <QElapsedTimer>
 
 // #include <QDebug>
 
@@ -1438,9 +1439,11 @@ void MainWindow::on_actionPreferences_triggered()
 
 }
 
-/////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_actionReboot_triggered()
 {
+
+     QString cstring;
 
     if (!isConnected)
        { QMessageBox::critical(
@@ -1459,6 +1462,8 @@ void MainWindow::on_actionReboot_triggered()
             "Root required!");
          return;
    }
+
+
 
    QMessageBox::StandardButton reply;
      reply = QMessageBox::question(this, "Reboot Device", "Reboot Device?",
@@ -1466,15 +1471,40 @@ void MainWindow::on_actionReboot_triggered()
      if (reply == QMessageBox::Yes) {
          isConnected=false;
          ui->device_connected->setText(devstr2);
-         QString cstring = adb + " reboot";
-         QProcess::startDetached(cstring);
+
+
+
+
+          QElapsedTimer rtimer;
+          int nMilliseconds;
+
+            QProcess *reboot_device=new QProcess;
+            rtimer.start();
+            reboot_device->setProcessChannelMode(QProcess::MergedChannels);
+            cstring = adb + " -s " +daddr+port+ " reboot";
+            reboot_device->start(cstring);
+
+
+             while(reboot_device->state() != QProcess::NotRunning)
+               {
+                 qApp->processEvents();
+                  nMilliseconds = rtimer.elapsed();
+                if (nMilliseconds >= 5000)
+                    break;
+             }
+
+             delete reboot_device;
+
+
      }
 
 }
 
-///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_actionRecovery_triggered()
 {
+
+    QString cstring;
 
     if (!isConnected)
        { QMessageBox::critical(
@@ -1496,21 +1526,36 @@ void MainWindow::on_actionRecovery_triggered()
 
 
    QMessageBox::StandardButton reply;
-     reply = QMessageBox::question(this, "Reboot Recovery", "Reboot to Recovery?",
+     reply = QMessageBox::question(this, "", "Reboot Recovery?",
          QMessageBox::Yes|QMessageBox::No);
      if (reply == QMessageBox::Yes) {
-
          isConnected=false;
          ui->device_connected->setText(devstr2);
 
-         QString cstring = adb + " reboot recovery";
-         QProcess::startDetached(cstring);
-     }
+
+  QElapsedTimer rtimer;
+   int nMilliseconds;
 
 
+   QProcess *reboot_recovery=new QProcess;
+    rtimer.start();
+   reboot_recovery->setProcessChannelMode(QProcess::MergedChannels);
+   cstring = adb + " -s " +daddr+port+ " reboot recovery";
+   reboot_recovery->start(cstring);
+
+   while(reboot_recovery->state() != QProcess::NotRunning)
+     {
+       qApp->processEvents();
+        nMilliseconds = rtimer.elapsed();
+      if (nMilliseconds >= 5000)
+          break;
+   }
+
+    delete reboot_recovery;
 
 }
 
+}
 ///////////////////////////////////////////////
 void MainWindow::on_screenshotButton_clicked()
 {

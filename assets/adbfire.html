@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.0</b></u> is a companion program for Android XBMC and forks. It allows you to
-install XBMC and other apps to your Android device without the hassle of downloading the Android SDK. <p>
+<u><b>adbFire v1.0</b></u> is a companion program for Android XBMC and its forks. It allows you to
+install XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
-Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the Amazon Fire TV (51.1.1.0 or earlier) and more. <p>
+Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the Amazon Fire TV (51.1.1.0 or earlier) and much more. <p>
 <b><u>adbFire</u></b> has been successfully tested on Samsung cell phones and tablets and the Amazon Fire TV.<p>
 
 At startup  "ADB running" is displayed the status bar. If it's not, click "Start" in the ADB server group.
@@ -23,12 +23,15 @@ The "Start" button starts the adb server<br>
 The "Stop" button stops the adb server
 <p>
 
-<b><u>Push/Pull</u></b><p>
-<b>NOTE: Before pushing/pulling data, XBMC <u>MUST</u> have been run for the first time on the Android device. XBMC sets up its inner directory structure when first run.</b><p>
-
-To push files to XBMC select the destination folder from the dropdown widget, then press "Push". Next, choose and confirm the file to push from your PC to XBMC. The source folder is "sticky", it will be remembered for future runs.
+<b><u>Push/Pull/Delete</u></b><p>
+<b>NOTE: Before pushing/pulling/deleting data in XBMC folders, XBMC <u>MUST</u> have been run for the first time on the Android device. XBMC sets up its inner directory structure when first run. The folder /sdcard/ is available anytime.</b><p>
 <p>
-To pull files from XBMC select the source folder from the dropdown widget, then press "Pull". Enter a filename into the text area to pull from XBMC to "pull folder" (default: home folder) on the PC. You can change the destination folder for pulled files in the preferences dialog.
+"Push" and "Pull" are simply Android's terminology for file copying. From your PC you "push" files to your Android device or conversely, you "pull" files from your Android device to your PC.<p>
+To push files select the destination folder from the dropdown widget, then press "Push". Next, choose and confirm the file to push from  PC to device. The source folder is "sticky", it will be remembered for future runs.
+<p>
+To pull files select the source folder from the dropdown widget, then press "Pull". Enter a filename into the text area to be pulled from the device to the PC's "pull folder" (default: home folder). You can change the destination folder for pulled files in the preferences dialog.
+<p>
+To delete files select the source folder from the dropdown widget, then press "Delete". Enter a filename you wish deleted into the text area.
 <p>
 <b><u>Application processes</u></b><br>
 The <b>"Install APK" </b> button installs or "sideloads"  apps. Click it and choose the APK file you want installed. All installs are done with the "-r" flag. <p>
@@ -45,11 +48,11 @@ The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc to t
 <p>
 The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbFire</b></u> installation folder, Three xml files for the Fire TV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
-The <b>"Screen shot"</b> button creates a graphic of the device's current screen and saves it to file /sdcard/screen.png. <p>
+The <b>"Screen shot"</b> button takes a snapshot of the device's current screen, names it screen.png, and saves it to the pulled files folder (default: home directory).<p> Unfortunately, High-bandwidth Digital Content Protection (HDCP) prevents you from taking screenshots of most commercia video streams. Luckily, XBMC is not affected by HDCP.<p>
 <p>
 The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a Fire TV. <p>
 <p>
-The <b>"Root Fire TV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 1.0. You must complete the process by going to FireTV settings and running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
+The <b>"Root Fire TV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by going to FireTV settings and running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
 <p>
 <p>
 <u><b>Application Menu</b></u>
@@ -60,20 +63,21 @@ About this application: Version information and home URL.
 <b><u>Quit adbFire</b></u>  Terminates adbFire.
 <p>
 <b><u>Preferences</b></u><br>
-<b><u>Package name</b></u>, default: org.xbmc.xbmc.<p>
+<b><u>XBMC Package name</b></u>, default: org.xbmc.xbmc. This varies depending on what variant of XBMC you're running.<p>
 If you are running a fork of XBMC, enter its packagename here, e.g. for Beyond XBMC enter "com.flumpster.xbmc".
-<p>Two forks have been tested, Beyond XBMC and elmerohueso's XBMC for Fire TV (which currently keeps org.xbmc.xbmc as a package name.)<p>
-NOTE: Forks should work if their file directory structure adheres to XBMC 13.x (/sdcard/Android/data/packagename/files/.xbmc) directory structure. YMMV.<p>
+<p>Thus far, SPMC, BeyondXBMC, elmerohueso's XBMC Launcher, Gotham 13.1 and Helix nightlies have been tested with adbFire.<p>
+In theory any fork should work if its file directory structure adheres to XBMC's (/sdcard/Android/data/packagename/files/.xbmc) directory structure. YMMV.<p>
 <p>
 <b><u>Pull Folder</b></u>, default: User's home directory.<br>
-Choose the folder where pulled XBMC files are placed.
+Choose the folder where pulled XBMC files and screenshot pngs are placed.
 <p>
-
-<b><u>Root only menu options</b></u><br>
+<p>
+<b><u>Menu Choices</b></u><br>
 <b><u>Reboot device</b></u> Reboots the connected device.
 <p>
 <b><u>Reboot into recovery</b></u> Reboots the connected device into recovery.
 <p>
+<b><u>Root only menu options</b></u><br>
 <b><u>Fire TV updates on</b></u> Enables com.amazon.dcp.
 <p>
 <b><u>Fire TV updates off</b></u> Disables com.amazon.dcp.
@@ -82,7 +86,13 @@ Choose the folder where pulled XBMC files are placed.
 <p>
 <b><u>Mount /system ro</b></u> Makes /system partition read-only.
 <p>
-=================
+<b><u>Install Busybox</b></u><br>
+BusyBox combines tiny versions of many common UNIX utilities into a single small executable. It provides replacements for most of the utilities you usually find on a Linux system. It has an extremely small footprint, under 2Mb
+<p>
+<b><u>Uninstall Busybox</b></u><br>
+Removes BusyBox frpm your system.<p>
+
+=============================
 <p>
 The <b><u>adbFire</b></u> binary and its external files are located in adbFire's installation folder. The default folder is adbFire. <p>
 Under OS X, the folder adbFire must be located in the standard location Applications.  Don't move the folder from Applications, the program will fail.<p>

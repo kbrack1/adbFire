@@ -296,7 +296,7 @@
     <property name="title">
      <string>Application processes</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -339,7 +339,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>140</x>
@@ -394,18 +394,6 @@
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
-   <zorder>sideload_Button</zorder>
-   <zorder>uninstall_Button</zorder>
-   <zorder>backupButton</zorder>
-   <zorder>restoreButton</zorder>
-   <zorder>pushRemote</zorder>
-   <zorder>screenshotButton</zorder>
-   <zorder>consoleButton</zorder>
-   <zorder>rootButton</zorder>
-   <zorder>pushRemote</zorder>
-   <zorder>sideload_Button</zorder>
-   <zorder>uninstall_Button</zorder>
-   <zorder>screenshotButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
