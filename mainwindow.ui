@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>618</width>
-    <height>381</height>
+    <width>629</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -45,8 +45,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>470</y>
+      <x>20</x>
+      <y>560</y>
       <width>118</width>
       <height>16</height>
      </rect>
@@ -61,8 +61,8 @@
    <widget class="QLabel" name="server_running">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>470</y>
+      <x>160</x>
+      <y>560</y>
       <width>148</width>
       <height>16</height>
      </rect>
@@ -74,8 +74,8 @@
    <widget class="QLabel" name="device_connected">
     <property name="geometry">
      <rect>
-      <x>320</x>
-      <y>470</y>
+      <x>300</x>
+      <y>560</y>
       <width>136</width>
       <height>16</height>
      </rect>
@@ -149,10 +149,10 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>240</y>
-      <width>381</width>
-      <height>71</height>
+      <x>410</x>
+      <y>270</y>
+      <width>161</width>
+      <height>171</height>
      </rect>
     </property>
     <property name="title">
@@ -164,13 +164,13 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>30</y>
-       <width>339</width>
-       <height>32</height>
+       <width>116</width>
+       <height>132</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
        <widget class="QComboBox" name="comboBox">
         <item>
@@ -287,65 +287,22 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>280</x>
       <y>40</y>
-      <width>291</width>
-      <height>191</height>
+      <width>301</width>
+      <height>221</height>
      </rect>
     </property>
     <property name="title">
-     <string>Application processes</string>
+     <string>System processes</string>
     </property>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>30</y>
-       <width>127</width>
-       <height>134</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QPushButton" name="sideload_Button">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install app to device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Install APK</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="backupButton">
-        <property name="text">
-         <string>Backup XBMC</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushRemote">
-        <property name="text">
-         <string>Push Remote</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="rootButton">
-        <property name="text">
-         <string>Root FireTV</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
+       <x>150</x>
        <y>30</y>
        <width>130</width>
-       <height>134</height>
+       <height>168</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -377,9 +334,178 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="roButton">
+        <property name="text">
+         <string>Mount R/O</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="consoleButton">
         <property name="text">
          <string>ADB Shell</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>127</width>
+       <height>168</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="sideload_Button">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install app to device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Install APK</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="backupButton">
+        <property name="text">
+         <string>Backup XBMC</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushRemote">
+        <property name="text">
+         <string>Push Remote</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="rwButton">
+        <property name="text">
+         <string>Mount R/W</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="rootButton">
+        <property name="text">
+         <string>Root FireTV</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <zorder>layoutWidget</zorder>
+    <zorder>layoutWidget</zorder>
+    <zorder></zorder>
+    <zorder></zorder>
+    <zorder></zorder>
+    <zorder></zorder>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>270</y>
+      <width>201</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>USB Drive</string>
+    </property>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>167</width>
+       <height>134</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QPushButton" name="mntButton">
+        <property name="text">
+         <string>Mount drive</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="umntButton">
+        <property name="text">
+         <string>Unmount drive</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="makepstButton">
+        <property name="text">
+         <string>Make Persistent</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="rmpstButton">
+        <property name="text">
+         <string>Remove Persistence</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_6">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>270</y>
+      <width>151</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>SSH</string>
+    </property>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>108</width>
+       <height>134</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QPushButton" name="instsshButton">
+        <property name="text">
+         <string>Install ssh</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="startsshButton">
+        <property name="text">
+         <string>Start ssh</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stopsshButton">
+        <property name="text">
+         <string>Stop ssh</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="delsshButton">
+        <property name="text">
+         <string>Delete ssh</string>
         </property>
        </widget>
       </item>
@@ -394,13 +520,25 @@
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
+   <zorder>groupBox_2</zorder>
+   <zorder>groupBox_6</zorder>
+   <zorder>sideload_Button</zorder>
+   <zorder>uninstall_Button</zorder>
+   <zorder>backupButton</zorder>
+   <zorder>restoreButton</zorder>
+   <zorder>pushRemote</zorder>
+   <zorder>screenshotButton</zorder>
+   <zorder>rootButton</zorder>
+   <zorder>consoleButton</zorder>
+   <zorder>rwButton</zorder>
+   <zorder>roButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>618</width>
+     <width>629</width>
      <height>22</height>
     </rect>
    </property>
@@ -413,10 +551,10 @@
     <addaction name="actionRecovery"/>
     <addaction name="actionUpdates_on"/>
     <addaction name="actionUpdates_off"/>
-    <addaction name="actionMount_system_rw"/>
-    <addaction name="actionMount_system_ro"/>
+    <addaction name="actionSSH_Password"/>
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
+    <addaction name="actionFirmware_install"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -500,16 +638,6 @@
     <string>Amazon updates off</string>
    </property>
   </action>
-  <action name="actionMount_system_rw">
-   <property name="text">
-    <string>Mount system r/w</string>
-   </property>
-  </action>
-  <action name="actionMount_system_ro">
-   <property name="text">
-    <string>Mount system r/o</string>
-   </property>
-  </action>
   <action name="actionInstall_busybox">
    <property name="text">
     <string>Install Busybox</string>
@@ -518,6 +646,22 @@
   <action name="actionUninstall_Busybox">
    <property name="text">
     <string>Uninstall Busybox</string>
+   </property>
+  </action>
+  <action name="actionFirmware_install">
+   <property name="text">
+    <string>Firmware install</string>
+   </property>
+   <property name="toolTip">
+    <string>Upgrade/downgrade firmware </string>
+   </property>
+  </action>
+  <action name="actionSSH_Password">
+   <property name="text">
+    <string>SSH Password</string>
+   </property>
+   <property name="toolTip">
+    <string>Change SSH Password</string>
    </property>
   </action>
  </widget>

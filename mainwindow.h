@@ -63,16 +63,39 @@ private slots:
 
     void on_actionUpdates_off_triggered();
 
-    void on_actionMount_system_rw_triggered();
-
-    void on_actionMount_system_ro_triggered();
-
     void on_actionInstall_busybox_triggered();
 
 
     void on_actionUninstall_Busybox_triggered();
 
     void on_fdellButton_clicked();
+
+    void on_actionFirmware_install_triggered();
+
+
+    void on_mntButton_clicked();
+
+    void on_makepstButton_clicked();
+
+    void on_umntButton_clicked();
+
+    void on_rmpstButton_clicked();
+
+    void on_instsshButton_clicked();
+
+    void on_startsshButton_clicked();
+
+    void on_stopsshButton_clicked();
+
+    void on_delsshButton_clicked();
+
+
+
+    void on_rwButton_clicked();
+
+    void on_roButton_clicked();
+
+    void on_actionSSH_Password_triggered();
 
 private:
     Ui::MainWindow *ui;
