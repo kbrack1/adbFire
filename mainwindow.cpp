@@ -198,8 +198,8 @@ void createTables()
 {
 
     QSqlQuery query;
-    query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) )");
-    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc' )");
+    query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , sshcheck int, usbcheck int, ftvupdate int)");
+    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',0,0,0 )");
 
 }
 
@@ -296,11 +296,20 @@ void readTables()
 
 
 
-
     if(isConnected)
-        ui->device_connected->setText(devstr1);
-      else
-       ui->device_connected->setText(devstr2);
+       {
+         ui->device_connected->setText(devstr1);
+         ui->usbBox->setDisabled(false);
+         ui->sshBox->setDisabled(false);
+        }
+
+    else
+
+    {
+     ui->device_connected->setText(devstr2);
+     ui->usbBox->setDisabled(true);
+     ui->sshBox->setDisabled(true);
+    }
 
 
 
@@ -308,8 +317,6 @@ void readTables()
     ui->statusBar->addPermanentWidget(ui->device_connected);
     ui->progressBar->setHidden(true);
     ui->statusBar->addPermanentWidget( ui->progressBar);
-
-
 
  if (os == 1)
     {
@@ -516,14 +523,19 @@ void MainWindow::on_connButton_clicked()
         isConnected=false;
 
 
+
      if(isConnected)
        {
          ui->device_connected->setText("  Device connected.");
          ui->server_running->setText(adbstr1);
          serverRunning = true;
+         ui->usbBox->setDisabled(false);
+         ui->sshBox->setDisabled(false);
      }
        else
         { ui->device_connected->setText("  Device not connected.");
+         ui->usbBox->setDisabled(true);
+         ui->sshBox->setDisabled(true);
          if (!firstrun)
          QMessageBox::critical(
                       this,
@@ -647,8 +659,8 @@ void MainWindow::on_disButton_clicked()
 
 
 
-
-
+        ui->usbBox->setDisabled(true);
+        ui->sshBox->setDisabled(true);
         daddr = ui->device->text();
         QString cstring = adb + " disconnect "+daddr+port ;
         QProcess disconnect_device;
@@ -2403,7 +2415,7 @@ void MainWindow::on_mntButton_clicked()
 
 
 
-    QString mntstring = "mount -o rw -t vfat /dev/block/sda1 /data/media/0/usbStorage/sda1";
+    QString mntstring = "mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
     QString cstring;
 
 
@@ -2438,249 +2450,6 @@ void MainWindow::on_mntButton_clicked()
 
 }
 
-///////////////////////////////////////////
-void MainWindow::on_makepstButton_clicked()
-{
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-
-    is_package("eu.chainfire.supersu");
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            "Root required!");
-         return;
-   }
-
-  QString cstring;
-  QString hashbang = "#!/system/bin/sh";
-  QString makepst = "mount -o rw -t vfat /dev/block/sda1 /data/media/0/usbStorage/sda1";
-  QString filename = adbdir+"install-recovery-2.sh";
-
-    QProcess check_file;
-    check_file.setProcessChannelMode(QProcess::MergedChannels);
-    cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh | grep mount";
-    check_file.start(cstring);
-    check_file.waitForFinished(-1);
-    command=check_file.readAll();
-    
-
-      if (command.contains("mount"))
-       {
-          QMessageBox::information( this,"","USB drive already persistent");
-          return;
-       }
-
-
-      if (command.contains("No such file or directory"))
-       {
-
-          QFile file(filename);
-
-
-              if(!file.open(QFile::WriteOnly |
-                            QFile::Text))
-              {
-                  QMessageBox::critical(this,"","Error creating file!");
-                  return;
-              }
-
-
-              QTextStream out(&file);
-              out << hashbang << "\n" << makepst << "\n";
-
-              file.flush();
-              file.close();
-
-              mount_system("rw");
-
-
-
-              QProcess push_adb;
-              push_adb.setProcessChannelMode(QProcess::MergedChannels);
-              cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-              push_adb.start(cstring);
-               while(push_adb.state() != QProcess::NotRunning)
-                   qApp->processEvents();
-               command = push_adb.readAll();
-               
-
-               // QMessageBox::critical(this,"",command);
-
-               if (!command.contains("bytes"))
-                {
-
-                   QMessageBox::critical(this,"","Error moving file!");
-                   return;
-               }
-
-
-               QProcess move_file;
-               move_file.setProcessChannelMode(QProcess::MergedChannels);
-               cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-               move_file.start(cstring);
-               move_file.waitForFinished(-1);
-               command=move_file.readAll();
-               
-
-               QProcess chmod_file;
-               move_file.setProcessChannelMode(QProcess::MergedChannels);
-               cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-               chmod_file.start(cstring);
-               chmod_file.waitForFinished(-1);
-               command=chmod_file.readAll();
-               
-
-               if (command.contains("No such file or directory"))
-                {
-                   QMessageBox::critical(this,"","chmod: No such file or directory");
-                   return;
-                 }
-
-                  QProcess rm_file1;
-                  rm_file1.setProcessChannelMode(QProcess::MergedChannels);
-                  cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-                  rm_file1.start(cstring);
-                  rm_file1.waitForFinished(-1);
-                  command=rm_file1.readAll();
-                  
-
-                  if (command.contains("No such file or directory"))
-                   {
-                      QMessageBox::critical(this,"","sdcard: No such file or directory");
-                      return;
-                    }
-
-                  QProcess rm_file2;
-                  rm_file2.setProcessChannelMode(QProcess::MergedChannels);
-                  cstring = "rm " + filename;
-                  rm_file2.start(cstring);
-                  rm_file2.waitForFinished(-1);
-                  command=rm_file2.readAll();
-                  
-
-         mount_system("ro");
-
-      }
-
-   else
-
-      {
-
-          QProcess pull_file;
-          pull_file.setProcessChannelMode(QProcess::MergedChannels);
-          cstring = adb + " -s " + daddr + port +  " pull /system/etc/install-recovery-2.sh " + adbdir;
-          pull_file.start(cstring);
-          pull_file.waitForFinished(-1);
-          command=pull_file.readAll();
-          
-
-          // QMessageBox::information( this,"",command);
-
-            if (command.contains("No such file or directory"))
-             {
-                QMessageBox::information( this,"","Not found: /system/etc/install-recovery-2.sh");
-                return;
-             }
-
-
-          QFile file(filename);
-          file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
-          QTextStream out(&file);
-          out <<  makepst << "\n";
-          file.flush();
-          file.close();
-
-          mount_system("rw");
-
-
-
-          QProcess push_adb;
-          push_adb.setProcessChannelMode(QProcess::MergedChannels);
-          cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-          push_adb.start(cstring);
-           while(push_adb.state() != QProcess::NotRunning)
-               qApp->processEvents();
-           command = push_adb.readAll();
-           
-
-           // QMessageBox::critical(this,"",command);
-
-           if (!command.contains("bytes"))
-            {
-
-               QMessageBox::critical(this,"","2:Error moving file!");
-               return;
-           }
-
-
-           QProcess move_file;
-           move_file.setProcessChannelMode(QProcess::MergedChannels);
-           cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-           move_file.start(cstring);
-           move_file.waitForFinished(-1);
-           command=move_file.readAll();
-           
-
-           QProcess chmod_file;
-           move_file.setProcessChannelMode(QProcess::MergedChannels);
-           cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-           chmod_file.start(cstring);
-           chmod_file.waitForFinished(-1);
-           command=chmod_file.readAll();
-           
-
-           if (command.contains("No such file or directory"))
-            {
-               QMessageBox::critical(this,"","chmod2: No such file or directory");
-               return;
-             }
-
-              QProcess rm_file1;
-              rm_file1.setProcessChannelMode(QProcess::MergedChannels);
-              cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-              rm_file1.start(cstring);
-              rm_file1.waitForFinished(-1);
-              command=rm_file1.readAll();
-              
-
-              if (command.contains("No such file or directory"))
-               {
-                  QMessageBox::critical(this,"","sdcard2: No such file or directory");
-                  return;
-                }
-
-              QProcess rm_file2;
-              rm_file2.setProcessChannelMode(QProcess::MergedChannels);
-              cstring = "rm " + filename;
-              rm_file2.start(cstring);
-              rm_file2.waitForFinished(-1);
-              command=rm_file2.readAll();
-              
-
-
-
-      }
-
-
-      QMessageBox::information( this,"","USB drive is now persistent");
-      mount_system("ro");
-
-
-
-
-
-
-}
 
 //////////////////////////////////////////
 void MainWindow::on_umntButton_clicked()
@@ -2707,7 +2476,7 @@ void MainWindow::on_umntButton_clicked()
 
 
 
-    QString umntstring = "umount /data/media/0/usbStorage/sda1/";
+    QString umntstring = "umount /sdcard/usbStorage/sda1/";
     QString cstring;
 
 
@@ -2726,557 +2495,6 @@ void MainWindow::on_umntButton_clicked()
 
 }
 
-///////////////////////////////////////////////
-void MainWindow::on_rmpstButton_clicked()
-{
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-
-    is_package("eu.chainfire.supersu");
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            "Root required!");
-         return;
-   }
-
-  QString cstring;
-  QString hashbang = "#!/system/bin/sh";
-  QString makepst = "mount -o rw -t vfat /dev/block/sda1 /data/media/0/usbStorage/sda1";
-  QString dropbear = "/system/etc/dropbear.sh";
-  QString filename = adbdir+"install-recovery-2.sh";
-
-    QProcess check_file;
-    check_file.setProcessChannelMode(QProcess::MergedChannels);
-    cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh";
-    check_file.start(cstring);
-    check_file.waitForFinished(-1);
-    command=check_file.readAll();
-    
-
-    //QMessageBox::information(this,"",command);
-    //return;
-
-    if (!command.contains("mount -o"))
-     {
-
-        QMessageBox::critical(this,"","USB drive is not persistent.");
-        return;
-    }
-
-    if (command.contains("/system/etc/dropbear.sh"))
-     {
-
-
-
-        QFile file(filename);
-
-
-            if(!file.open(QFile::WriteOnly |
-                          QFile::Text))
-            {
-                QMessageBox::critical(this,"","Error creating file!");
-                return;
-            }
-
-
-            QTextStream out(&file);
-            out << hashbang << "\n" << dropbear << "\n";
-
-            file.flush();
-            file.close();
-
-            QProcess push_adb;
-            push_adb.setProcessChannelMode(QProcess::MergedChannels);
-            cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-            push_adb.start(cstring);
-             while(push_adb.state() != QProcess::NotRunning)
-                 qApp->processEvents();
-             command = push_adb.readAll();
-             
-
-             mount_system("rw");
-             QProcess move_file;
-             move_file.setProcessChannelMode(QProcess::MergedChannels);
-             cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-             move_file.start(cstring);
-             move_file.waitForFinished(-1);
-             command=move_file.readAll();
-             
-
-             QProcess chmod_file;
-             move_file.setProcessChannelMode(QProcess::MergedChannels);
-             cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-             chmod_file.start(cstring);
-             chmod_file.waitForFinished(-1);
-             command=chmod_file.readAll();
-             
-             mount_system("ro");
-
-             if (command.contains("No such file or directory"))
-              {
-                 QMessageBox::critical(this,"","chmod: No such file or directory");
-                 return;
-               }
-
-                QProcess rm_file1;
-                rm_file1.setProcessChannelMode(QProcess::MergedChannels);
-                cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-                rm_file1.start(cstring);
-                rm_file1.waitForFinished(-1);
-                command=rm_file1.readAll();
-                
-
-                if (command.contains("No such file or directory"))
-                 {
-                    QMessageBox::critical(this,"","sdcard: No such file or directory");
-                    return;
-                  }
-
-                QProcess rm_file2;
-                rm_file2.setProcessChannelMode(QProcess::MergedChannels);
-                cstring = "rm " + filename;
-                rm_file2.start(cstring);
-                rm_file2.waitForFinished(-1);
-                command=rm_file2.readAll();
-                
-                mount_system("ro");
-
-                QMessageBox::information(this,"","USB drive persistence removed.");
-                return;
-
-
-    }
-
-   else
-    {
-        mount_system("rw");
-        QProcess rm_file1;
-        rm_file1.setProcessChannelMode(QProcess::MergedChannels);
-        cstring = adb + " -s " + daddr+port + " shell rm " + " /system/etc/install-recovery-2.sh";
-        rm_file1.start(cstring);
-        rm_file1.waitForFinished(-1);
-        command=rm_file1.readAll();
-        
-        mount_system("ro");
-
-        if (command.contains("No such file or directory"))
-         {
-            QMessageBox::critical(this,"","No persistence script found.");
-            return;
-          }
-    }
-
-
-}
-
-
-////////////////////////////////////////////
-void MainWindow::on_instsshButton_clicked()
-{
-
-    QString cstring;
-    QString dropbear = "/system/etc/dropbear.sh";
-    QString hashbang = "#!/system/bin/sh";
-    QString filename = adbdir+"install-recovery-2.sh";
-    QString makepst = "mount -o rw -t vfat /dev/block/sda1 /data/media/0/usbStorage/sda1";
-
-
-
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-
-    is_package("eu.chainfire.supersu");
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            "Root required!");
-         return;
-   }
-
-
-
-   QProcess check_bb;
-   check_bb.setProcessChannelMode(QProcess::MergedChannels);
-   cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/which";
-   check_bb.start(cstring);
-   check_bb.waitForFinished(-1);
-   command=check_bb.readAll();
-
-
-     if (command.contains("No such file or directory"))
-      { QMessageBox::critical( this,"","Busybox required for ssh installation.");
-       return;
-     }
-
-
-
-     QProcess check_ssh1;
-     check_ssh1.setProcessChannelMode(QProcess::MergedChannels);
-     cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/dropbear.sh";
-     check_ssh1.start(cstring);
-     check_ssh1.waitForFinished(-1);
-     command=check_ssh1.readAll();
-
-       if (!command.contains("No such file or directory"))
-        { QMessageBox::critical( this,"","SSH already installed!");
-         return;
-       }
-
-
-
-    mount_system("rw");
-
-
-
-
-
-    QProcess push_adb1;
-    push_adb1.setProcessChannelMode(QProcess::MergedChannels);
-    cstring = adb + " -s " + daddr + port +  " push "+adbdir+"dropbear.tar /sdcard/";
-    push_adb1.start(cstring);
-
-    while(push_adb1.state() != QProcess::NotRunning)
-         qApp->processEvents();
-
-     command = push_adb1.readAll();
-
-     if (!command.contains("bytes"))
-       {
-         QMessageBox::critical(this,"",command);
-         return;
-       }
-
-
-     QProcess cp_script;
-     cp_script.setProcessChannelMode(QProcess::MergedChannels);
-     cstring = adb + " -s " + daddr + port +  " shell su -c  cp /sdcard/dropbear.tar /data/";
-     cp_script.start(cstring);
-     while(cp_script.state() != QProcess::NotRunning)
-          qApp->processEvents();
-      command = cp_script.readAll();
-
-
-
-      QProcess ch_script;
-      ch_script.setProcessChannelMode(QProcess::MergedChannels);
-      cstring = adb + " -s " + daddr + port +  " shell su -c  tar -C /data -xf /data/dropbear.tar";
-      ch_script.start(cstring);
-      while(ch_script.state() != QProcess::NotRunning)
-           qApp->processEvents();
-       command = ch_script.readAll();
-
-
-
-
-       QProcess cp_1;
-       cp_1.setProcessChannelMode(QProcess::MergedChannels);
-       cstring = adb + " -s " + daddr + port +  " shell su -c cp /data/dropbear/dropbear.sh /system/xbin/";
-       cp_1.start(cstring);
-       while(cp_1.state() != QProcess::NotRunning)
-            qApp->processEvents();
-        command = cp_1.readAll();
-
-
-
-        QProcess ch_1;
-        ch_1.setProcessChannelMode(QProcess::MergedChannels);
-        cstring = adb + " -s " + daddr + port +  " shell su -c  chmod 0755 /system/xbin/dropbear.sh";
-        ch_1.start(cstring);
-        while(ch_1.state() != QProcess::NotRunning)
-             qApp->processEvents();
-         command = ch_1.readAll();
-
-
-         QProcess cp_2;
-         cp_2.setProcessChannelMode(QProcess::MergedChannels);
-         cstring = adb + " -s " + daddr + port +  " shell su -c rm /sdcard/dropbear.tar";
-         cp_2.start(cstring);
-         while(cp_2.state() != QProcess::NotRunning)
-              qApp->processEvents();
-          command = cp_2.readAll();
-
-
-
-          QProcess ch_2;
-          ch_2.setProcessChannelMode(QProcess::MergedChannels);
-          cstring = adb + " -s " + daddr + port +  " shell su -c rm /data/dropbear.tar";
-          ch_2.start(cstring);
-          while(ch_2.state() != QProcess::NotRunning)
-               qApp->processEvents();
-           command = ch_2.readAll();
-
-
-
-
-         /////////  1234
-
-
-
-               QProcess check_file;
-               check_file.setProcessChannelMode(QProcess::MergedChannels);
-               cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh | grep dropbear.sh";
-               check_file.start(cstring);
-               check_file.waitForFinished(-1);
-               command=check_file.readAll();
-               
-
-
-
-                 if (command.contains("No such file or directory"))
-                  {
-
-                     QFile file(filename);
-
-
-                         if(!file.open(QFile::WriteOnly |
-                                       QFile::Text))
-                         {
-                             QMessageBox::critical(this,"","Error creating file!");
-                             return;
-                         }
-
-
-                         QTextStream out(&file);
-                         out << hashbang << "\n" << dropbear << "\n";
-
-                         file.flush();
-                         file.close();
-
-                         mount_system("rw");
-
-
-
-                         QProcess push_adb;
-                         push_adb.setProcessChannelMode(QProcess::MergedChannels);
-                         cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-                         push_adb.start(cstring);
-                          while(push_adb.state() != QProcess::NotRunning)
-                              qApp->processEvents();
-                          command = push_adb.readAll();
-                          
-
-                          // QMessageBox::critical(this,"",command);
-
-                          if (!command.contains("bytes"))
-                           {
-
-                              QMessageBox::critical(this,"","Error moving file!");
-                              return;
-                          }
-
-
-                          QProcess move_file;
-                          move_file.setProcessChannelMode(QProcess::MergedChannels);
-                          cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-                          move_file.start(cstring);
-                          move_file.waitForFinished(-1);
-                          command=move_file.readAll();
-                          
-
-                          QProcess chmod_file;
-                          move_file.setProcessChannelMode(QProcess::MergedChannels);
-                          cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-                          chmod_file.start(cstring);
-                          chmod_file.waitForFinished(-1);
-                          command=chmod_file.readAll();
-                          
-
-                          if (command.contains("No such file or directory"))
-                           {
-                              QMessageBox::critical(this,"","chmod: No such file or directory");
-                              return;
-                            }
-
-                             QProcess rm_file1;
-                             rm_file1.setProcessChannelMode(QProcess::MergedChannels);
-                             cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-                             rm_file1.start(cstring);
-                             rm_file1.waitForFinished(-1);
-                             command=rm_file1.readAll();
-                             
-
-                             if (command.contains("No such file or directory"))
-                              {
-                                 QMessageBox::critical(this,"","sdcard: No such file or directory");
-                                 return;
-                               }
-
-                             QProcess rm_file2;
-                             rm_file2.setProcessChannelMode(QProcess::MergedChannels);
-                             cstring = "rm " + filename;
-                             rm_file2.start(cstring);
-                             rm_file2.waitForFinished(-1);
-                             command=rm_file2.readAll();
-                             
-
-                    mount_system("ro");
-
-                 }
-
-              else
-
-                 {
-
-                     QProcess pull_file;
-                     pull_file.setProcessChannelMode(QProcess::MergedChannels);
-                     cstring = adb + " -s " + daddr + port +  " pull /system/etc/install-recovery-2.sh " + adbdir;
-                     pull_file.start(cstring);
-                     pull_file.waitForFinished(-1);
-                     command=pull_file.readAll();
-                     
-
-                     // QMessageBox::information( this,"",command);
-
-                       if (command.contains("No such file or directory"))
-                        {
-                           QMessageBox::information( this,"","Not found: /system/etc/install-recovery-2.sh");
-                           return;
-                        }
-
-
-                     QFile file(filename);
-                     file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
-                     QTextStream out(&file);
-                     out <<  dropbear << "\n";
-                     file.flush();
-                     file.close();
-
-                     mount_system("rw");
-
-
-
-                     QProcess push_adb;
-                     push_adb.setProcessChannelMode(QProcess::MergedChannels);
-                     cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-                     push_adb.start(cstring);
-                      while(push_adb.state() != QProcess::NotRunning)
-                          qApp->processEvents();
-                      command = push_adb.readAll();
-                      
-
-                      // QMessageBox::critical(this,"",command);
-
-                      if (!command.contains("bytes"))
-                       {
-
-                          QMessageBox::critical(this,"","2:Error moving file!");
-                          return;
-                      }
-
-
-                      QProcess move_file;
-                      move_file.setProcessChannelMode(QProcess::MergedChannels);
-                      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-                      move_file.start(cstring);
-                      move_file.waitForFinished(-1);
-                      command=move_file.readAll();
-                      
-
-                      QProcess chmod_file;
-                      move_file.setProcessChannelMode(QProcess::MergedChannels);
-                      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-                      chmod_file.start(cstring);
-                      chmod_file.waitForFinished(-1);
-                      command=chmod_file.readAll();
-                      
-
-                      if (command.contains("No such file or directory"))
-                       {
-                          QMessageBox::critical(this,"","chmod2: No such file or directory");
-                          return;
-                        }
-
-                         QProcess rm_file1;
-                         rm_file1.setProcessChannelMode(QProcess::MergedChannels);
-                         cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-                         rm_file1.start(cstring);
-                         rm_file1.waitForFinished(-1);
-                         command=rm_file1.readAll();
-                         
-
-                         if (command.contains("No such file or directory"))
-                          {
-                             QMessageBox::critical(this,"","sdcard2: No such file or directory");
-                             return;
-                           }
-
-                         QProcess rm_file2;
-                         rm_file2.setProcessChannelMode(QProcess::MergedChannels);
-                         cstring = "rm " + filename;
-                         rm_file2.start(cstring);
-                         rm_file2.waitForFinished(-1);
-                         command=rm_file2.readAll();
-                         
-
-
-
-                 }
-
-
-                 QProcess check_ssh;
-                 check_ssh.setProcessChannelMode(QProcess::MergedChannels);
-                 cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/dropbear.sh";
-                 check_ssh.start(cstring);
-                 check_ssh.waitForFinished(-1);
-                 command=check_ssh.readAll();
-
-
-                   if (command.contains("No such file or directory"))
-                     QMessageBox::critical( this,"","Install failed!");
-                    else
-                     {
-                       QProcess ch_dr;
-                       ch_dr.setProcessChannelMode(QProcess::MergedChannels);
-                        cstring = adb + " -s " + daddr + port +  " shell dropbear.sh";
-
-                       ch_dr.start(cstring);
-
-                       while(ch_dr.state() != QProcess::NotRunning)
-                            qApp->processEvents();
-
-                       command = ch_dr.readAll();
-
-                       QProcess ck_dr;
-                       ck_dr.setProcessChannelMode(QProcess::MergedChannels);
-                       cstring = adb + " -s " + daddr + port +  " shell ps | grep dropbear";
-
-                       ck_dr.start(cstring);
-
-                       while(ck_dr.state() != QProcess::NotRunning)
-                            qApp->processEvents();
-
-                       command = ck_dr.readAll();
-
-                       if (command.contains("dropbear"))
-                       QMessageBox::information(this,"","SSH installed and started");
-                       else
-                       QMessageBox::information(this,"","SSH installed, but won't start!");
-
-
-                   }
-
-
-
-}
 
 ////////////////////////////////////////////
 void MainWindow::on_startsshButton_clicked()
@@ -3434,194 +2652,6 @@ void MainWindow::on_stopsshButton_clicked()
      QMessageBox::information(this,"","SSH Stopped.");
 
 }
-
-////////////////////////////////////////////
-void MainWindow::on_delsshButton_clicked()
-{
-
-    QString cstring;
-    QString dropbear = "/system/etc/dropbear.sh";
-    QString hashbang = "#!/system/bin/sh";
-    QString filename = adbdir+"install-recovery-2.sh";
-    QString makepst = "mount -o rw -t vfat /dev/block/sda1 /data/media/0/usbStorage/sda1";
-
-
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-
-    is_package("eu.chainfire.supersu");
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            "Root required!");
-         return;
-   }
-
-
-
-     QProcess check_ssh1;
-     check_ssh1.setProcessChannelMode(QProcess::MergedChannels);
-     cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/dropbear.sh";
-     check_ssh1.start(cstring);
-     check_ssh1.waitForFinished(-1);
-     command=check_ssh1.readAll();
-
-       if (command.contains("No such file or directory"))
-        { QMessageBox::critical( this,"","SSH not installed!");
-         return;
-       }
-
-
-
-    mount_system("rw");
-
-    QProcess ch_dr;
-    ch_dr.setProcessChannelMode(QProcess::MergedChannels);
-    cstring = adb + " -s " + daddr + port +  " shell su -c  killall dropbear";
-    ch_dr.start(cstring);
-    while(ch_dr.state() != QProcess::NotRunning)
-         qApp->processEvents();
-     command = ch_dr.readAll();
-
-    QProcess push_adb1;
-    push_adb1.setProcessChannelMode(QProcess::MergedChannels);
-    cstring = adb + " -s " + daddr + port +  " shell su -c  rm -r /data/dropbear/";
-    push_adb1.start(cstring);
-
-    while(push_adb1.state() != QProcess::NotRunning)
-         qApp->processEvents();
-
-     command = push_adb1.readAll();
-
-
-
-
-     QProcess push_adb2;
-     push_adb2.setProcessChannelMode(QProcess::MergedChannels);
-     cstring = adb + " -s " + daddr + port +  " shell su -c  rm -r /system/xbin/dropbear.sh";
-     push_adb2.start(cstring);
-
-     while(push_adb2.state() != QProcess::NotRunning)
-          qApp->processEvents();
-
-      command = push_adb2.readAll();
-
-
-
-
-                     QProcess check_file;
-                     check_file.setProcessChannelMode(QProcess::MergedChannels);
-                     cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh";
-                     check_file.start(cstring);
-                     check_file.waitForFinished(-1);
-                     command=check_file.readAll();
-
-                     if (command.contains("mount"))
-                      {
-
-
-                         QFile file(filename);
-
-
-                             if(!file.open(QFile::WriteOnly |
-                                           QFile::Text))
-                             {
-                                 QMessageBox::critical(this,"","Error creating file!");
-                                 mount_system("ro");
-                                 return;
-                             }
-
-
-                             QTextStream out(&file);
-                             out << hashbang << "\n" << makepst << "\n";
-
-                             file.flush();
-                             file.close();
-
-                             QProcess push_adb;
-                             push_adb.setProcessChannelMode(QProcess::MergedChannels);
-                             cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-                             push_adb.start(cstring);
-                              while(push_adb.state() != QProcess::NotRunning)
-                                  qApp->processEvents();
-                              command = push_adb.readAll();
-
-                              QProcess move_file;
-                              move_file.setProcessChannelMode(QProcess::MergedChannels);
-                              cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-                              move_file.start(cstring);
-                              move_file.waitForFinished(-1);
-                              command=move_file.readAll();
-
-
-                              QProcess chmod_file;
-                              move_file.setProcessChannelMode(QProcess::MergedChannels);
-                              cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-                              chmod_file.start(cstring);
-                              chmod_file.waitForFinished(-1);
-                              command=chmod_file.readAll();
-
-                              if (command.contains("No such file or directory"))
-                               {
-                                  QMessageBox::critical(this,"","chmod: No such file or directory");
-                                  mount_system("ro");
-                                  return;
-                                }
-
-                                 QProcess rm_file1;
-                                 rm_file1.setProcessChannelMode(QProcess::MergedChannels);
-                                 cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-                                 rm_file1.start(cstring);
-                                 rm_file1.waitForFinished(-1);
-                                 command=rm_file1.readAll();
-
-
-                                 if (command.contains("No such file or directory"))
-                                  {
-                                     QMessageBox::critical(this,"","sdcard: No such file or directory");
-                                     mount_system("ro");
-                                     return;
-                                   }
-
-                                 QProcess rm_file2;
-                                 rm_file2.setProcessChannelMode(QProcess::MergedChannels);
-                                 cstring = "rm " + filename;
-                                 rm_file2.start(cstring);
-                                 rm_file2.waitForFinished(-1);
-                                 command=rm_file2.readAll();
-
-
-
-                     }
-
-
-
-                     QProcess check_ssh;
-                     check_ssh.setProcessChannelMode(QProcess::MergedChannels);
-                     cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/dropbear.sh";
-                     check_ssh.start(cstring);
-                     check_ssh.waitForFinished(-1);
-                     command=check_ssh.readAll();
-
-
-                       if (command.contains("No such file or directory"))
-                         QMessageBox::information(this,"","SSH Removed.");
-                        else
-                         QMessageBox::critical(this,"","SSH removal failed.");
-
-                       mount_system("ro");
-
-}
-
 
 
 ////////////////////////////////////////
@@ -3856,5 +2886,1017 @@ mount_system("ro");
 
  }
 
+
+}
+
+/////////////////////////////////////
+void MainWindow::on_usbBox_clicked()
+{
+
+}
+
+////////////////////////////////////
+void MainWindow::on_sshBox_clicked()
+{
+
+}
+
+/////////////////////////////////////////////////
+void MainWindow::on_actionInstall_SSH_triggered()
+{
+
+
+
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+
+
+
+    QString cstring;
+    QString dropbear = "/system/xbin/dropbear.sh";
+    QString hashbang = "#!/system/bin/sh";
+    QString filename = adbdir+"install-recovery-2.sh";
+    QString makepst = "mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
+
+
+
+
+   QProcess check_bb;
+   check_bb.setProcessChannelMode(QProcess::MergedChannels);
+   cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/which";
+   check_bb.start(cstring);
+   check_bb.waitForFinished(-1);
+   command=check_bb.readAll();
+
+
+     if (command.contains("No such file or directory"))
+      { QMessageBox::critical( this,"","Busybox required for ssh installation.");
+       return;
+     }
+
+
+
+     QProcess check_ssh1;
+     check_ssh1.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/dropbear.sh";
+     check_ssh1.start(cstring);
+     check_ssh1.waitForFinished(-1);
+     command=check_ssh1.readAll();
+
+       if (!command.contains("No such file or directory"))
+        { QMessageBox::critical( this,"","SSH already installed!");
+         return;
+       }
+
+
+
+    mount_system("rw");
+
+
+
+
+
+    QProcess push_adb1;
+    push_adb1.setProcessChannelMode(QProcess::MergedChannels);
+    cstring = adb + " -s " + daddr + port +  " push "+adbdir+"dropbear.tar /sdcard/";
+    push_adb1.start(cstring);
+
+    while(push_adb1.state() != QProcess::NotRunning)
+         qApp->processEvents();
+
+     command = push_adb1.readAll();
+
+     if (!command.contains("bytes"))
+       {
+         QMessageBox::critical(this,"",command);
+         return;
+       }
+
+
+     QProcess cp_script;
+     cp_script.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr + port +  " shell su -c  cp /sdcard/dropbear.tar /data/";
+     cp_script.start(cstring);
+     while(cp_script.state() != QProcess::NotRunning)
+          qApp->processEvents();
+      command = cp_script.readAll();
+
+
+
+      QProcess ch_script;
+      ch_script.setProcessChannelMode(QProcess::MergedChannels);
+      cstring = adb + " -s " + daddr + port +  " shell su -c  tar -C /data -xf /data/dropbear.tar";
+      ch_script.start(cstring);
+      while(ch_script.state() != QProcess::NotRunning)
+           qApp->processEvents();
+       command = ch_script.readAll();
+
+
+
+
+       QProcess cp_1;
+       cp_1.setProcessChannelMode(QProcess::MergedChannels);
+       cstring = adb + " -s " + daddr + port +  " shell su -c cp /data/dropbear/dropbear.sh /system/xbin/";
+       cp_1.start(cstring);
+       while(cp_1.state() != QProcess::NotRunning)
+            qApp->processEvents();
+        command = cp_1.readAll();
+
+
+
+        QProcess ch_1;
+        ch_1.setProcessChannelMode(QProcess::MergedChannels);
+        cstring = adb + " -s " + daddr + port +  " shell su -c  chmod 0755 /system/xbin/dropbear.sh";
+        ch_1.start(cstring);
+        while(ch_1.state() != QProcess::NotRunning)
+             qApp->processEvents();
+         command = ch_1.readAll();
+
+
+         QProcess cp_2;
+         cp_2.setProcessChannelMode(QProcess::MergedChannels);
+         cstring = adb + " -s " + daddr + port +  " shell su -c rm /sdcard/dropbear.tar";
+         cp_2.start(cstring);
+         while(cp_2.state() != QProcess::NotRunning)
+              qApp->processEvents();
+          command = cp_2.readAll();
+
+
+
+          QProcess ch_2;
+          ch_2.setProcessChannelMode(QProcess::MergedChannels);
+          cstring = adb + " -s " + daddr + port +  " shell su -c rm /data/dropbear.tar";
+          ch_2.start(cstring);
+          while(ch_2.state() != QProcess::NotRunning)
+               qApp->processEvents();
+           command = ch_2.readAll();
+
+
+               QProcess check_file;
+               check_file.setProcessChannelMode(QProcess::MergedChannels);
+               cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh | grep dropbear.sh";
+               check_file.start(cstring);
+               check_file.waitForFinished(-1);
+               command=check_file.readAll();
+
+
+
+
+                 if (command.contains("No such file or directory"))
+                  {
+
+                     QFile file(filename);
+
+
+                         if(!file.open(QFile::WriteOnly |
+                                       QFile::Text))
+                         {
+                             QMessageBox::critical(this,"","Error creating file!");
+                             return;
+                         }
+
+
+                         QTextStream out(&file);
+                         out << hashbang << "\n" << dropbear << "\n";
+
+                         file.flush();
+                         file.close();
+
+                         mount_system("rw");
+
+
+
+                         QProcess push_adb;
+                         push_adb.setProcessChannelMode(QProcess::MergedChannels);
+                         cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+                         push_adb.start(cstring);
+                          while(push_adb.state() != QProcess::NotRunning)
+                              qApp->processEvents();
+                          command = push_adb.readAll();
+
+
+                          // QMessageBox::critical(this,"",command);
+
+                          if (!command.contains("bytes"))
+                           {
+
+                              QMessageBox::critical(this,"","Error moving file!");
+                              return;
+                          }
+
+
+                          QProcess move_file;
+                          move_file.setProcessChannelMode(QProcess::MergedChannels);
+                          cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+                          move_file.start(cstring);
+                          move_file.waitForFinished(-1);
+                          command=move_file.readAll();
+
+
+                          QProcess chmod_file;
+                          move_file.setProcessChannelMode(QProcess::MergedChannels);
+                          cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+                          chmod_file.start(cstring);
+                          chmod_file.waitForFinished(-1);
+                          command=chmod_file.readAll();
+
+
+                          if (command.contains("No such file or directory"))
+                           {
+                              QMessageBox::critical(this,"","chmod: No such file or directory");
+                              return;
+                            }
+
+                             QProcess rm_file1;
+                             rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                             cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                             rm_file1.start(cstring);
+                             rm_file1.waitForFinished(-1);
+                             command=rm_file1.readAll();
+
+
+                             if (command.contains("No such file or directory"))
+                              {
+                                 QMessageBox::critical(this,"","sdcard: No such file or directory");
+                                 return;
+                               }
+
+                             QProcess rm_file2;
+                             rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                             cstring = "rm " + filename;
+                             rm_file2.start(cstring);
+                             rm_file2.waitForFinished(-1);
+                             command=rm_file2.readAll();
+
+
+                    mount_system("ro");
+
+                 }
+
+              else
+
+                 {
+
+                     QProcess pull_file;
+                     pull_file.setProcessChannelMode(QProcess::MergedChannels);
+                     cstring = adb + " -s " + daddr + port +  " pull /system/etc/install-recovery-2.sh " + adbdir;
+                     pull_file.start(cstring);
+                     pull_file.waitForFinished(-1);
+                     command=pull_file.readAll();
+
+
+                     // QMessageBox::information( this,"",command);
+
+                       if (command.contains("No such file or directory"))
+                        {
+                           QMessageBox::information( this,"","Not found: /system/etc/install-recovery-2.sh");
+                           return;
+                        }
+
+
+                     QFile file(filename);
+                     file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+                     QTextStream out(&file);
+                     out <<  dropbear << "\n";
+                     file.flush();
+                     file.close();
+
+                     mount_system("rw");
+
+
+
+                     QProcess push_adb;
+                     push_adb.setProcessChannelMode(QProcess::MergedChannels);
+                     cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+                     push_adb.start(cstring);
+                      while(push_adb.state() != QProcess::NotRunning)
+                          qApp->processEvents();
+                      command = push_adb.readAll();
+
+
+                      // QMessageBox::critical(this,"",command);
+
+                      if (!command.contains("bytes"))
+                       {
+
+                          QMessageBox::critical(this,"","2:Error moving file!");
+                          return;
+                      }
+
+
+                      QProcess move_file;
+                      move_file.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+                      move_file.start(cstring);
+                      move_file.waitForFinished(-1);
+                      command=move_file.readAll();
+
+
+                      QProcess chmod_file;
+                      move_file.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+                      chmod_file.start(cstring);
+                      chmod_file.waitForFinished(-1);
+                      command=chmod_file.readAll();
+
+
+                      if (command.contains("No such file or directory"))
+                       {
+                          QMessageBox::critical(this,"","chmod2: No such file or directory");
+                          return;
+                        }
+
+                         QProcess rm_file1;
+                         rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                         cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                         rm_file1.start(cstring);
+                         rm_file1.waitForFinished(-1);
+                         command=rm_file1.readAll();
+
+
+                         if (command.contains("No such file or directory"))
+                          {
+                             QMessageBox::critical(this,"","sdcard2: No such file or directory");
+                             return;
+                           }
+
+                         QProcess rm_file2;
+                         rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                         cstring = "rm " + filename;
+                         rm_file2.start(cstring);
+                         rm_file2.waitForFinished(-1);
+                         command=rm_file2.readAll();
+
+
+
+
+                 }
+
+
+                 QProcess check_ssh;
+                 check_ssh.setProcessChannelMode(QProcess::MergedChannels);
+                 cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/dropbear.sh";
+                 check_ssh.start(cstring);
+                 check_ssh.waitForFinished(-1);
+                 command=check_ssh.readAll();
+
+
+                   if (command.contains("No such file or directory"))
+                     QMessageBox::critical( this,"","Install failed!");
+                    else
+                     {
+                       QProcess ch_dr;
+                       ch_dr.setProcessChannelMode(QProcess::MergedChannels);
+                        cstring = adb + " -s " + daddr + port +  " shell dropbear.sh";
+
+                       ch_dr.start(cstring);
+
+                       while(ch_dr.state() != QProcess::NotRunning)
+                            qApp->processEvents();
+
+                       command = ch_dr.readAll();
+
+                       QProcess ck_dr;
+                       ck_dr.setProcessChannelMode(QProcess::MergedChannels);
+                       cstring = adb + " -s " + daddr + port +  " shell ps | grep dropbear";
+
+                       ck_dr.start(cstring);
+
+                       while(ck_dr.state() != QProcess::NotRunning)
+                            qApp->processEvents();
+
+                       command = ck_dr.readAll();
+
+                       if (command.contains("dropbear"))
+                       QMessageBox::information(this,"","SSH installed and started");
+                       else
+                       QMessageBox::information(this,"","SSH installed, but won't start!");
+
+
+                   }
+
+
+
+}
+
+////////////////////////////////////////////////
+void MainWindow::on_actionRemove_SSH_triggered()
+{
+
+    QString cstring;
+    QString dropbear = "/system/etc/dropbear.sh";
+    QString hashbang = "#!/system/bin/sh";
+    QString filename = adbdir+"install-recovery-2.sh";
+    QString makepst = "sleep 10; mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
+    bool mountpst = false;
+
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+mount_system("rw");
+
+     QProcess check_ssh1;
+     check_ssh1.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/dropbear.sh";
+     check_ssh1.start(cstring);
+     check_ssh1.waitForFinished(-1);
+     command=check_ssh1.readAll();
+
+       if (command.contains("No such file or directory"))
+        { QMessageBox::critical( this,"","SSH not installed!");
+           mount_system("ro");
+         return;
+       }
+
+
+
+       QProcess check_file1;
+         check_file1.setProcessChannelMode(QProcess::MergedChannels);
+         cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh";
+         check_file1.start(cstring);
+         check_file1.waitForFinished(-1);
+         command=check_file1.readAll();
+
+
+         if (command.contains("No such file or directory"))
+          {
+             QMessageBox::critical(this,"","1:install-recovery-2.sh not found.");
+              mount_system("ro");
+             return;
+           }
+
+        if (command.contains("mount"))
+            mountpst = true;
+
+
+
+             QProcess rm_file1;
+             rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+             cstring = adb + " -s " + daddr+port + " shell su -c rm " + " /system/etc/install-recovery-2.sh";
+             rm_file1.start(cstring);
+             rm_file1.waitForFinished(-1);
+             command=rm_file1.readAll();
+             // QMessageBox::information(this,"",command);
+
+              QProcess kill_dropbear;
+              kill_dropbear.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr + port +  " shell su -c  killall dropbear";
+              kill_dropbear.start(cstring);
+              while(kill_dropbear.state() != QProcess::NotRunning)
+               qApp->processEvents();
+               command = kill_dropbear.readAll();
+               // QMessageBox::information(this,"",command);
+
+              QProcess rm_dropbear1;
+              rm_dropbear1.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr + port +  " shell su -c  rm -r /data/dropbear/";
+              rm_dropbear1.start(cstring);
+              while(rm_dropbear1.state() != QProcess::NotRunning)
+                qApp->processEvents();
+              command = rm_dropbear1.readAll();
+              // QMessageBox::information(this,"",command);
+
+
+              QProcess rm_dropbear2;
+              rm_dropbear2.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr + port +  " shell su -c  rm -r /system/xbin/dropbear.sh";
+              rm_dropbear2.start(cstring);
+              while(rm_dropbear2.state() != QProcess::NotRunning)
+               qApp->processEvents();
+              command = rm_dropbear2.readAll();
+              // QMessageBox::information(this,"",command);
+
+         if (mountpst)
+
+         {
+
+
+                 QFile file(filename);
+
+
+                     if(!file.open(QFile::WriteOnly |
+                                   QFile::Text))
+                     {
+                         QMessageBox::critical(this,"","Error creating file!");
+                         mount_system("ro");
+                         return;
+                     }
+
+
+                     QTextStream out(&file);
+                     out << hashbang << "\n" << makepst << "\n";
+
+                     file.flush();
+                     file.close();
+
+                     QProcess push_script;
+                     push_script.setProcessChannelMode(QProcess::MergedChannels);
+                     cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+                     push_script.start(cstring);
+                      while(push_script.state() != QProcess::NotRunning)
+                          qApp->processEvents();
+                      command = push_script.readAll();
+
+                      QProcess move_file;
+                      move_file.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+                      move_file.start(cstring);
+                      move_file.waitForFinished(-1);
+                      command=move_file.readAll();
+
+                      QProcess chmod_file;
+                      move_file.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+                      chmod_file.start(cstring);
+                      chmod_file.waitForFinished(-1);
+                      command=chmod_file.readAll();
+
+                      if (command.contains("No such file or directory"))
+                       {
+                          QMessageBox::critical(this,"","chmod: No such file or directory");
+                          mount_system("ro");
+                          return;
+                        }
+
+                         QProcess rm_cleanup1;
+                         rm_cleanup1.setProcessChannelMode(QProcess::MergedChannels);
+                         cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                         rm_cleanup1.start(cstring);
+                         rm_cleanup1.waitForFinished(-1);
+                         command=rm_cleanup1.readAll();
+
+
+                         if (command.contains("No such file or directory"))
+                          {
+                             QMessageBox::critical(this,"","sdcard: No such file or directory");
+                             mount_system("ro");
+                             return;
+                           }
+
+                         QProcess rm_cleanup2;
+                         rm_cleanup2.setProcessChannelMode(QProcess::MergedChannels);
+                         cstring = "rm " + filename;
+                         rm_cleanup2.start(cstring);
+                         rm_cleanup2.waitForFinished(-1);
+                         command=rm_cleanup2.readAll();
+
+             }
+
+
+
+             QMessageBox::information(this,"","SSH Removed.");
+             mount_system("ro");
+             return;
+
+}
+
+/////////////////////////////////////////////////
+void MainWindow::on_usbBox_clicked(bool checked)
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+QString cstring;
+QString hashbang = "#!/system/bin/sh";
+QString makepst = "sleep 10; mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
+QString filename = adbdir+"install-recovery-2.sh";
+QString dropbear = "/system/xbin/dropbear.sh";
+
+    if (checked)
+    {
+
+
+        QProcess check_file;
+        check_file.setProcessChannelMode(QProcess::MergedChannels);
+        cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh | grep mount";
+        check_file.start(cstring);
+        check_file.waitForFinished(-1);
+        command=check_file.readAll();
+
+
+          if (command.contains("mount"))
+           {
+              QMessageBox::information( this,"","USB drive already persistent");
+              return;
+           }
+
+
+          if (command.contains("No such file or directory"))
+           {
+
+              QFile file(filename);
+
+
+                  if(!file.open(QFile::WriteOnly |
+                                QFile::Text))
+                  {
+                      QMessageBox::critical(this,"","Error creating file!");
+                      return;
+                  }
+
+
+                  QTextStream out(&file);
+                  out << hashbang << "\n" << makepst << "\n";
+
+                  file.flush();
+                  file.close();
+
+                  mount_system("rw");
+
+
+
+                  QProcess push_adb;
+                  push_adb.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+                  push_adb.start(cstring);
+                   while(push_adb.state() != QProcess::NotRunning)
+                       qApp->processEvents();
+                   command = push_adb.readAll();
+
+
+                   // QMessageBox::critical(this,"",command);
+
+                   if (!command.contains("bytes"))
+                    {
+
+                       QMessageBox::critical(this,"","Error moving file!");
+                       return;
+                   }
+
+
+                   QProcess move_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+                   move_file.start(cstring);
+                   move_file.waitForFinished(-1);
+                   command=move_file.readAll();
+
+
+                   QProcess chmod_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+                   chmod_file.start(cstring);
+                   chmod_file.waitForFinished(-1);
+                   command=chmod_file.readAll();
+
+
+                   if (command.contains("No such file or directory"))
+                    {
+                       QMessageBox::critical(this,"","chmod: No such file or directory");
+                       return;
+                     }
+
+                      QProcess rm_file1;
+                      rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                      rm_file1.start(cstring);
+                      rm_file1.waitForFinished(-1);
+                      command=rm_file1.readAll();
+
+
+                      if (command.contains("No such file or directory"))
+                       {
+                          QMessageBox::critical(this,"","sdcard: No such file or directory");
+                          return;
+                        }
+
+                      QProcess rm_file2;
+                      rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = "rm " + filename;
+                      rm_file2.start(cstring);
+                      rm_file2.waitForFinished(-1);
+                      command=rm_file2.readAll();
+
+
+             mount_system("ro");
+
+          }
+
+       else
+
+          {
+
+              QProcess pull_file;
+              pull_file.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr + port +  " pull /system/etc/install-recovery-2.sh " + adbdir;
+              pull_file.start(cstring);
+              pull_file.waitForFinished(-1);
+              command=pull_file.readAll();
+
+
+              // QMessageBox::information( this,"",command);
+
+                if (command.contains("No such file or directory"))
+                 {
+                    QMessageBox::information( this,"","Not found: /system/etc/install-recovery-2.sh");
+                    return;
+                 }
+
+
+              QFile file(filename);
+              file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+              QTextStream out(&file);
+              out <<  makepst << "\n";
+              file.flush();
+              file.close();
+
+              mount_system("rw");
+
+
+
+              QProcess push_adb;
+              push_adb.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+              push_adb.start(cstring);
+               while(push_adb.state() != QProcess::NotRunning)
+                   qApp->processEvents();
+               command = push_adb.readAll();
+
+
+               // QMessageBox::critical(this,"",command);
+
+               if (!command.contains("bytes"))
+                {
+
+                   QMessageBox::critical(this,"","2:Error moving file!");
+                   return;
+               }
+
+
+               QProcess move_file;
+               move_file.setProcessChannelMode(QProcess::MergedChannels);
+               cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+               move_file.start(cstring);
+               move_file.waitForFinished(-1);
+               command=move_file.readAll();
+
+
+               QProcess chmod_file;
+               move_file.setProcessChannelMode(QProcess::MergedChannels);
+               cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+               chmod_file.start(cstring);
+               chmod_file.waitForFinished(-1);
+               command=chmod_file.readAll();
+
+
+               if (command.contains("No such file or directory"))
+                {
+                   QMessageBox::critical(this,"","chmod2: No such file or directory");
+                   return;
+                 }
+
+                  QProcess rm_file1;
+                  rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                  rm_file1.start(cstring);
+                  rm_file1.waitForFinished(-1);
+                  command=rm_file1.readAll();
+
+
+                  if (command.contains("No such file or directory"))
+                   {
+                      QMessageBox::critical(this,"","sdcard2: No such file or directory");
+                      return;
+                    }
+
+                  QProcess rm_file2;
+                  rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = "rm " + filename;
+                  rm_file2.start(cstring);
+                  rm_file2.waitForFinished(-1);
+                  command=rm_file2.readAll();
+
+
+
+
+          }
+
+
+          QMessageBox::information( this,"","USB drive is now persistent");
+          mount_system("ro");
+
+    }
+
+ ////////////////////////////////////////
+
+   if(!checked)
+
+    {
+
+
+      mount_system("rw");
+
+        QProcess check_file;
+          check_file.setProcessChannelMode(QProcess::MergedChannels);
+          cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh";
+          check_file.start(cstring);
+          check_file.waitForFinished(-1);
+          command=check_file.readAll();
+
+
+          if (command.contains("No such file or directory"))
+           {
+              QMessageBox::critical(this,"","No persistence script found.");
+               mount_system("ro");
+              return;
+            }
+
+
+          if (!command.contains("dropbear.sh"))
+           {
+              QProcess rm_file1;
+              rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr+port + " shell su -c rm " + " /system/etc/install-recovery-2.sh";
+              rm_file1.start(cstring);
+              rm_file1.waitForFinished(-1);
+              command=rm_file1.readAll();
+              QMessageBox::information(this,"","USB drive is not persistent.");
+              mount_system("ro");
+              return;
+          }
+
+
+      else
+
+          {
+
+
+          if (command.contains("/system/xbin/dropbear.sh"))
+           {
+
+          QFile file(filename);
+
+
+                  if(!file.open(QFile::WriteOnly |
+                                QFile::Text))
+                  {
+                      QMessageBox::critical(this,"","Error creating file!");
+                      mount_system("ro");
+                      return;
+                  }
+
+
+                  QTextStream out(&file);
+                  out << hashbang << "\n" << dropbear << "\n";
+
+                  file.flush();
+                  file.close();
+
+                  QProcess push_adb;
+                  push_adb.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+                  push_adb.start(cstring);
+                   while(push_adb.state() != QProcess::NotRunning)
+                       qApp->processEvents();
+                   command = push_adb.readAll();
+
+
+
+                   QProcess move_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+                   move_file.start(cstring);
+                   move_file.waitForFinished(-1);
+                   command=move_file.readAll();
+
+
+                   QProcess chmod_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+                   chmod_file.start(cstring);
+                   chmod_file.waitForFinished(-1);
+                   command=chmod_file.readAll();
+
+
+
+                   if (command.contains("No such file or directory"))
+                    {
+                       QMessageBox::critical(this,"","chmod: No such file or directory");
+                       mount_system("ro");
+                       return;
+                     }
+
+                      QProcess rm_file1;
+                      rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                      rm_file1.start(cstring);
+                      rm_file1.waitForFinished(-1);
+                      command=rm_file1.readAll();
+
+
+                      if (command.contains("No such file or directory"))
+                       {
+                          QMessageBox::critical(this,"","sdcard: No such file or directory");
+                          mount_system("ro");
+                          return;
+                        }
+
+                      QProcess rm_file2;
+                      rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = "rm " + filename;
+                      rm_file2.start(cstring);
+                      rm_file2.waitForFinished(-1);
+                      command=rm_file2.readAll();
+
+                      QMessageBox::information(this,"","USB drive is not persistent.");
+                      mount_system("ro");
+
+
+            }
+
+         }
+
+
+    }
+
+
+
+
+
+
+}
+
+void MainWindow::on_sshBox_clicked(bool checked)
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    is_package("eu.chainfire.supersu");
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+    if (checked)
+    QMessageBox::information(this,"","SSH Persistent.");
+    else
+     QMessageBox::information(this,"","SSH not persistent.");
 
 }

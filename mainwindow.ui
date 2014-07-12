@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>629</width>
-    <height>542</height>
+    <width>619</width>
+    <height>482</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -45,8 +45,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>560</y>
+      <x>10</x>
+      <y>600</y>
       <width>118</width>
       <height>16</height>
      </rect>
@@ -62,7 +62,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>560</y>
+      <y>600</y>
       <width>148</width>
       <height>16</height>
      </rect>
@@ -74,8 +74,8 @@
    <widget class="QLabel" name="device_connected">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>560</y>
+      <x>330</x>
+      <y>600</y>
       <width>136</width>
       <height>16</height>
      </rect>
@@ -149,8 +149,8 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>270</y>
+      <x>30</x>
+      <y>240</y>
       <width>161</width>
       <height>171</height>
      </rect>
@@ -296,7 +296,7 @@
     <property name="title">
      <string>System processes</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -349,7 +349,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -399,20 +399,14 @@
       </item>
      </layout>
     </widget>
-    <zorder>layoutWidget</zorder>
-    <zorder>layoutWidget</zorder>
-    <zorder></zorder>
-    <zorder></zorder>
-    <zorder></zorder>
-    <zorder></zorder>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>220</x>
       <y>270</y>
-      <width>201</width>
-      <height>181</height>
+      <width>131</width>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
@@ -423,71 +417,63 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>167</width>
-       <height>134</height>
+       <width>104</width>
+       <height>89</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
        <widget class="QPushButton" name="mntButton">
         <property name="text">
-         <string>Mount drive</string>
+         <string>Mount</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="umntButton">
         <property name="text">
-         <string>Unmount drive</string>
+         <string>Unmount</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="makepstButton">
-        <property name="text">
-         <string>Make Persistent</string>
+       <widget class="QCheckBox" name="usbBox">
+        <property name="enabled">
+         <bool>true</bool>
         </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="rmpstButton">
         <property name="text">
-         <string>Remove Persistence</string>
+         <string>Persistent</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_6">
+   <widget class="QGroupBox" name="sshgroupBox">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>380</x>
       <y>270</y>
-      <width>151</width>
-      <height>181</height>
+      <width>141</width>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
      <string>SSH</string>
     </property>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>30</y>
-       <width>108</width>
-       <height>134</height>
+       <width>100</width>
+       <height>89</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <item>
-       <widget class="QPushButton" name="instsshButton">
-        <property name="text">
-         <string>Install ssh</string>
-        </property>
-       </widget>
-      </item>
+     <layout class="QVBoxLayout" name="verticalLayout_7">
       <item>
        <widget class="QPushButton" name="startsshButton">
         <property name="text">
@@ -503,9 +489,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="delsshButton">
+       <widget class="QCheckBox" name="sshBox">
         <property name="text">
-         <string>Delete ssh</string>
+         <string>Persistent</string>
         </property>
        </widget>
       </item>
@@ -520,25 +506,18 @@
    <zorder>groupBox_4</zorder>
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
-   <zorder>groupBox_2</zorder>
-   <zorder>groupBox_6</zorder>
-   <zorder>sideload_Button</zorder>
-   <zorder>uninstall_Button</zorder>
-   <zorder>backupButton</zorder>
-   <zorder>restoreButton</zorder>
-   <zorder>pushRemote</zorder>
-   <zorder>screenshotButton</zorder>
-   <zorder>rootButton</zorder>
-   <zorder>consoleButton</zorder>
-   <zorder>rwButton</zorder>
-   <zorder>roButton</zorder>
+   <zorder>usbgroupBox</zorder>
+   <zorder>sshgroupBox</zorder>
+   <zorder>sshBox</zorder>
+   <zorder>stopsshButton</zorder>
+   <zorder>startsshButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>629</width>
+     <width>619</width>
      <height>22</height>
     </rect>
    </property>
@@ -551,9 +530,11 @@
     <addaction name="actionRecovery"/>
     <addaction name="actionUpdates_on"/>
     <addaction name="actionUpdates_off"/>
-    <addaction name="actionSSH_Password"/>
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
+    <addaction name="actionInstall_SSH"/>
+    <addaction name="actionRemove_SSH"/>
+    <addaction name="actionSSH_Password"/>
     <addaction name="actionFirmware_install"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -662,6 +643,16 @@
    </property>
    <property name="toolTip">
     <string>Change SSH Password</string>
+   </property>
+  </action>
+  <action name="actionInstall_SSH">
+   <property name="text">
+    <string>Install SSH</string>
+   </property>
+  </action>
+  <action name="actionRemove_SSH">
+   <property name="text">
+    <string>Remove SSH</string>
    </property>
   </action>
  </widget>

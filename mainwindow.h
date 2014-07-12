@@ -72,30 +72,31 @@ private slots:
 
     void on_actionFirmware_install_triggered();
 
-
     void on_mntButton_clicked();
 
-    void on_makepstButton_clicked();
-
     void on_umntButton_clicked();
-
-    void on_rmpstButton_clicked();
-
-    void on_instsshButton_clicked();
 
     void on_startsshButton_clicked();
 
     void on_stopsshButton_clicked();
-
-    void on_delsshButton_clicked();
-
-
 
     void on_rwButton_clicked();
 
     void on_roButton_clicked();
 
     void on_actionSSH_Password_triggered();
+
+    void on_usbBox_clicked();
+
+    void on_sshBox_clicked();
+
+    void on_actionInstall_SSH_triggered();
+
+    void on_actionRemove_SSH_triggered();
+
+    void on_usbBox_clicked(bool checked);
+
+    void on_sshBox_clicked(bool checked);
 
 private:
     Ui::MainWindow *ui;
