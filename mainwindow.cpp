@@ -44,8 +44,16 @@ QString daddr="";
 QString sldir = "";
 QString pushdir = "";
 QString pulldir = "";
+bool updatecheck = true;
 QString port = ":5555";
 QString xbmcpackage ="";
+
+
+QString makepst = "sleep 15; /system/xbin/mount -o user,umask=0000 -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
+
+int sshcheck;
+int usbcheck;
+int ftvupdate;
 
 
 
@@ -174,7 +182,6 @@ bool amazon_updates(QString onoff)
        command=update_policy.readAll();
 
 
-
         if (onoff == "enable")
            { if (command.contains("enabled"))
                return true;
@@ -191,8 +198,6 @@ bool amazon_updates(QString onoff)
 }
 
 
-
-
 ////////////////////////////////
 void createTables()
 {
@@ -207,6 +212,16 @@ void createTables()
 ////////////////////////////////
 void updateTables()
 {
+
+    QString str1;
+    QString str2;
+    QString str3;
+
+
+    str1.setNum(sshcheck);
+    str2.setNum(usbcheck);
+    str3.setNum(ftvupdate);
+
     QSqlQuery query;
 
     QString sqlstatement = "UPDATE device SET name='"+daddr+"' WHERE Id=1";
@@ -224,7 +239,14 @@ void updateTables()
       sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"' WHERE Id=1";
        query.exec(sqlstatement);
 
+       sqlstatement = "UPDATE device SET sshcheck='"+str1+"' WHERE Id=1";
+        query.exec(sqlstatement);
 
+        sqlstatement = "UPDATE device SET usbcheck='"+str2+"' WHERE Id=1";
+         query.exec(sqlstatement);
+
+         sqlstatement = "UPDATE device SET ftvupdate='"+str3+"' WHERE Id=1";
+          query.exec(sqlstatement);
 
 }
 
@@ -263,7 +285,25 @@ void readTables()
             }
 
 
-     if (sldir.isEmpty())
+
+            query.exec("SELECT sshcheck FROM device");
+            while (query.next()) {
+                  sshcheck = query.value(0).toInt();
+            }
+
+            query.exec("SELECT usbcheck FROM device");
+            while (query.next()) {
+                  usbcheck = query.value(0).toInt();
+            }
+
+            query.exec("SELECT ftvupdate FROM device");
+            while (query.next()) {
+                  ftvupdate = query.value(0).toInt();
+            }
+
+
+
+if (sldir.isEmpty())
          sldir = hdir;
 
      if (pushdir.isEmpty())
@@ -274,6 +314,12 @@ void readTables()
 
      if (xbmcpackage.isEmpty())
          xbmcpackage = "org.xbmc.xbmc";
+
+     if (ftvupdate==0)
+         updatecheck=false;
+     else
+         updatecheck=true;
+
 
 
    // qDebug() << query.isSelect();
@@ -293,6 +339,23 @@ void readTables()
 
 
     this->setFixedSize(this->size().width(), this->size().height());
+
+
+
+
+           if (sshcheck == 1)
+               ui->sshBox->setChecked(true);
+           else
+              ui->sshBox->setChecked(false);
+
+           if (usbcheck == 1)
+               ui->usbBox->setChecked(true);
+           else
+              ui->usbBox->setChecked(false);
+
+
+
+
 
 
 
@@ -367,6 +430,16 @@ void readTables()
 
    readTables();
 
+
+   if (sshcheck == 1)
+       ui->sshBox->setChecked(true);
+   else
+      ui->sshBox->setChecked(false);
+
+   if (usbcheck == 1)
+       ui->usbBox->setChecked(true);
+   else
+      ui->usbBox->setChecked(false);
     ui->device->setText(daddr);
 
     if (!(os == 1))
@@ -399,6 +472,22 @@ void readTables()
 
 MainWindow::~MainWindow()
 {
+    if (ui->usbBox->isChecked())
+        usbcheck = 1;
+    else
+        usbcheck = 0;
+
+    if (ui->sshBox->isChecked())
+        sshcheck = 1;
+    else
+        sshcheck = 0;
+
+    if (updatecheck)
+        ftvupdate = 1;
+    else
+        ftvupdate = 0;
+
+    kill_server();
     updateTables();
     db.close();
     delete ui;
@@ -504,6 +593,8 @@ void MainWindow::on_connButton_clicked()
              tr("Device address required."));
           return;
     }
+
+    // QMessageBox::critical(this,"","xxxx");
 
     port = ":5555";
 
@@ -1434,9 +1525,13 @@ QString cstring = "";
 //////////////////////////////////////////////////
 void MainWindow::on_actionPreferences_triggered()
 {
+
+    // updatecheck = true;
+
     preferencesDialog dialog;
     dialog.setPackagename(xbmcpackage);
     dialog.setPulldir(pulldir);
+    dialog.setftvUpdate(updatecheck);
     dialog.setModal(true);
 
 
@@ -1445,6 +1540,29 @@ void MainWindow::on_actionPreferences_triggered()
 
     xbmcpackage = dialog.xbmcpackageName();
     pulldir = dialog.pulldir();
+    updatecheck = dialog.updatecheck();
+
+
+   if ( is_package("eu.chainfire.supersu"))
+     {
+
+    if (updatecheck)
+     {
+       if (amazon_updates("enable"))
+       QMessageBox::information(this,"","Amazon updates on\ncom.amazon.dcp enabled");
+     else
+        QMessageBox::critical(this,"","Problem: com.amazon.dcp not enabled!");
+    }
+
+    else
+    {
+        if (amazon_updates("disable"))
+        QMessageBox::information(this,"","Amazon updates off\ncom.amazon.dcp disabled");
+      else
+         QMessageBox::critical(this,"","Problem: com.amazon.dcp not disabled!");
+    }
+  }
+
     updateTables();
 
     }
@@ -1635,91 +1753,6 @@ void MainWindow::on_screenshotButton_clicked()
 
 
 }
-
-
-
-////////////////////////////////////////////////
-void MainWindow::on_actionUpdates_on_triggered()
-{
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-
-    is_package("eu.chainfire.supersu");
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            "Root required!");
-         return;
-   }
-
-
-   if (amazon_updates("enable"))
-    QMessageBox::information(
-                   this,
-                  "",
-                   "com.amazon.dcp enabled");
-    else
-
-       QMessageBox::critical(
-                      this,
-                     "",
-                      "com.amazon.dcp not enabled!");
-
-
-}
-
-
-/////////////////////////////////////////////////
-void MainWindow::on_actionUpdates_off_triggered()
-{
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-
-    is_package("eu.chainfire.supersu");
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            "Root required!");
-         return;
-   }
-
-
-
-
-
-   if (amazon_updates("disable"))
-    QMessageBox::information(
-                   this,
-                  "",
-                   "com.amazon.dcp disabled");
-    else
-
-       QMessageBox::critical(
-                      this,
-                     "",
-                      "com.amazon.dcp not disabled!");
-
-
-}
-
 
 
 //////////////////////////////////////////////////////
@@ -2184,13 +2217,21 @@ void MainWindow::on_actionFirmware_install_triggered()
      if (reply == QMessageBox::No)
          return;
 
-    QProcess step_1;
+
+
+
+
+     QProcess step_1;
     step_1.setProcessChannelMode(QProcess::MergedChannels);
     cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /cache";
     step_1.start(cstring);
     step_1.waitForFinished(-1);
     command=step_1.readAll();
+
     
+    if (!command.isEmpty())
+     { QMessageBox::information( this,"","Error: "+command);
+        return; }
 
     QProcess step_2;
     step_2.setProcessChannelMode(QProcess::MergedChannels);
@@ -2199,6 +2240,10 @@ void MainWindow::on_actionFirmware_install_triggered()
     step_2.waitForFinished(-1);
     command=step_2.readAll();
     
+
+    if (!command.isEmpty())
+     { QMessageBox::information( this,"","Error: "+command);
+        return; }
 
 
     QFile file(commstr);
@@ -2226,7 +2271,9 @@ void MainWindow::on_actionFirmware_install_triggered()
     step_3.waitForFinished(-1);
     command=step_3.readAll();
     
-
+    if (!command.contains("bytes"))
+     { QMessageBox::information( this,"","Error: "+command);
+        return; }
 
     QProcess step_4;
     step_4.setProcessChannelMode(QProcess::MergedChannels);
@@ -2256,7 +2303,20 @@ void MainWindow::on_actionFirmware_install_triggered()
           usbstick = true;
           fileName = "/sdcard/usbStorage/sda1/update.zip";
 
-         }
+          QProcess update_zip_exist;
+          update_zip_exist.setProcessChannelMode(QProcess::MergedChannels);
+          cstring = adb + " -s " + daddr+port + " shell ls "+fileName;
+          update_zip_exist.start(cstring);
+          update_zip_exist.waitForFinished(-1);
+          command=update_zip_exist.readAll();
+
+          if (command.contains("No such file or directory"))
+           {
+              QMessageBox::information( this,"","Error: "+command);
+              return;
+          }
+
+          }
 
          else
 
@@ -2318,10 +2378,6 @@ void MainWindow::on_actionFirmware_install_triggered()
     command=step_7.readAll();
     
 
-
-
-
-
    if (!usbstick)
    {
     QProcess step_8;
@@ -2341,15 +2397,41 @@ void MainWindow::on_actionFirmware_install_triggered()
     step_9.start(cstring);
     step_9.waitForFinished(-1);
     command=step_9.readAll();
-    
+
+    QProcess step_10;
+    step_10.setProcessChannelMode(QProcess::MergedChannels);
+    cstring ="rm "+commstr;
+    step_10.start(cstring);
+    step_10.waitForFinished(-1);
+    command=step_10.readAll();
 
     ui->progressBar->setHidden(true);
 
     QMessageBox::StandardButton reply3;
       reply3 = QMessageBox::question(this, "", "Reboot to recovery?",
                                     QMessageBox::Yes|QMessageBox::No);
-      if (reply == QMessageBox::No)
+      if (reply3 == QMessageBox::No)
+       {
+
+          QProcess rm_update1;
+          rm_update1.setProcessChannelMode(QProcess::MergedChannels);
+          cstring = adb + " -s " + daddr+port + " shell su -c rm /cache/update.zip";
+          rm_update1.start(cstring);
+          rm_update1.waitForFinished(-1);
+          command=rm_update1.readAll();
+
+
+          QProcess rm_update2;
+          rm_update2.setProcessChannelMode(QProcess::MergedChannels);
+          cstring = adb + " -s " + daddr+port + " shell su -c rm /cache/recovery/command";
+          rm_update2.start(cstring);
+          rm_update2.waitForFinished(-1);
+          command=rm_update2.readAll();
+
+
           return;
+
+       }
 
 
     QElapsedTimer rtimer;
@@ -2378,15 +2460,6 @@ void MainWindow::on_actionFirmware_install_triggered()
 
     }
 
-    QProcess step_12;
-    step_12.setProcessChannelMode(QProcess::MergedChannels);
-    cstring ="rm "+commstr;
-    step_12.start(cstring);
-    step_12.waitForFinished(-1);
-    command=step_12.readAll();
-
-
-
 
 }
 
@@ -2414,9 +2487,23 @@ void MainWindow::on_mntButton_clicked()
    }
 
 
+   QProcess check_bb;
+   check_bb.setProcessChannelMode(QProcess::MergedChannels);
+   QString cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/mount";
+   check_bb.start(cstring);
+   check_bb.waitForFinished(-1);
+   command=check_bb.readAll();
 
-    QString mntstring = "mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
-    QString cstring;
+
+     if (command.contains("No such file or directory"))
+      { QMessageBox::critical( this,"","Busybox required for USB drive. Install it from the menu.");
+       return;
+     }
+
+
+
+    QString mntstring = "/system/xbin/mount -o user,umask=0000 -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
+
 
 
     QProcess mount_system;
@@ -2435,7 +2522,7 @@ void MainWindow::on_mntButton_clicked()
 
 
 
-       if (command.contains("mount: Device or resource busy"))
+       if (command.contains("resource busy"))
         {
            QMessageBox::information( this,"","USB drive already mounted");
            return;
@@ -2475,9 +2562,21 @@ void MainWindow::on_umntButton_clicked()
    }
 
 
+   QProcess check_bb;
+   check_bb.setProcessChannelMode(QProcess::MergedChannels);
+   QString cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/umount";
+   check_bb.start(cstring);
+   check_bb.waitForFinished(-1);
+   command=check_bb.readAll();
 
-    QString umntstring = "umount /sdcard/usbStorage/sda1/";
-    QString cstring;
+
+     if (command.contains("No such file or directory"))
+      { QMessageBox::critical( this,"","Busybox required for USB drive. Install it from the menu.");
+       return;
+     }
+
+
+    QString umntstring = "/system/xbin/umount /sdcard/usbStorage/sda1/";
 
 
     QProcess umount_system;
@@ -2520,9 +2619,25 @@ void MainWindow::on_startsshButton_clicked()
    }
 
 
+   QString cstring;
+
+   QProcess dropbear_installed;
+   dropbear_installed.setProcessChannelMode(QProcess::MergedChannels);
+   cstring = adb + " -s " + daddr + port +  " shell su -c ls /data/dropbear";
+
+    dropbear_installed.start(cstring);
+    dropbear_installed.waitForFinished(-1);
+    command = dropbear_installed.readAll();
+
+   if (command.contains("No such file or directory"))
+   {
+       QMessageBox::critical(this,"","Install dropbear from the menu.");
+       return;
+   }
 
 
-QString cstring;
+
+
 
     QProcess ck1_dr;
     ck1_dr.setProcessChannelMode(QProcess::MergedChannels);
@@ -2610,6 +2725,23 @@ void MainWindow::on_stopsshButton_clicked()
 
     QString cstring;
 
+
+    QProcess dropbear_installed;
+    dropbear_installed.setProcessChannelMode(QProcess::MergedChannels);
+    cstring = adb + " -s " + daddr + port +  " shell su -c ls /data/dropbear";
+
+     dropbear_installed.start(cstring);
+     dropbear_installed.waitForFinished(-1);
+     command = dropbear_installed.readAll();
+
+    if (command.contains("No such file or directory"))
+    {
+        QMessageBox::critical(this,"","Install dropbear from the menu.");
+        return;
+    }
+
+
+
     QProcess ck1_dr;
     ck1_dr.setProcessChannelMode(QProcess::MergedChannels);
     cstring = adb + " -s " + daddr + port +  " shell ps | grep dropbear";
@@ -2683,13 +2815,13 @@ void MainWindow::on_rwButton_clicked()
     QMessageBox::information(
                    this,
                   "",
-                   "/system mounted r/w");
+                   "Filesystem mounted r/w");
     else
 
        QMessageBox::critical(
                       this,
                      "",
-                      "/system not remounted!!");
+                      "Error: Filesystem not remounted!!");
 
 
 }
@@ -2721,13 +2853,13 @@ void MainWindow::on_roButton_clicked()
     QMessageBox::information(
                    this,
                   "",
-                   "/system mounted r/o");
+                   "Filesystem mounted r/o");
     else
 
        QMessageBox::critical(
                       this,
                      "",
-                      "/system not remounted!!");
+                      "Error: Filesystem not remounted!!");
 
 }
 
@@ -2754,9 +2886,27 @@ void MainWindow::on_actionSSH_Password_triggered()
          return;
    }
 
+   QString hashbang = "#!/system/bin/sh";
+   QString ssh1 = "su -c /data/dropbear/dropbear -p 22 -A -N root -U 0 -G 0 -C ";
+   QString ssh2 = " -r /data/dropbear/rsa";
+   QString filename = adbdir + "dropbear.sh";
+   QString dropbear;
+   QString cstring;
 
+   QProcess dropbear_installed;
+   dropbear_installed.setProcessChannelMode(QProcess::MergedChannels);
+   cstring = adb + " -s " + daddr + port +  " shell su -c ls /data/dropbear";
 
+    dropbear_installed.start(cstring);
+    dropbear_installed.waitForFinished(-1);
+    command = dropbear_installed.readAll();
 
+   if (command.contains("No such file or directory"))
+   {
+       QMessageBox::critical(this,"","Install dropbear from the menu.");
+       ui->sshBox->setChecked(false);
+       return;
+   }
 
 
     QString password = QInputDialog::getText(this,"" ,
@@ -2771,12 +2921,7 @@ void MainWindow::on_actionSSH_Password_triggered()
                return;
             }
 
-QString hashbang = "#!/system/bin/sh";
-QString ssh1 = "su -c /data/dropbear/dropbear -p 22 -A -N root -U 0 -G 0 -C ";
-QString ssh2 = " -r /data/dropbear/rsa";
-QString filename = adbdir + "dropbear.sh";
-QString dropbear;
-QString cstring;
+
 
 mount_system("rw");
 
@@ -2889,17 +3034,6 @@ mount_system("ro");
 
 }
 
-/////////////////////////////////////
-void MainWindow::on_usbBox_clicked()
-{
-
-}
-
-////////////////////////////////////
-void MainWindow::on_sshBox_clicked()
-{
-
-}
 
 /////////////////////////////////////////////////
 void MainWindow::on_actionInstall_SSH_triggered()
@@ -2935,7 +3069,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
     QString dropbear = "/system/xbin/dropbear.sh";
     QString hashbang = "#!/system/bin/sh";
     QString filename = adbdir+"install-recovery-2.sh";
-    QString makepst = "mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
+    
 
 
 
@@ -3306,7 +3440,7 @@ void MainWindow::on_actionRemove_SSH_triggered()
     QString dropbear = "/system/etc/dropbear.sh";
     QString hashbang = "#!/system/bin/sh";
     QString filename = adbdir+"install-recovery-2.sh";
-    QString makepst = "sleep 10; mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
+    
     bool mountpst = false;
 
 
@@ -3513,9 +3647,26 @@ void MainWindow::on_usbBox_clicked(bool checked)
 
 QString cstring;
 QString hashbang = "#!/system/bin/sh";
-QString makepst = "sleep 10; mount -o rw -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
 QString filename = adbdir+"install-recovery-2.sh";
 QString dropbear = "/system/xbin/dropbear.sh";
+
+QProcess busybox_installed;
+busybox_installed.setProcessChannelMode(QProcess::MergedChannels);
+cstring = adb + " -s " + daddr + port +  " shell su -c ls /system/xbin/mount";
+
+ busybox_installed.start(cstring);
+ busybox_installed.waitForFinished(-1);
+ command = busybox_installed.readAll();
+
+if (command.contains("No such file or directory"))
+{
+    QMessageBox::critical(this,"","Busybox required for USB drive. Install it from the menu.");
+    ui->usbBox->setChecked(false);
+    return;
+}
+
+
+
 
     if (checked)
     {
@@ -3871,7 +4022,9 @@ QString dropbear = "/system/xbin/dropbear.sh";
 
 }
 
+//////////////////////////////////////////////////
 void MainWindow::on_sshBox_clicked(bool checked)
+
 {
 
     if (!isConnected)
@@ -3893,10 +4046,377 @@ void MainWindow::on_sshBox_clicked(bool checked)
          return;
    }
 
+QString cstring;
+
+   QProcess dropbear_installed;
+   dropbear_installed.setProcessChannelMode(QProcess::MergedChannels);
+   cstring = adb + " -s " + daddr + port +  " shell su -c ls /data/dropbear";
+
+    dropbear_installed.start(cstring);
+    dropbear_installed.waitForFinished(-1);
+    command = dropbear_installed.readAll();
+
+   if (command.contains("No such file or directory"))
+   {
+       QMessageBox::critical(this,"","Install dropbear from the menu.");
+       ui->sshBox->setChecked(false);
+       return;
+   }
+
+
+
+
+QString hashbang = "#!/system/bin/sh";
+QString filename = adbdir+"install-recovery-2.sh";
+QString dropbear = "/system/xbin/dropbear.sh";
 
     if (checked)
-    QMessageBox::information(this,"","SSH Persistent.");
-    else
-     QMessageBox::information(this,"","SSH not persistent.");
+    {
+
+
+        QProcess check_file;
+        check_file.setProcessChannelMode(QProcess::MergedChannels);
+        cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh | grep dropbear.sh";
+        check_file.start(cstring);
+        check_file.waitForFinished(-1);
+        command=check_file.readAll();
+
+
+          if (command.contains("dropbear.sh"))
+           {
+              QMessageBox::information( this,"","SSH already persistent");
+              return;
+           }
+
+
+          if (command.contains("No such file or directory"))
+           {
+
+              QFile file(filename);
+
+
+                  if(!file.open(QFile::WriteOnly |
+                                QFile::Text))
+                  {
+                      QMessageBox::critical(this,"","Error creating file!");
+                      return;
+                  }
+
+
+                  QTextStream out(&file);
+                  out << hashbang << "\n" << dropbear << "\n";
+
+                  file.flush();
+                  file.close();
+
+                  mount_system("rw");
+
+
+
+                  QProcess push_adb;
+                  push_adb.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+                  push_adb.start(cstring);
+                   while(push_adb.state() != QProcess::NotRunning)
+                       qApp->processEvents();
+                   command = push_adb.readAll();
+
+
+                   // QMessageBox::critical(this,"",command);
+
+                   if (!command.contains("bytes"))
+                    {
+
+                       QMessageBox::critical(this,"","Error moving file!");
+                       return;
+                   }
+
+
+                   QProcess move_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+                   move_file.start(cstring);
+                   move_file.waitForFinished(-1);
+                   command=move_file.readAll();
+
+
+                   QProcess chmod_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+                   chmod_file.start(cstring);
+                   chmod_file.waitForFinished(-1);
+                   command=chmod_file.readAll();
+
+
+                   if (command.contains("No such file or directory"))
+                    {
+                       QMessageBox::critical(this,"","chmod: No such file or directory");
+                       return;
+                     }
+
+                      QProcess rm_file1;
+                      rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                      rm_file1.start(cstring);
+                      rm_file1.waitForFinished(-1);
+                      command=rm_file1.readAll();
+
+
+                      if (command.contains("No such file or directory"))
+                       {
+                          QMessageBox::critical(this,"","sdcard: No such file or directory");
+                          return;
+                        }
+
+                      QProcess rm_file2;
+                      rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = "rm " + filename;
+                      rm_file2.start(cstring);
+                      rm_file2.waitForFinished(-1);
+                      command=rm_file2.readAll();
+
+
+             mount_system("ro");
+
+          }
+
+       else
+
+          {
+
+              QProcess pull_file;
+              pull_file.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr + port +  " pull /system/etc/install-recovery-2.sh " + adbdir;
+              pull_file.start(cstring);
+              pull_file.waitForFinished(-1);
+              command=pull_file.readAll();
+
+
+              // QMessageBox::information( this,"",command);
+
+                if (command.contains("No such file or directory"))
+                 {
+                    QMessageBox::information( this,"","Not found: /system/etc/install-recovery-2.sh");
+                    return;
+                 }
+
+
+              QFile file(filename);
+              file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+              QTextStream out(&file);
+              out <<  dropbear << "\n";
+              file.flush();
+              file.close();
+
+              mount_system("rw");
+
+
+
+              QProcess push_adb;
+              push_adb.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+              push_adb.start(cstring);
+               while(push_adb.state() != QProcess::NotRunning)
+                   qApp->processEvents();
+               command = push_adb.readAll();
+
+
+               // QMessageBox::critical(this,"",command);
+
+               if (!command.contains("bytes"))
+                {
+
+                   QMessageBox::critical(this,"","SSH 2:Error pushing file!");
+                   return;
+               }
+
+
+               QProcess move_file;
+               move_file.setProcessChannelMode(QProcess::MergedChannels);
+               cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+               move_file.start(cstring);
+               move_file.waitForFinished(-1);
+               command=move_file.readAll();
+
+
+               QProcess chmod_file;
+               move_file.setProcessChannelMode(QProcess::MergedChannels);
+               cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+               chmod_file.start(cstring);
+               chmod_file.waitForFinished(-1);
+               command=chmod_file.readAll();
+
+
+               if (command.contains("No such file or directory"))
+                {
+                   QMessageBox::critical(this,"","SSH chmod2: No such file or directory");
+                   return;
+                 }
+
+                  QProcess rm_file1;
+                  rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                  rm_file1.start(cstring);
+                  rm_file1.waitForFinished(-1);
+                  command=rm_file1.readAll();
+
+
+                  if (command.contains("No such file or directory"))
+                   {
+                      QMessageBox::critical(this,"","SSH sdcard2: No such file or directory");
+                      return;
+                    }
+
+                  QProcess rm_file2;
+                  rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = "rm " + filename;
+                  rm_file2.start(cstring);
+                  rm_file2.waitForFinished(-1);
+                  command=rm_file2.readAll();
+
+
+
+
+          }
+
+
+          QMessageBox::information( this,"","SSH is now persistent");
+          mount_system("ro");
+
+    }
+
+ ////////////////////////////////////////
+
+   if(!checked)
+
+    {
+
+
+      mount_system("rw");
+
+        QProcess check_file;
+          check_file.setProcessChannelMode(QProcess::MergedChannels);
+          cstring = adb + " -s " + daddr + port +  " shell cat /system/etc/install-recovery-2.sh";
+          check_file.start(cstring);
+          check_file.waitForFinished(-1);
+          command=check_file.readAll();
+
+
+          if (command.contains("No such file or directory"))
+           {
+              QMessageBox::critical(this,"","No persistence script found.");
+               mount_system("ro");
+              return;
+            }
+
+
+          if (!command.contains(makepst))
+           {
+              QProcess rm_file1;
+              rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+              cstring = adb + " -s " + daddr+port + " shell su -c rm " + " /system/etc/install-recovery-2.sh";
+              rm_file1.start(cstring);
+              rm_file1.waitForFinished(-1);
+              command=rm_file1.readAll();
+              QMessageBox::information(this,"","SSH is not persistent.");
+              mount_system("ro");
+              return;
+          }
+
+
+      else
+
+          {
+
+
+          if (command.contains(makepst))
+           {
+
+          QFile file(filename);
+
+
+                  if(!file.open(QFile::WriteOnly |
+                                QFile::Text))
+                  {
+                      QMessageBox::critical(this,"","Error creating file!");
+                      mount_system("ro");
+                      return;
+                  }
+
+
+                  QTextStream out(&file);
+                  out << hashbang << "\n" << makepst << "\n";
+
+                  file.flush();
+                  file.close();
+
+                  QProcess push_adb;
+                  push_adb.setProcessChannelMode(QProcess::MergedChannels);
+                  cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+                  push_adb.start(cstring);
+                   while(push_adb.state() != QProcess::NotRunning)
+                       qApp->processEvents();
+                   command = push_adb.readAll();
+
+
+
+                   QProcess move_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
+                   move_file.start(cstring);
+                   move_file.waitForFinished(-1);
+                   command=move_file.readAll();
+
+
+                   QProcess chmod_file;
+                   move_file.setProcessChannelMode(QProcess::MergedChannels);
+                   cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
+                   chmod_file.start(cstring);
+                   chmod_file.waitForFinished(-1);
+                   command=chmod_file.readAll();
+
+
+
+                   if (command.contains("No such file or directory"))
+                    {
+                       QMessageBox::critical(this,"","SSH chmod:3 No such file or directory");
+                       mount_system("ro");
+                       return;
+                     }
+
+                      QProcess rm_file1;
+                      rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
+                      rm_file1.start(cstring);
+                      rm_file1.waitForFinished(-1);
+                      command=rm_file1.readAll();
+
+
+                      if (command.contains("No such file or directory"))
+                       {
+                          QMessageBox::critical(this,"","sdcard:ssh No such file or directory");
+                          mount_system("ro");
+                          return;
+                        }
+
+                      QProcess rm_file2;
+                      rm_file2.setProcessChannelMode(QProcess::MergedChannels);
+                      cstring = "rm " + filename;
+                      rm_file2.start(cstring);
+                      rm_file2.waitForFinished(-1);
+                      command=rm_file2.readAll();
+
+                      QMessageBox::information(this,"","SSH is not persistent.");
+                      mount_system("ro");
+
+
+            }
+
+         }
+
+
+    }
+
 
 }
+

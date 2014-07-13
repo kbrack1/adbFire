@@ -20,6 +20,7 @@ public:
 
       void setPackagename(const QString &packagename);
       void setPulldir(const QString &pulldir);
+      void setftvUpdate(const bool &updatecheck);
 
     ~preferencesDialog();
 
@@ -29,6 +30,8 @@ public:
 public:
    QString pulldir();
 
+public:
+   bool updatecheck();
 
 private slots:
    void on_pfolderButton_clicked();

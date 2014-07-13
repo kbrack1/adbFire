@@ -12,6 +12,10 @@ QString preferencesDialog::pulldir() {
    return ui->pulldir->text();
 }
 
+bool preferencesDialog::updatecheck() {
+   return ui->ftvupdatesBox->isChecked();
+}
+
 void preferencesDialog::setPackagename(const QString &packagename)
 {
     ui->packagename->setText(packagename);
@@ -22,6 +26,10 @@ void preferencesDialog::setPulldir(const QString &pulldir)
     ui->pulldir->setText(pulldir);
 }
 
+void preferencesDialog::setftvUpdate(const bool &updatecheck)
+{
+    ui->ftvupdatesBox->setChecked(updatecheck);
+}
 
 preferencesDialog::preferencesDialog(QWidget *parent) :
     QDialog(parent),

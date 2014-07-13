@@ -59,10 +59,6 @@ private slots:
 
     void on_screenshotButton_clicked();
 
-    void on_actionUpdates_on_triggered();
-
-    void on_actionUpdates_off_triggered();
-
     void on_actionInstall_busybox_triggered();
 
 
@@ -86,10 +82,6 @@ private slots:
 
     void on_actionSSH_Password_triggered();
 
-    void on_usbBox_clicked();
-
-    void on_sshBox_clicked();
-
     void on_actionInstall_SSH_triggered();
 
     void on_actionRemove_SSH_triggered();
@@ -97,6 +89,7 @@ private slots:
     void on_usbBox_clicked(bool checked);
 
     void on_sshBox_clicked(bool checked);
+
 
 private:
     Ui::MainWindow *ui;

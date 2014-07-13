@@ -1,11 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.0</b></u> is a companion program for Android XBMC and its forks. It allows you to
-install XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
+<u><b>adbFire v1.01</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the Amazon Fire TV. <p>adbFire allows you to
+install (sideload) XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
 Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the Amazon Fire TV (51.1.1.0 or earlier) and much more. <p>
-<b><u>adbFire</u></b> has been successfully tested on Samsung cell phones and tablets and the Amazon Fire TV.<p>
+Although originally intended as a Amazon Fire TV adjunct, <b><u>adbFire</u></b> has been successfully tested on Samsung cell phones and tablets.<p>
 
 At startup  "ADB running" is displayed the status bar. If it's not, click "Start" in the ADB server group.
 <p>
@@ -33,7 +33,16 @@ To pull files select the source folder from the dropdown widget, then press "Pul
 <p>
 To delete files select the source folder from the dropdown widget, then press "Delete". Enter a filename you wish deleted into the text area.
 <p>
-<b><u>Application processes</u></b><br>
+
+<u><b>"USB Drive" </b> </u>
+This will mounts/unmounts a USB drive or stick at /dev/block/sda1. Currently, it can only deal with one external storage device. <p> If you have multiple devices (e.g. /dev/block/sda1, /dev/block/sdb1, etc) you may be better served with a solution like Chainfire's stickmount.<p> If checked, the "persistence" checkbox mounts<br> /dev/block/sda1 at boot.
+<p>
+Mounting USB mass storage devices requires installation of busybox.
+<p>
+<u><b>"SSH" </b> </u>
+This starts/stops the dropbear SSH daemon.  If checked, the "persistence" checkbox starts dropbear at boot. Dropbear requires pre-installation of busybox.
+<p>
+<b><u>System processes</u></b><br>
 The <b>"Install APK" </b> button installs or "sideloads"  apps. Click it and choose the APK file you want installed. All installs are done with the "-r" flag. <p>
 This has the effect of preserving a previously installed app's data. It has no effect when installing a new app. If you require a "clean" install of an existing app, uninstall it first.
 <p>
@@ -50,19 +59,52 @@ The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.
 <p>
 The <b>"Screen shot"</b> button takes a snapshot of the device's current screen, names it screen.png, and saves it to the pulled files folder (default: home directory).<p> Unfortunately, High-bandwidth Digital Content Protection (HDCP) prevents you from taking screenshots of most commercia video streams. Luckily, XBMC is not affected by HDCP.<p>
 <p>
-The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a Fire TV. <p>
+<b><u>Filesystem R/W</b></u> Makes /system partition writable.
 <p>
+<b><u>Filesystem R/O</b></u> Makes /system partition read-only.
+<p>
+
 The <b>"Root Fire TV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by going to FireTV settings and running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
 <p>
+The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a Fire TV. <p>
 <p>
-<u><b>Application Menu</b></u>
+<u><b>Menu items</b></u>
 <p>
-<u><b>About</b></u><br>
-About this application: Version information and home URL.
+<u><b>About</b></u> Version information and home URL.
+<p>
+<b><u>Reboot device</b></u> Reboots the connected device.
+<p>
+<b><u>Reboot into recovery</b></u> Reboots the connected device into recovery.
+<p>
+<b><u>Help</b></u> Opens this window.
 <p>
 <b><u>Quit adbFire</b></u>  Terminates adbFire.
 <p>
-<b><u>Preferences</b></u><br>
+<b><u>Root only menu options</b></u>
+<p>
+<b><u>Install Busybox</b></u><br>
+BusyBox combines tiny versions of many common UNIX utilities into a single small executable. It provides replacements for most of the utilities you usually find on a Linux system. It has an extremely small footprint, under 2Mb
+<p>
+<b><u>Uninstall Busybox</b></u><br>
+Removes BusyBox frpm your system.<p>
+
+<b><u>Install SSH</b></u><br>
+Installs SSH/SFTP to your device. SSH is used to open a terminal session between your PC and your android device. SFTP opens an ftp-like connection. This utility has a footprint under 1Mb.
+<p>
+Dropbear requires pre-installation of busybox.
+<p>
+<b><u>Uninstall SSH</b></u><br>
+Removes SSH/SFTP from your device.<p>
+
+<b><u>SSH password</b></u><br>
+Change default SSH/SFTP password from 'password' to your choice.<p>
+
+<b><u>Install Fire TV firmware</b></u><br>
+Install firmware to Amazon Fire TV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>
+<p>
+<p>
+<b><u>Preferences</b></u>
+<p>
 <b><u>XBMC Package name</b></u>, default: org.xbmc.xbmc. This varies depending on what variant of XBMC you're running.<p>
 If you are running a fork of XBMC, enter its packagename here, e.g. for Beyond XBMC enter "com.flumpster.xbmc".
 <p>Thus far, SPMC, BeyondXBMC, elmerohueso's XBMC Launcher, Gotham 13.1 and Helix nightlies have been tested with adbFire.<p>
@@ -71,30 +113,9 @@ In theory any fork should work if its file directory structure adheres to XBMC's
 <b><u>Pull Folder</b></u>, default: User's home directory.<br>
 Choose the folder where pulled XBMC files and screenshot pngs are placed.
 <p>
+<b><u>Fire TV updates</b></u> Toggle Amazon Fire TV updates on/off. This disables/enables com.amazon.dcp.
 <p>
-<b><u>Menu Choices</b></u><br>
-<b><u>Reboot device</b></u> Reboots the connected device.
-<p>
-<b><u>Reboot into recovery</b></u> Reboots the connected device into recovery.
-<p>
-<b><u>Root only menu options</b></u><br>
-<b><u>Fire TV updates on</b></u> Enables com.amazon.dcp.
-<p>
-<b><u>Fire TV updates off</b></u> Disables com.amazon.dcp.
-<p>
-<b><u>Mount /system rw</b></u> Makes /system partition writable.
-<p>
-<b><u>Mount /system ro</b></u> Makes /system partition read-only.
-<p>
-<b><u>Install Busybox</b></u><br>
-BusyBox combines tiny versions of many common UNIX utilities into a single small executable. It provides replacements for most of the utilities you usually find on a Linux system. It has an extremely small footprint, under 2Mb
-<p>
-<b><u>Uninstall Busybox</b></u><br>
-Removes BusyBox frpm your system.<p>
 
-<b><u>Install Firmware</b></u><br>
-Install firmware to Amazon Fire TV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC. Thanks to roligov@xda for the method.<p>
-<p>
 =============================
 <p>
 The <b><u>adbFire</b></u> binary and its external files are located in adbFire's installation folder. The default folder is adbFire. <p>

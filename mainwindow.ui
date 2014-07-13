@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>619</width>
+    <width>648</width>
     <height>482</height>
    </rect>
   </property>
@@ -289,115 +289,112 @@
      <rect>
       <x>280</x>
       <y>40</y>
-      <width>301</width>
+      <width>321</width>
       <height>221</height>
      </rect>
     </property>
     <property name="title">
      <string>System processes</string>
     </property>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>30</y>
-       <width>130</width>
-       <height>168</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QPushButton" name="uninstall_Button">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Uninstall APK</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="restoreButton">
-        <property name="text">
-         <string>Restore XBMC</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="screenshotButton">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Screen shot</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="roButton">
-        <property name="text">
-         <string>Mount R/O</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="consoleButton">
-        <property name="text">
-         <string>ADB Shell</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QSplitter" name="splitter">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>30</y>
-       <width>127</width>
+       <width>277</width>
        <height>168</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QPushButton" name="sideload_Button">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install app to device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Install APK</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="backupButton">
-        <property name="text">
-         <string>Backup XBMC</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushRemote">
-        <property name="text">
-         <string>Push Remote</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="rwButton">
-        <property name="text">
-         <string>Mount R/W</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="rootButton">
-        <property name="text">
-         <string>Root FireTV</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="sideload_Button">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install app to device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Install APK</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="backupButton">
+         <property name="text">
+          <string>Backup XBMC</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushRemote">
+         <property name="text">
+          <string>Push Remote</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rwButton">
+         <property name="text">
+          <string>Filesystem R/W</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rootButton">
+         <property name="text">
+          <string>Root FireTV</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QPushButton" name="uninstall_Button">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Uninstall APK</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="restoreButton">
+         <property name="text">
+          <string>Restore XBMC</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="screenshotButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Screen shot</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="roButton">
+         <property name="text">
+          <string>Filesystem R/O</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="consoleButton">
+         <property name="text">
+          <string>ADB Shell</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <widget class="QGroupBox" name="usbgroupBox">
@@ -464,7 +461,7 @@
     <property name="title">
      <string>SSH</string>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -508,16 +505,13 @@
    <zorder>groupBox</zorder>
    <zorder>usbgroupBox</zorder>
    <zorder>sshgroupBox</zorder>
-   <zorder>sshBox</zorder>
-   <zorder>stopsshButton</zorder>
-   <zorder>startsshButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>619</width>
+     <width>648</width>
      <height>22</height>
     </rect>
    </property>
@@ -528,8 +522,6 @@
     <addaction name="actionPreferences"/>
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
-    <addaction name="actionUpdates_on"/>
-    <addaction name="actionUpdates_off"/>
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
     <addaction name="actionInstall_SSH"/>
@@ -603,22 +595,6 @@
     <string>Reboot Recovery</string>
    </property>
   </action>
-  <action name="actionUpdates_on">
-   <property name="text">
-    <string>Fire TV updates on</string>
-   </property>
-   <property name="toolTip">
-    <string>Amazon updates on</string>
-   </property>
-  </action>
-  <action name="actionUpdates_off">
-   <property name="text">
-    <string>Fire TV updates off</string>
-   </property>
-   <property name="toolTip">
-    <string>Amazon updates off</string>
-   </property>
-  </action>
   <action name="actionInstall_busybox">
    <property name="text">
     <string>Install Busybox</string>
@@ -631,10 +607,10 @@
   </action>
   <action name="actionFirmware_install">
    <property name="text">
-    <string>Firmware install</string>
+    <string>Install Fire TV firmware</string>
    </property>
    <property name="toolTip">
-    <string>Upgrade/downgrade firmware </string>
+    <string>Upgrade/downgrade Fire TV firmware </string>
    </property>
   </action>
   <action name="actionSSH_Password">
@@ -652,7 +628,7 @@
   </action>
   <action name="actionRemove_SSH">
    <property name="text">
-    <string>Remove SSH</string>
+    <string>Uninstall SSH</string>
    </property>
   </action>
  </widget>
