@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>648</width>
-    <height>482</height>
+    <width>511</width>
+    <height>522</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>110</x>
       <y>10</y>
       <width>261</width>
       <height>16</height>
@@ -61,10 +61,10 @@
    <widget class="QLabel" name="server_running">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>180</x>
       <y>600</y>
-      <width>148</width>
-      <height>16</height>
+      <width>51</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
@@ -74,9 +74,9 @@
    <widget class="QLabel" name="device_connected">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>280</x>
       <y>600</y>
-      <width>136</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -149,8 +149,8 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>240</y>
+      <x>330</x>
+      <y>40</y>
       <width>161</width>
       <height>171</height>
      </rect>
@@ -287,10 +287,10 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>40</y>
+      <x>20</x>
+      <y>240</y>
       <width>321</width>
-      <height>221</height>
+      <height>211</height>
      </rect>
     </property>
     <property name="title">
@@ -400,8 +400,8 @@
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>270</y>
+      <x>360</x>
+      <y>240</y>
       <width>131</width>
       <height>141</height>
      </rect>
@@ -449,52 +449,6 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="sshgroupBox">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>270</y>
-      <width>141</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>SSH</string>
-    </property>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>30</y>
-       <width>100</width>
-       <height>89</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_7">
-      <item>
-       <widget class="QPushButton" name="startsshButton">
-        <property name="text">
-         <string>Start ssh</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="stopsshButton">
-        <property name="text">
-         <string>Stop ssh</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="sshBox">
-        <property name="text">
-         <string>Persistent</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
    <zorder>device_connected</zorder>
    <zorder>label_5</zorder>
    <zorder>progressBar</zorder>
@@ -504,14 +458,13 @@
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
    <zorder>usbgroupBox</zorder>
-   <zorder>sshgroupBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>648</width>
+     <width>511</width>
      <height>22</height>
     </rect>
    </property>
@@ -524,9 +477,6 @@
     <addaction name="actionRecovery"/>
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
-    <addaction name="actionInstall_SSH"/>
-    <addaction name="actionRemove_SSH"/>
-    <addaction name="actionSSH_Password"/>
     <addaction name="actionFirmware_install"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -611,24 +561,6 @@
    </property>
    <property name="toolTip">
     <string>Upgrade/downgrade Fire TV firmware </string>
-   </property>
-  </action>
-  <action name="actionSSH_Password">
-   <property name="text">
-    <string>SSH Password</string>
-   </property>
-   <property name="toolTip">
-    <string>Change SSH Password</string>
-   </property>
-  </action>
-  <action name="actionInstall_SSH">
-   <property name="text">
-    <string>Install SSH</string>
-   </property>
-  </action>
-  <action name="actionRemove_SSH">
-   <property name="text">
-    <string>Uninstall SSH</string>
    </property>
   </action>
  </widget>

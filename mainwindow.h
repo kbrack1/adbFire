@@ -72,23 +72,11 @@ private slots:
 
     void on_umntButton_clicked();
 
-    void on_startsshButton_clicked();
-
-    void on_stopsshButton_clicked();
-
     void on_rwButton_clicked();
 
     void on_roButton_clicked();
 
-    void on_actionSSH_Password_triggered();
-
-    void on_actionInstall_SSH_triggered();
-
-    void on_actionRemove_SSH_triggered();
-
     void on_usbBox_clicked(bool checked);
-
-    void on_sshBox_clicked(bool checked);
 
 
 private:
