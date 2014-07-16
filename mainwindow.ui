@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>511</width>
-    <height>522</height>
+    <width>558</width>
+    <height>518</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,19 +26,6 @@
    <string>adbFire</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>10</y>
-      <width>261</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>adbFire:  XBMC for Android Companion</string>
-    </property>
-   </widget>
    <widget class="QProgressBar" name="progressBar">
     <property name="enabled">
      <bool>true</bool>
@@ -149,7 +136,7 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>360</x>
       <y>40</y>
       <width>161</width>
       <height>171</height>
@@ -173,6 +160,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
        <widget class="QComboBox" name="comboBox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select folder to push/pull files to/from&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <item>
          <property name="text">
           <string>addons</string>
@@ -217,6 +207,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="fpushButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push a file to the selected folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Push</string>
         </property>
@@ -224,6 +217,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="fpullButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pull a file from the selected folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Pull</string>
         </property>
@@ -231,6 +227,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="fdellButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete a file in selected folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Delete</string>
         </property>
@@ -322,6 +321,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="backupButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Backup XBMC (or fork)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Backup XBMC</string>
          </property>
@@ -329,6 +331,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushRemote">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push remote control definition xml to XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Push Remote</string>
          </property>
@@ -336,6 +341,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="rwButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make /system partition writeable&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Filesystem R/W</string>
          </property>
@@ -343,6 +351,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="rootButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Root Fire TV using Geohot's towelroot and Chainfire's SuperSU&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Root FireTV</string>
          </property>
@@ -355,7 +366,7 @@
        <item>
         <widget class="QPushButton" name="uninstall_Button">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall apk&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Uninstall APK</string>
@@ -364,6 +375,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="restoreButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore XBMC's data files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Restore XBMC</string>
          </property>
@@ -372,7 +386,7 @@
        <item>
         <widget class="QPushButton" name="screenshotButton">
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot (saved to your &amp;quot;pull&amp;quot; folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Screen shot</string>
@@ -381,6 +395,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="roButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make /system partition read-only&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Filesystem R/O</string>
          </property>
@@ -388,6 +405,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="consoleButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open a terminal session on the connected device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>ADB Shell</string>
          </property>
@@ -400,7 +420,7 @@
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>370</x>
       <y>240</y>
       <width>131</width>
       <height>141</height>
@@ -421,6 +441,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
        <widget class="QPushButton" name="mntButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mount /dev/sda1 at /sdcard/usbDtorage/sda1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Mount</string>
         </property>
@@ -428,6 +451,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="umntButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unmount /sdcard/usbMount/sda1/&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
          <string>Unmount</string>
         </property>
@@ -437,6 +463,9 @@
        <widget class="QCheckBox" name="usbBox">
         <property name="enabled">
          <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make mount of /dev/block/sda1 persistent&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string>Persistent</string>
@@ -449,8 +478,29 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>541</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>adbFire:  XBMC for Android Companion</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <zorder>device_connected</zorder>
-   <zorder>label_5</zorder>
    <zorder>progressBar</zorder>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_5</zorder>
@@ -458,13 +508,14 @@
    <zorder>server_running</zorder>
    <zorder>groupBox</zorder>
    <zorder>usbgroupBox</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>511</width>
+     <width>558</width>
      <height>22</height>
     </rect>
    </property>

@@ -26,7 +26,7 @@
     <string>&lt;b&gt;&lt;u&gt;adbFire Preferences&lt;/b&gt;&lt;/u&gt;</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -52,7 +52,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>31</x>
@@ -103,6 +103,9 @@
     </item>
     <item>
      <widget class="QCheckBox" name="ftvupdatesBox">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>FireTV updates on</string>
       </property>

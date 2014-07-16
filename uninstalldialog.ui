@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Uninstall APK</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>33</x>
@@ -51,7 +51,7 @@
         <item>
          <widget class="QLineEdit" name="packagename">
           <property name="toolTip">
-           <string>enter package name</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;enter package name to delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
