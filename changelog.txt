@@ -1,0 +1,23 @@
+http://jocala.com/adbfire.html
+
+adbFire Beta 4 changelog
+
+Fix for OS X Fire TV root
+
+Addition of support for XBMC forks
+
+
+
+Help file additions
+
+
+
+
+
+
+
+
+
+
+
+

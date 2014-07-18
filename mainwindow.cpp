@@ -20,7 +20,7 @@
 #include <preferencesdialog.h>
 #include <QElapsedTimer>
 #include <QTextStream>
-//#include <iostream>
+#include <QDate>
 // #include <QDebug>
 
 bool isConnected = false;
@@ -49,8 +49,6 @@ bool updatecheck = true;
 QString port = ":5555";
 QString xbmcpackage ="";
 
-
-QString makepst = "sleep 15; /system/xbin/mount -o user,umask=0000 -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
 
 int sshcheck;
 int usbcheck;
@@ -151,6 +149,33 @@ bool mount_system(QString mnt)
     QProcess mount_system;
        mount_system.setProcessChannelMode(QProcess::MergedChannels);
        QString cstring = adb + " -s " +daddr+port+ " shell su -c mount -o remount,"+mnt+ " /system";
+       mount_system.start(cstring);
+       mount_system.waitForFinished(-1);
+       command=mount_system.readAll();
+
+
+
+
+
+
+        if (command.isEmpty())
+           return true;
+            else
+            return false;
+
+        // return  mounted_op;
+
+
+}
+
+/////////////////////////////////////////////////////
+bool mount_root(QString mnt)
+{
+
+
+    QProcess mount_system;
+       mount_system.setProcessChannelMode(QProcess::MergedChannels);
+       QString cstring = adb + " -s " +daddr+port+ " shell su -c mount -o remount,"+mnt+ " /";
        mount_system.start(cstring);
        mount_system.waitForFinished(-1);
        command=mount_system.readAll();
@@ -1676,9 +1701,13 @@ void MainWindow::on_screenshotButton_clicked()
     }
 
 
+        QDateTime dateTime = QDateTime::currentDateTime();
+        QString dtstr = dateTime.toString("MMddyyhhmmss");
+
+
     QProcess screen_shot;
     screen_shot.setProcessChannelMode(QProcess::MergedChannels);
-    QString cstring = adb +" -s " + daddr+port +" shell screencap -p /sdcard/screen.png";
+    QString cstring = adb +" -s " + daddr+port +" shell screencap -p /sdcard/"+dtstr+".png";
     screen_shot.start(cstring);
     screen_shot.waitForFinished(-1);
     command=screen_shot.readAll();
@@ -1695,7 +1724,7 @@ void MainWindow::on_screenshotButton_clicked()
 
         QProcess get_shot;
         get_shot.setProcessChannelMode(QProcess::MergedChannels);
-        QString cstring = adb +" -s " + daddr+port +" pull /sdcard/screen.png "+pulldir;
+        QString cstring = adb +" -s " + daddr+port +" pull /sdcard/"+dtstr+".png " +pulldir;
         get_shot.start(cstring);
         get_shot.waitForFinished(-1);
         command=get_shot.readAll();
@@ -1712,12 +1741,12 @@ void MainWindow::on_screenshotButton_clicked()
             QMessageBox::information(
                            this,
                           "",
-                           "Screenshot copied to "+pulldir);
+                           "Screenshot "+dtstr+ " copied to "+pulldir);
 
 
         QProcess del_shot;
         del_shot.setProcessChannelMode(QProcess::MergedChannels);
-        cstring = adb +" -s " + daddr+port +" shell rm /sdcard/screen.png";
+        cstring = adb +" -s " + daddr+port +" shell rm /sdcard/"+dtstr+".png " ;
         del_shot.start(cstring);
         del_shot.waitForFinished(-1);
         command=del_shot.readAll();
@@ -1764,11 +1793,16 @@ void MainWindow::on_actionInstall_busybox_triggered()
     QString busybox1  = adbdir+"binstall.sh";
     QString busybox2 = adbdir+"buninstall.sh";
     QString busybox3 = adbdir+"busybox";
-
+    QString busybox4 = adbdir+"ntfs-3g";
+    QString busybox5 = adbdir+"mount.exfat-fuse";
+    QString busybox6 = adbdir+"mntdrives.sh";
 
         bool file1 = false;
         bool file2 = false;
         bool file3 = false;
+        bool file4 = false;
+        bool file5 = false;
+        bool file6 = false;
 
      QFile Fout1(busybox1);
 
@@ -1808,7 +1842,47 @@ void MainWindow::on_actionInstall_busybox_triggered()
             return;
           }
 
-    command = "";
+
+      QFile Fout4(busybox4);
+
+      if(!Fout4.exists())
+         {
+
+           QMessageBox::critical(
+            this,
+            tr("adbFire"),
+             busybox4+" not found.");
+            return;
+          }
+
+
+      QFile Fout5(busybox5);
+
+      if(!Fout5.exists())
+         {
+
+           QMessageBox::critical(
+            this,
+            tr("adbFire"),
+             busybox5+" not found.");
+            return;
+          }
+
+
+      QFile Fout6(busybox6);
+
+      if(!Fout6.exists())
+         {
+
+           QMessageBox::critical(
+            this,
+            tr("adbFire"),
+             busybox6+" not found.");
+            return;
+          }
+
+
+      command = "";
 
 
       QProcess install_apk1;
@@ -1826,7 +1900,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
             this,
              "",
              "busybox install failed ");
-              ui->progressBar->setHidden(true);
+              //ui->progressBar->setHidden(true);
              return;
              }
             else
@@ -1843,7 +1917,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
               command=install_apk2.readAll();
               
-              ui->progressBar->setHidden(true);
+              //ui->progressBar->setHidden(true);
 
               if (!command.isEmpty())
                  { QMessageBox::information(
@@ -1868,7 +1942,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
                command=install_apk3.readAll();
                
-               ui->progressBar->setHidden(true);
+               //ui->progressBar->setHidden(true);
 
                if (!command.isEmpty())
                   { QMessageBox::information(
@@ -1880,10 +1954,75 @@ void MainWindow::on_actionInstall_busybox_triggered()
                else
                    file3 = true;
 
+               QProcess install_apk4;
+                cstring = adb + " -s " + daddr + port + " push "+busybox4+ " /sdcard/";
+                install_apk4.start(cstring);
+
+                install_apk4.waitForFinished(-1);
+
+                command=install_apk4.readAll();
+
+               // ui->progressBar->setHidden(true);
+
+                if (!command.isEmpty())
+                   { QMessageBox::information(
+                                this,
+                                "",
+                                "busybox install failed");
+
+                   }
+                else
+                    file4 = true;
+
+
+                QProcess install_apk5;
+                 cstring = adb + " -s " + daddr + port + " push "+busybox5+ " /sdcard/";
+                 install_apk5.start(cstring);
+
+                 install_apk5.waitForFinished(-1);
+
+                 command=install_apk5.readAll();
+
+                // ui->progressBar->setHidden(true);
+
+                 if (!command.isEmpty())
+                    { QMessageBox::information(
+                                 this,
+                                 "",
+                                 "busybox install failed");
+
+                    }
+                 else
+                     file5 = true;
+
+
+                 QProcess install_apk6;
+                  cstring = adb + " -s " + daddr + port + " push "+busybox6+ " /sdcard/";
+                  install_apk6.start(cstring);
+
+                  install_apk6.waitForFinished(-1);
+
+                  command=install_apk6.readAll();
+
+                 // ui->progressBar->setHidden(true);
+
+                  if (!command.isEmpty())
+                     { QMessageBox::information(
+                                  this,
+                                  "",
+                                  "busybox install failed");
+
+                     }
+                  else
+                      file6 = true;
 
 
 
- if (file1 && file2 && file3)
+
+
+
+
+ if (file1 && file2 && file3 && file4 && file5 && file6)
 
  {
 
@@ -1915,13 +2054,37 @@ void MainWindow::on_actionInstall_busybox_triggered()
      command=copy_script3.readAll();
      
 
+
+     QProcess copy_script4;
+     copy_script4.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/ntfs-3g /system/xbin";
+     copy_script4.start(cstring);
+     copy_script4.waitForFinished(-1);
+     command=copy_script4.readAll();
+
+
+     QProcess copy_script5;
+     copy_script5.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/mount.exfat-fuse /system/xbin";
+     copy_script5.start(cstring);
+     copy_script5.waitForFinished(-1);
+     command=copy_script5.readAll();
+
+     QProcess copy_script6;
+     copy_script6.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/mntdrives.sh /system/xbin";
+     copy_script6.start(cstring);
+     copy_script6.waitForFinished(-1);
+     command=copy_script6.readAll();
+
+
+
      QProcess chmod_script1;
      chmod_script1.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/binstall.sh";
      chmod_script1.start(cstring);
      chmod_script1.waitForFinished(-1);
      command=chmod_script1.readAll();
-     chmod_script1.readAll();
      
 
 
@@ -1931,7 +2094,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
      chmod_script2.start(cstring);
      chmod_script2.waitForFinished(-1);
      command=chmod_script2.readAll();
-     chmod_script2.readAll();
+
 
 
 
@@ -1941,8 +2104,30 @@ void MainWindow::on_actionInstall_busybox_triggered()
      chmod_script3.start(cstring);
      chmod_script3.waitForFinished(-1);
      command=chmod_script3.readAll();
-     chmod_script3.readAll();
+
      
+     QProcess chmod_script4;
+     chmod_script4.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/ntfs-3g";
+     chmod_script4.start(cstring);
+     chmod_script4.waitForFinished(-1);
+     command=chmod_script4.readAll();
+
+
+     QProcess chmod_script5;
+     chmod_script5.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/mount.exfat-fuse";
+     chmod_script5.start(cstring);
+     chmod_script5.waitForFinished(-1);
+     command=chmod_script5.readAll();
+
+
+     QProcess chmod_script6;
+     chmod_script6.setProcessChannelMode(QProcess::MergedChannels);
+     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/mntdrives.sh";
+     chmod_script6.start(cstring);
+     chmod_script6.waitForFinished(-1);
+     command=chmod_script5.readAll();
 
      QProcess run_script1;
      run_script1.setProcessChannelMode(QProcess::MergedChannels);
@@ -1962,17 +2147,10 @@ void MainWindow::on_actionInstall_busybox_triggered()
       command=check_dir.readAll();
       
 
-
-
-
         if (command.contains("No such file or directory"))
           QMessageBox::critical( this,"","Busybox not installed!");
         else
          QMessageBox::information( this,"","Busybox installed!");
-
-
-
-
 
  }
 
@@ -2010,11 +2188,52 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
          if (reply == QMessageBox::No)
          return;
 
-        mount_system("rw");
+         QString cstring;
+         QString umntstring = "/system/xbin/umount /storage/sd\?\?/";
+         QString rmsd = "rm -r /storage/sd\?\?/";
+
+
+
+
+         QProcess check_usb;
+         check_usb.setProcessChannelMode(QProcess::MergedChannels);
+         cstring = adb + " -s " + daddr+port + " shell su -c ls /storage/sd\?\?/";
+         check_usb.start(cstring);
+         check_usb.waitForFinished(-1);
+         command=check_usb.readAll();
+
+         if (!command.contains("No such file or directory"))
+
+         {
+             mount_root("rw");
+
+
+            QProcess umount_system;
+            umount_system.setProcessChannelMode(QProcess::MergedChannels);
+            cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
+            umount_system.start(cstring);
+            umount_system.waitForFinished(-1);
+            command=umount_system.readAll();
+
+
+            QProcess rm_sd;
+            rm_sd.setProcessChannelMode(QProcess::MergedChannels);
+            cstring = adb + " -s " + daddr+port + " shell su -c " + rmsd;
+            rm_sd.start(cstring);
+            rm_sd.waitForFinished(-1);
+            command=rm_sd.readAll();
+
+             mount_root("ro");
+
+           }
+
+
+
+             mount_system("rw");
 
          QProcess run_script1;
          run_script1.setProcessChannelMode(QProcess::MergedChannels);
-         QString cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/buninstall.sh";
+         cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/buninstall.sh";
          run_script1.start(cstring);
          run_script1.waitForFinished(-1);
          
@@ -2272,13 +2491,13 @@ void MainWindow::on_actionFirmware_install_triggered()
     QString fileName;
 
     QMessageBox::StandardButton reply2;
-      reply2 = QMessageBox::question(this, "", "Is update.zip on stick?",
+      reply2 = QMessageBox::question(this, "", "Is update.zip on /storage/sda1?",
                                     QMessageBox::Yes|QMessageBox::No);
       if (reply2 == QMessageBox::Yes)
          {
 
           usbstick = true;
-          fileName = "/sdcard/usbStorage/sda1/update.zip";
+          fileName = "/storage/sda1/update.zip";
 
           QProcess update_zip_exist;
           update_zip_exist.setProcessChannelMode(QProcess::MergedChannels);
@@ -2344,7 +2563,7 @@ void MainWindow::on_actionFirmware_install_triggered()
     if (!usbstick)
     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/update.zip /cache/";
     else
-    cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/usbStorage/sda1/update.zip /cache/";
+    cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /storage/sda1/update.zip /cache/";
 
     step_7.start(cstring);
 
@@ -2473,6 +2692,13 @@ void MainWindow::on_mntButton_clicked()
    }
 
 
+   ui->progressBar->setHidden(false);
+   ui->progressBar->setValue(0);
+
+   QTimer *timer = new QTimer(this);
+   connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+   timer->start(tsvalue);
+
    QProcess check_bb;
    check_bb.setProcessChannelMode(QProcess::MergedChannels);
    QString cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/mount";
@@ -2488,21 +2714,25 @@ void MainWindow::on_mntButton_clicked()
 
 
 
-    QString mntstring = "/system/xbin/mount -o user,umask=0000 -t vfat /dev/block/sda1 /sdcard/usbStorage/sda1";
-
 
 
     QProcess mount_system;
        mount_system.setProcessChannelMode(QProcess::MergedChannels);
-       cstring = adb + " -s " + daddr+port + " shell su -c " + mntstring;
+       cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/mntdrives.sh";
        mount_system.start(cstring);
-       mount_system.waitForFinished(-1);
+
+
+       while(mount_system.state() != QProcess::NotRunning)
+           qApp->processEvents();
+
+
        command=mount_system.readAll();
 
+       ui->progressBar->setHidden(true);
 
-       if (command.isEmpty())
+       if (command.isEmpty()  || command.contains("FUSE"))
         {
-           QMessageBox::information( this,"","USB drive mounted");
+           QMessageBox::information( this,"","USB drive(s) mounted");
            return;
         }
 
@@ -2548,6 +2778,8 @@ void MainWindow::on_umntButton_clicked()
    }
 
 
+
+
    QProcess check_bb;
    check_bb.setProcessChannelMode(QProcess::MergedChannels);
    QString cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/umount";
@@ -2562,10 +2794,12 @@ void MainWindow::on_umntButton_clicked()
      }
 
 
-    QString umntstring = "/system/xbin/umount /sdcard/usbStorage/sda1/";
+    QString umntstring = "/system/xbin/umount /storage/sd\?\?/";
+    QString rmsd = "rm -r /storage/sd\?\?/";
 
+    mount_root("rw");
 
-    QProcess umount_system;
+       QProcess umount_system;
        umount_system.setProcessChannelMode(QProcess::MergedChannels);
        cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
        umount_system.start(cstring);
@@ -2576,7 +2810,18 @@ void MainWindow::on_umntButton_clicked()
        if (command.contains("failed"))
          QMessageBox::critical( this,"","USB drive not found!");
        else
-        QMessageBox::information( this,"","USB Drive unmounted.");
+        {
+           QProcess rm_sd;
+           rm_sd.setProcessChannelMode(QProcess::MergedChannels);
+           cstring = adb + " -s " + daddr+port + " shell su -c " + rmsd;
+           rm_sd.start(cstring);
+           rm_sd.waitForFinished(-1);
+           command=rm_sd.readAll();
+
+           QMessageBox::information( this,"","USB Drive unmounted.");
+           mount_root("ro");
+        }
+
 
 }
 
@@ -2687,6 +2932,8 @@ void MainWindow::on_usbBox_clicked(bool checked)
 QString cstring;
 QString hashbang = "#!/system/bin/sh";
 QString filename = adbdir+"install-recovery-2.sh";
+
+QString makepst = "/system/xbin/mntdrives.sh";
 
 QProcess busybox_installed;
 busybox_installed.setProcessChannelMode(QProcess::MergedChannels);

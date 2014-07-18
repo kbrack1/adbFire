@@ -14,6 +14,8 @@ done
 
 rm /system/xbin/busybox
 rm /system/xbin/buninstall.sh
+rm /system/xbin/ntfs-3g
+rm /system/xbin/mount.exfat-fuse
 
 mount -o remount,ro /system
 

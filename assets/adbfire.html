@@ -6,7 +6,19 @@ install (sideload) XBMC and other apps to your Android device without the bother
 
 Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the Amazon Fire TV (51.1.1.0 or earlier) and much more. <p>
 Although originally intended as a Amazon Fire TV adjunct, <b><u>adbFire</u></b> has been successfully tested on Samsung cell phones and tablets.<p>
+Prior to using adbFire there are setup steps required on the Fire TV itself:<p>
 
+<b><u>Set up Fire TV</u></b><br>
+From the main (Launcher) screen of Amazon Fire TV, select Settings.<p>
+Select System > Developer Options.<p>
+Select ADB Debugging.<p>
+
+<b><u>Get the IP Address</u><br></b>
+From the main screen of Amazon Fire TV, select Settings.<p>
+Select System > About > Network. Make note of the IP address listed on this screen.
+<p>
+
+<b><u>adbFire Startup</b></u><br>
 At startup  "ADB running" is displayed the status bar. If it's not, click "Start" in the ADB server group.
 <p>
 Enter the Android device IP or name into the text box (e.g. 192.168.1.110, or mydevice, if you have assigned your device a name). This address is "sticky", it will be remembered for future runs.<p>
@@ -35,7 +47,7 @@ To delete files select the source folder from the dropdown widget, then press "D
 <p>
 
 <u><b>"USB Drive" </b> </u>
-This mounts/unmounts a USB drive or stick at /dev/block/sda1. Currently, it only works with the /dev/block/sda interface. If checked, the "persistence" checkbox mounts<br> /dev/block/sda1 at boot.
+This mounts/unmounts all connected USB drives or sticks. If checked, the "persistence" checkbox mounts your devices at boot.
 <p>
 Mounting USB mass storage devices requires installation of busybox.
 <p>
@@ -106,9 +118,12 @@ Choose the folder where pulled XBMC files and screenshot pngs are placed.
 =============================
 <p>
 The <b><u>adbFire</b></u> binary and its external files are located in adbFire's installation folder. The default folder is adbFire. <p>
-Under OS X, the folder adbFire must be located in the standard location Applications.  Don't move the folder from Applications, the program will fail.<p>
+Under OS X, the folder adbFire must be located in the standard location Applications.  Don't move the folder from Applications, the program will fail. Don't change the folder name from adbFire, the program will fail.<p>
 <p>
 The adb binaries and dlls are part of the Android SDK.
+<p>
+The busybox binary is v1.20.2-linusyang<p>
+The mount.exfat-fuse binary and ntfs-3g binary are from shardul_seth@xda.
 <p>
 adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire
 

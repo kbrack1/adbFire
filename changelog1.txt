@@ -1,0 +1,47 @@
+http://jocala.com/adbfire.html
+
+adbFire V1.0 changelog
+
+Fix for OS X Fire TV root
+
+Application home directory change: “adbFire”
+
+Addition of preferences dialog 
+
+Addition of support for XBMC forks (BeyondXBMC, XBMCLauncher, etc)
+
+Pulled files folder preference
+
+Addition of /sdcard/ to list of push/pull folders
+
+Addition of file deletion
+
+Towelroot and SuperSU updated
+
+Database error checks
+
+Reboot Device
+
+Reboot Recovery
+
+Fire TV updates off/on
+
+Mount /system  partition rw/ro
+
+Take screen shots
+
+Install/Uninstall Busybox
+
+Help file additions
+
+
+
+
+
+
+
+
+
+
+
+
