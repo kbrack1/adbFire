@@ -16,6 +16,7 @@ rm /system/xbin/busybox
 rm /system/xbin/buninstall.sh
 rm /system/xbin/ntfs-3g
 rm /system/xbin/mount.exfat-fuse
+rm /system/xbin/mntdrives.sh
 
 mount -o remount,ro /system
 

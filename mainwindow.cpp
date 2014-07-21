@@ -21,6 +21,10 @@
 #include <QElapsedTimer>
 #include <QTextStream>
 #include <QDate>
+#include <QRegularExpression>
+#include <QStringList>
+#include <QListWidget>
+#include <QListWidgetItem>
 // #include <QDebug>
 
 bool isConnected = false;
@@ -2383,6 +2387,8 @@ void MainWindow::on_actionFirmware_install_triggered()
     QString cstring;
     QString updatezip = "--update_package=/cache/update.zip";
     QString commstr = adbdir+"command";
+    QString tmpstr = adbdir+"tmpstr";
+    bool ok;
 
     if (!isConnected)
        { QMessageBox::critical(
@@ -2491,13 +2497,52 @@ void MainWindow::on_actionFirmware_install_triggered()
     QString fileName;
 
     QMessageBox::StandardButton reply2;
-      reply2 = QMessageBox::question(this, "", "Is update.zip on /storage/sda1?",
+      reply2 = QMessageBox::question(this, "", "Is update.zip on usb storage?",
                                     QMessageBox::Yes|QMessageBox::No);
       if (reply2 == QMessageBox::Yes)
          {
 
+
+          QProcess update_zip_count;
+          update_zip_count.setProcessChannelMode(QProcess::MergedChannels);
+          cstring = adb + " -s " + daddr+port + " shell su -c find /storage/usb/ -name update.zip | wc -l" ;
+          update_zip_count.start(cstring);
+          update_zip_count.waitForFinished(-1);
+          command=update_zip_count.readAll();
+
+
+
+          int value = command.toInt(&ok);
+          if (!ok)
+              {QMessageBox::critical(this,"","Error 1: update.zip search");
+              return;
+          }
+
+          if (value<=0)
+          {QMessageBox::critical(this,"","update.zip not found");
+          return; }
+
+          if (value>1)
+          {QMessageBox::critical(this,"","More than 1 update.zip found!");
+          return; }
+
+
+
+
+
+       QProcess update_zip_existx;
+       update_zip_existx.setProcessChannelMode(QProcess::MergedChannels);
+       cstring = adb + " -s " + daddr+port + " shell su -c find /storage/usb/ -name update.zip" ;
+       //cstring = adb + " -s " + daddr+port + " shell pm list packages" ;
+       update_zip_existx.start(cstring);
+       update_zip_existx.waitForFinished(-1);
+       command=update_zip_existx.readAll();
+
+
           usbstick = true;
-          fileName = "/storage/sda1/update.zip";
+
+          if (command.contains("/update.zip"))
+            fileName = command;
 
           QProcess update_zip_exist;
           update_zip_exist.setProcessChannelMode(QProcess::MergedChannels);
@@ -2563,7 +2608,7 @@ void MainWindow::on_actionFirmware_install_triggered()
     if (!usbstick)
     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/update.zip /cache/";
     else
-    cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /storage/sda1/update.zip /cache/";
+    cstring = adb + " -s " + daddr+port + " shell su -c cp " + fileName + " /cache/";
 
     step_7.start(cstring);
 
@@ -2613,7 +2658,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
     QMessageBox::StandardButton reply3;
-      reply3 = QMessageBox::question(this, "", "Reboot to recovery?",
+      reply3 = QMessageBox::question(this, "", "Reboot to recovery?\nFirmware:"+fileName,
                                     QMessageBox::Yes|QMessageBox::No);
       if (reply3 == QMessageBox::No)
        {
@@ -2668,6 +2713,57 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 }
 
+
+/*
+
+          QFile file2(tmpstr);
+
+              if(!file2.open(QFile::WriteOnly |
+                            QFile::Text))
+              {
+                  QMessageBox::critical(this,"","Error creating file!");
+                  return;
+              }
+
+
+              QTextStream out(&file2);
+              out  << command << endl;
+
+              file2.flush();
+              file2.close();
+
+
+
+                  QFile file3(tmpstr);
+                  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+                  {
+                      QMessageBox::critical(this,"","Error reading file!");
+                      return;
+                  }
+
+                  QStringList stringList;
+                  QTextStream textStream(&file3);
+
+                  while (!textStream.atEnd())
+                      stringList << textStream.readLine();
+
+                  file3.close();
+
+
+                  QFile f(tmpstr);
+                  if(!f.open(QIODevice::ReadOnly)) {
+                      QMessageBox::information(0, "error", "Error");
+                  }
+
+
+                 ui->listWidget->addItems(QString(f.readAll()).split('\n'));
+
+                    f.close();
+          return;
+
+
+*/
+
 //////////////////////////////////////////////
 void MainWindow::on_mntButton_clicked()
 {
@@ -2692,6 +2788,8 @@ void MainWindow::on_mntButton_clicked()
    }
 
 
+QString cstring;
+
    ui->progressBar->setHidden(false);
    ui->progressBar->setValue(0);
 
@@ -2701,7 +2799,7 @@ void MainWindow::on_mntButton_clicked()
 
    QProcess check_bb;
    check_bb.setProcessChannelMode(QProcess::MergedChannels);
-   QString cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/mount";
+   cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/mount";
    check_bb.start(cstring);
    check_bb.waitForFinished(-1);
    command=check_bb.readAll();
@@ -2711,9 +2809,6 @@ void MainWindow::on_mntButton_clicked()
       { QMessageBox::critical( this,"","Busybox required for USB drive. Install it from the menu.");
        return;
      }
-
-
-
 
 
     QProcess mount_system;
