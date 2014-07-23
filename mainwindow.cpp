@@ -2714,56 +2714,6 @@ void MainWindow::on_actionFirmware_install_triggered()
 }
 
 
-/*
-
-          QFile file2(tmpstr);
-
-              if(!file2.open(QFile::WriteOnly |
-                            QFile::Text))
-              {
-                  QMessageBox::critical(this,"","Error creating file!");
-                  return;
-              }
-
-
-              QTextStream out(&file2);
-              out  << command << endl;
-
-              file2.flush();
-              file2.close();
-
-
-
-                  QFile file3(tmpstr);
-                  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-                  {
-                      QMessageBox::critical(this,"","Error reading file!");
-                      return;
-                  }
-
-                  QStringList stringList;
-                  QTextStream textStream(&file3);
-
-                  while (!textStream.atEnd())
-                      stringList << textStream.readLine();
-
-                  file3.close();
-
-
-                  QFile f(tmpstr);
-                  if(!f.open(QIODevice::ReadOnly)) {
-                      QMessageBox::information(0, "error", "Error");
-                  }
-
-
-                 ui->listWidget->addItems(QString(f.readAll()).split('\n'));
-
-                    f.close();
-          return;
-
-
-*/
-
 //////////////////////////////////////////////
 void MainWindow::on_mntButton_clicked()
 {
