@@ -1,20 +1,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.01</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the Amazon Fire TV. <p>adbFire allows you to
+<u><b>adbFire v1.01</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
 install (sideload) XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
-Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the Amazon Fire TV (51.1.1.0 or earlier) and much more. <p>
-Although originally intended as a Amazon Fire TV adjunct, <b><u>adbFire</u></b> has been successfully tested on Samsung cell phones and tablets.<p>
-Prior to using adbFire there are setup steps required on the Fire TV itself:<p>
+Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the AFTV (51.1.1.0 or earlier) and much more. <p>
+<b><u>adbFire's</u></b> non-device-specific features have been successfully tested on Samsung cell phones and tablets.<p>
+Prior to using adbFire there are setup steps required on the AFTV itself:<p>
 
-<b><u>Set up Fire TV</u></b><br>
-From the main (Launcher) screen of Amazon Fire TV, select Setti1ngs.<p>
+<b><u>Set up AFTV</u></b><br>
+From the main (Launcher) screen of AFTV, select Settings.<p>
 Select System > Developer Options.<p>
 Select ADB Debugging.<p>
 
 <b><u>Get the IP Address</u><br></b>
-From the main screen of Amazon Fire TV, select Settings.<p>
+From the main screen of AFTV, select Settings.<p>
 Select System > About > Network. Make note of the IP address listed on this screen.
 <p>
 
@@ -41,9 +41,9 @@ The "Stop" button stops the adb server
 "Push" and "Pull" are simply Android's terminology for file copying. From your PC you "push" files to your Android device or conversely, you "pull" files from your Android device to your PC.<p>
 To push files select the destination folder from the dropdown widget, then press "Push". Next, choose and confirm the file to push from  PC to device. The source folder is "sticky", it will be remembered for future runs.
 <p>
-To pull files select the source folder from the dropdown widget, then press "Pull". Enter a filename into the text area to be pulled from the device to the PC's "pull folder" (default: home folder). You can change the destination folder for pulled files in the preferences dialog.
+To pull files select the source folder from the dropdown widget, then press "Pull". You will be presented with a browsable list of files. Select the file you wish to pull and double-click or press "Ok". It will be copied to the PC's "pull folder" (default: home folder). You can change the destination folder for pulled files in the preferences dialog.
 <p>
-To delete files select the source folder from the dropdown widget, then press "Delete". Enter a filename you wish deleted into the text area.
+To delete files select the source folder from the dropdown widget, then press "Delete". You will be presented with a browsable list of files. Select the file you wish to delete and double-click or press "Ok".
 <p>
 
 <u><b>"USB Drive" </b> </u>
@@ -58,14 +58,14 @@ This has the effect of preserving a previously installed app's data. It has no e
 <p>
 The apk folder is "sticky", it will be remembered for future runs.
 <p>
-The  <b>"Uninstall APK"</b> button uninstalls apps from yout Android device. Enter the package name (e.g. org.xbmc.xbmc) to be uninstalled. To retain application data tick the "-k" checkbox. Data retention has only been tested with XBMC.
+The  <b>"Uninstall APK"</b> button uninstalls non-system apps from your Android device. Double-click or highlight apps then click "ok" to select. To retain application data tick the "-k" checkbox. Data retention has only been tested with XBMC.
 <p>
-The <b>"Backup XBMC"</b> button backs up the org.xbmc.xbmc folder on the Fire TV. Please note that XBMC <u>MUST</u> have been run for the first time before using this function. Empty directories are not backed up.
+The <b>"Backup XBMC"</b> button backs up the org.xbmc.xbmc folder on the device. Please note that XBMC <u>MUST</u> have been run for the first time before using this function. Empty directories are not backed up.
 <p>
 
-The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc to the the Fire TV.
+The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc to the device.
 <p>
-The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbFire</b></u> installation folder, Three xml files for the Fire TV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
+The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbFire</b></u> installation folder, Three xml files for the AFTV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
 The <b>"Screen shot"</b> button takes a snapshot of the device's current screen, names it screen.png, and saves it to the pulled files folder (default: home directory).<p> Unfortunately, High-bandwidth Digital Content Protection (HDCP) prevents you from taking screenshots of most commercia video streams. Luckily, XBMC is not affected by HDCP.<p>
 <p>
@@ -74,9 +74,9 @@ The <b>"Screen shot"</b> button takes a snapshot of the device's current screen,
 <b><u>Filesystem R/O</b></u> Makes /system partition read-only.
 <p>
 
-The <b>"Root Fire TV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by going to FireTV settings and running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
+The <b>"Root AFTV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
 <p>
-The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a Fire TV. <p>
+The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a AFTV. <p>
 <p>
 <u><b>Menu items</b></u>
 <p>
@@ -98,8 +98,8 @@ BusyBox combines tiny versions of many common UNIX utilities into a single small
 <b><u>Uninstall Busybox</b></u><br>
 Removes BusyBox frpm your system.<p>
 
-<b><u>Install Fire TV firmware</b></u><br>
-Install firmware to Amazon Fire TV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>When updating firmware from USB storage, adbFire looks on all devices for a file named update.zip. If it finds more than one file with that name, it will complain and not proceed.
+<b><u>Install AFTV firmware</b></u><br>
+Install firmware to  AFTV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>When updating firmware from USB storage, adbFire looks on all devices for files with an extension of ".bin" or ".zip" and presents them for your choice.
 <p>
 <p>
 <b><u>Preferences</b></u>
@@ -112,7 +112,7 @@ In theory any fork should work if its file directory structure adheres to XBMC's
 <b><u>Pull Folder</b></u>, default: User's home directory.<br>
 Choose the folder where pulled XBMC files and screenshot pngs are placed.
 <p>
-<b><u>Fire TV updates</b></u> Toggle Amazon Fire TV updates on/off. This disables/enables com.amazon.dcp.
+<b><u>AFTV updates</b></u> Toggle AFTV updates on/off. This disables/enables com.amazon.dcp.
 <p>
 
 =============================

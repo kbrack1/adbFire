@@ -24,8 +24,11 @@ QString adb2;
 QString fline;
 
 QString uninstallDialog::packageName() {
-   // return ui->packagename->text();
-   return ui->unlistWidget->currentItem()->text();
+
+   if( ui->unlistWidget->selectedItems().count() == 1 )
+        return ui->unlistWidget->currentItem()->text();
+     else return "";
+
 }
 
 bool uninstallDialog::keepBox() {

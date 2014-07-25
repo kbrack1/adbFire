@@ -4,7 +4,7 @@ sleep 15
 
 # v3
 
-storage="/storage"
+storage="/storage/usb"
 
 
 utf8=',utf8'

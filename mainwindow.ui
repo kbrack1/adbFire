@@ -355,7 +355,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Root Fire TV using Geohot's towelroot and Chainfire's SuperSU&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Root FireTV</string>
+          <string>Root AFTV</string>
          </property>
         </widget>
        </item>
@@ -608,7 +608,7 @@
   </action>
   <action name="actionFirmware_install">
    <property name="text">
-    <string>Install Fire TV firmware</string>
+    <string>Install AFTV firmware</string>
    </property>
    <property name="toolTip">
     <string>Upgrade/downgrade Fire TV firmware </string>

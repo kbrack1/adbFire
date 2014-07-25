@@ -6,6 +6,7 @@
 
 QT       += core gui sql
 
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = adbFire
@@ -16,7 +17,8 @@ SOURCES += main.cpp\
     dialog2.cpp \
     helpdialog.cpp \
     uninstalldialog.cpp \
-    preferencesdialog.cpp
+    preferencesdialog.cpp \
+    usbfiledialog.cpp
 
 RESOURCES = adbFire.qrc
 
@@ -24,13 +26,15 @@ HEADERS  += mainwindow.h \
     dialog2.h \
     helpdialog.h \
     uninstalldialog.h \
-    preferencesdialog.h
+    preferencesdialog.h \
+    usbfiledialog.h
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
     helpdialog.ui \
     uninstalldialog.ui \
-    preferencesdialog.ui
+    preferencesdialog.ui \
+    usbfiledialog.ui
 
 RC_FILE = adbFire.rc
 
