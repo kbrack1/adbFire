@@ -66,8 +66,6 @@ private slots:
 
     void on_fdellButton_clicked();
 
-    void on_fdellButton_clickedx();
-
     void on_actionFirmware_install_triggered();
 
     void on_mntButton_clicked();
@@ -83,11 +81,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
-
-
-
-
 
 };
 

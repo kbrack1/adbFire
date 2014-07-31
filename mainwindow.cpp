@@ -74,6 +74,8 @@ int tsvalue = 4000;
 
 QSqlDatabase db;
 
+
+
 ////////////////////////////////////////////////
  QString strip (QString str)
 {
@@ -344,6 +346,38 @@ if (sldir.isEmpty())
 
 }
 
+
+//////////////////////////////////////////////
+void open_pref_database()
+
+{
+
+    QFile Fout(dbstring);
+
+    if(!Fout.exists())
+    {
+      dbexists = false;
+    }
+    else
+    {
+      dbexists = true;
+    }
+
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(dbstring);
+
+
+    if (!db.open()) {
+        QMessageBox::critical(0, qApp->tr("Cannot open database"),
+            "Database error:\n"+dbstring
+                     , QMessageBox::Cancel);
+
+    }
+
+}
+
+
+
 //////////////////////////////////////////////
  MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -411,34 +445,11 @@ if (sldir.isEmpty())
     }
 
   hdir = QDir::homePath();
-
-  QFile Fout(dbstring);
-
-  if(!Fout.exists())
-  {
-    dbexists = false;
-  }
-  else
-  {
-    dbexists = true;
-  }
-
- db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName(dbstring);
-
-
-  if (!db.open()) {
-      QMessageBox::critical(0, qApp->tr("Cannot open database"),
-          "Database error:\n"+dbstring
-                   , QMessageBox::Cancel);
-
-  }
+  open_pref_database();
 
    if (!dbexists)
       createTables();
-
-   // else
-
+    else
    readTables();
 
 
@@ -491,8 +502,10 @@ MainWindow::~MainWindow()
         ftvupdate = 0;
 
     kill_server();
+    open_pref_database();
     updateTables();
     db.close();
+
     delete ui;
 
 }
@@ -1458,7 +1471,9 @@ void MainWindow::on_actionPreferences_triggered()
     }
   }
 
+    open_pref_database();
     updateTables();
+    db.close();
 
     }
 
@@ -1910,11 +1925,6 @@ void MainWindow::on_actionInstall_busybox_triggered()
                      }
                   else
                       file6 = true;
-
-
-
-
-
 
 
  if (file1 && file2 && file3 && file4 && file5 && file6)
@@ -2759,8 +2769,8 @@ void MainWindow::on_umntButton_clicked()
      }
 
 
-    QString umntstring = "/system/xbin/umount /storage/sd\?\?/";
-    QString rmsd = "rm -r /storage/sd\?\?/";
+    QString umntstring = "/system/xbin/umount /storage/usb/sd\?\?/";
+    QString rmsd = "rm -r /storage/usb/sd\?\?/";
 
     mount_root("rw");
 
@@ -2783,7 +2793,7 @@ void MainWindow::on_umntButton_clicked()
            rm_sd.waitForFinished(-1);
            command=rm_sd.readAll();
 
-           QMessageBox::information( this,"","USB Drive unmounted.");
+           QMessageBox::information( this,"","USB Drive(s) unmounted.");
            mount_root("ro");
         }
 
@@ -2893,11 +2903,9 @@ void MainWindow::on_usbBox_clicked(bool checked)
          return;
    }
 
-
 QString cstring;
 QString hashbang = "#!/system/bin/sh";
 QString filename = adbdir+"install-recovery-2.sh";
-
 QString makepst = "/system/xbin/mntdrives.sh";
 
 QProcess busybox_installed;
@@ -2914,8 +2922,6 @@ if (command.contains("No such file or directory"))
     ui->usbBox->setChecked(false);
     return;
 }
-
-
 
 
     if (checked)
@@ -3105,6 +3111,7 @@ void MainWindow::on_fpullButton_clicked()
      xpath = "/sdcard/";
      break;
 
+
      default:
      xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
      break;
@@ -3112,7 +3119,7 @@ void MainWindow::on_fpullButton_clicked()
 
      is_package(xbmcpackage);
 
-     if (xpath != "/sdcard/")
+     if (xpath != "/sdcard/" )
         if (!is_packageInstalled)
           { QMessageBox::critical(
                 this,
@@ -3192,119 +3199,3 @@ void MainWindow::on_fpullButton_clicked()
 
 
 
-/////////////////////////////////////////////
-void MainWindow::on_fdellButton_clickedx()
-{
-
-    if (!isConnected)
-          { QMessageBox::critical(
-                this,
-                "adbFire",
-                devstr2);
-             return;
-       }
-
-
-
-     QString xpath = "";
-     QString cname = ui->comboBox->currentText();
-
-     switch(ui->comboBox->currentIndex() ){
-     case 0:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
-     break;
-
-     case 1:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps/";
-     break;
-
-     case 2:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
-     break;
-
-     case 3:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/sounds/";
-     break;
-
-     case 4:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/system/";
-     break;
-
-     case 5:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/";
-     break;
-
-     case 6:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
-     break;
-
-     case 7:
-     xpath = "/sdcard/";
-     break;
-
-     default:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
-     break;
-     }
-
-
-
-  is_package(xbmcpackage);
-
-  if (xpath != "/sdcard/")
-     if (!is_packageInstalled)
-       { QMessageBox::critical(
-             this,
-             "",
-             "XBMC not installed");
-          return;
-       }
-
-
-
-
-
-      QString pullfile = QInputDialog::getText(this,"" ,
-        "Filename:", QLineEdit::Normal,
-        "", &ok);
-
-             if (!ok)
-               return;
-
-                         QProcess check_dir;
-                          check_dir.setProcessChannelMode(QProcess::MergedChannels);
-                          QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath+pullfile;
-                          check_dir.start(cstring);
-                          check_dir.waitForFinished(-1);
-                          command=check_dir.readAll();
-
-
-                          if (command.contains("No such file or directory"))
-                           { QMessageBox::critical(
-                                          this,
-                                         "",
-                                          "No such file or directory");
-                                          return;
-                          }
-
-
-             QProcess pull_file;
-             pull_file.setProcessChannelMode(QProcess::MergedChannels);
-             cstring = adb + " -s " + daddr + port +  " shell rm "+xpath+pullfile;
-             pull_file.start(cstring);
-             pull_file.waitForFinished(-1);
-             command=pull_file.readAll();
-
-
-             if (command.contains("exist"))
-              QMessageBox::critical(
-                             this,
-                            "",
-                             "Deletion of "+pullfile+" failed");
-                 else
-                  QMessageBox::information(
-                             this,
-                             "",
-                             "Deletion of "+pullfile+" succeeded");
-
-}
