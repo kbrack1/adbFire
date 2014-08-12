@@ -38,24 +38,18 @@
 int os=2;
 #endif
 
+
 bool isConnected = false;
 bool serverRunning = false;
 bool  is_packageInstalled = false;
 bool  mounted_op = false;
-bool ok = false;
 bool firstrun=true;
 bool dbexists = false;
 bool updatecheck = true;
 
-QString adbstr1 = "ADB running. ";
-QString adbstr2 = "ADB not running. ";
-QString devstr1 = "  Device connected";
-QString devstr2 = "  Device not connected.";
 
 QString port = ":5555";
-
 QString filename = "";
-QString command = "";
 QString adbdir =  "";
 QString adb = "";
 QString xmldir = "";
@@ -67,6 +61,13 @@ QString pulldir = "";
 QString xbmcpackage ="";
 QString dbstring = "";
 
+
+QString adbstr1 = "ADB running. ";
+QString adbstr2 = "ADB not running. ";
+QString devstr1 = "  Device connected";
+QString devstr2 = "  Device not connected.";
+
+
 int sshcheck;
 int usbcheck;
 int ftvupdate;
@@ -74,6 +75,98 @@ int tsvalue = 4000;
 
 QSqlDatabase db;
 
+//////////////////////////////////////////////
+void rotate_logfile()
+
+{
+
+ QFile file(adbdir+"adbfire.log.old");
+
+ if( file.exists() )
+     QFile::remove(adbdir+"adbfire.log.old");
+
+
+QFile file2(adbdir+"adbfire.log");
+
+if( file2.exists() )
+    file2.rename(adbdir+"adbfire.log.old");
+
+
+}
+
+
+//////////////////////////////////////////////
+void logfile(QString line)
+
+{
+
+
+QFile file(adbdir+"adbfire.log");
+   if(!file.open(QFile::WriteOnly | QFile::Text | QFile::Append))
+      {
+       QMessageBox::critical(0, "","Can't create logfile!\n",QMessageBox::Cancel);
+       return;
+      }
+
+   QTextStream out(&file);
+            out  << line << endl;
+
+ }
+
+
+/////////////////////////////////////////
+void rebootDevice(QString reboot)
+{
+
+ QElapsedTimer rtimer;
+ int nMilliseconds;
+
+QProcess reboot_device;
+rtimer.start();
+reboot_device.setProcessChannelMode(QProcess::MergedChannels);
+QString cstring = adb + " -s " +daddr+port + reboot;
+reboot_device.start(cstring);
+reboot_device.waitForStarted();
+while(reboot_device.state() != QProcess::NotRunning)
+  {
+    qApp->processEvents();
+     nMilliseconds = rtimer.elapsed();
+   if (nMilliseconds >= 5000)
+       break;
+}
+
+
+}
+
+
+///////////////////////////////////////////////
+QString RunProcess(QString cstring)
+{
+ QProcess run_command;
+ run_command.setProcessChannelMode(QProcess::MergedChannels);
+ run_command.start(cstring);
+ run_command.waitForStarted();
+ run_command.waitForFinished(-1);
+ QString command=run_command.readAll();
+ return command;
+}
+
+
+///////////////////////////////////////////////
+QString RunProcess2(QString cstring)
+{
+ QProcess run_command;
+ run_command.setProcessChannelMode(QProcess::MergedChannels);
+ run_command.start(cstring);
+ run_command.waitForStarted();
+
+ while(run_command.state() != QProcess::NotRunning)
+     qApp->processEvents();
+
+ QString command=run_command.readAll();
+
+ return command;
+}
 
 
 ////////////////////////////////////////////////
@@ -87,12 +180,9 @@ QSqlDatabase db;
  //////////////////////////////////////////
  void kill_server()
 {
- QProcess kill_adb;
- kill_adb.setProcessChannelMode(QProcess::MergedChannels);
+
  QString cstring = adb + " kill-server";
- kill_adb.start(cstring);
-command=kill_adb.readAll();
- kill_adb.waitForFinished(-1);
+ QString command=RunProcess(cstring);
  serverRunning = false;
  
 }
@@ -101,20 +191,25 @@ command=kill_adb.readAll();
  //////////////////////////////////////
 void start_server()
 {
- QProcess start_adb;
- start_adb.setProcessChannelMode(QProcess::MergedChannels);
+
  QString cstring = adb + " start-server";
- start_adb.start(cstring);
- start_adb.waitForFinished(-1);
- command=start_adb.readAll();
-
-
+ QString command=RunProcess(cstring);
 
      if (command.contains("daemon started successfully"))
-         serverRunning = true;
-         else
-         serverRunning = false;
+        {
+           logfile("server started");
+           logfile(cstring);
+           logfile(command);
+           serverRunning = true;
+          }
 
+         else
+        {
+         logfile("start-server failed!");
+         logfile(cstring);
+         logfile(command);
+         serverRunning = false;
+         }
 }
 
 
@@ -122,78 +217,74 @@ void start_server()
 bool is_package(QString package)
 {
 
-    QProcess ispackage_adb;
-    ispackage_adb.setProcessChannelMode(QProcess::MergedChannels);
     QString cstring = adb + " -s " + daddr + port + " shell pm list packages ";
-    ispackage_adb.start(cstring);
-    ispackage_adb.waitForFinished(-1);
-    command=ispackage_adb.readAll();
-
-
-
+    QString command=RunProcess(cstring);
 
         if (command.contains(package))
+            {
+            logfile(package+ " is installed");
+            logfile(cstring);
+            // logfile(command);
             is_packageInstalled = true;
+            }
             else
-            is_packageInstalled = false;
+            {
+            logfile(package+ " not found");
+            logfile(cstring);
+            // logfile(command);
+            is_packageInstalled = false;}
 
         return  is_packageInstalled;
 }
 
-
-
-
 /////////////////////////////////////////////////////
 bool mount_system(QString mnt)
 {
-
-
-    QProcess mount_system;
-       mount_system.setProcessChannelMode(QProcess::MergedChannels);
        QString cstring = adb + " -s " +daddr+port+ " shell su -c mount -o remount,"+mnt+ " /system";
-       mount_system.start(cstring);
-       mount_system.waitForFinished(-1);
-       command=mount_system.readAll();
-
-
-
+       QString command=RunProcess(cstring);
 
 
 
         if (command.isEmpty())
-           return true;
+          {
+            logfile("/system mounted "+mnt);
+            logfile(cstring);
+            logfile(command);
+            return true;
+          }
             else
+          {
+            logfile("/system not mounted "+mnt);
+            logfile(cstring);
+            logfile(command);
             return false;
-
-        // return  mounted_op;
-
+          }
 
 }
 
 /////////////////////////////////////////////////////
 bool mount_root(QString mnt)
 {
-
-
-    QProcess mount_system;
-       mount_system.setProcessChannelMode(QProcess::MergedChannels);
        QString cstring = adb + " -s " +daddr+port+ " shell su -c mount -o remount,"+mnt+ " /";
-       mount_system.start(cstring);
-       mount_system.waitForFinished(-1);
-       command=mount_system.readAll();
+       QString command=RunProcess(cstring);
 
+       logfile(cstring);
+       logfile(command);
 
-
-
-
-
-        if (command.isEmpty())
-           return true;
+    if (command.isEmpty())
+           {
+             logfile("/ mounted "+mnt);
+             logfile(cstring);
+             logfile(command);
+             return true;
+            }
             else
-            return false;
-
-        // return  mounted_op;
-
+            {
+               logfile("/ not mounted "+mnt);
+               logfile(cstring);
+               logfile(command);
+               return false;
+               }
 
 }
 
@@ -201,25 +292,54 @@ bool mount_root(QString mnt)
 /////////////////////////////////////////////////////
 bool amazon_updates(QString onoff)
 {
-
-       QProcess update_policy;
-       update_policy.setProcessChannelMode(QProcess::MergedChannels);
        QString cstring = adb + " -s " + daddr+port + " shell su -c pm "+ onoff + " com.amazon.dcp";
-       update_policy.start(cstring);
-       update_policy.waitForFinished(-1);
-       command=update_policy.readAll();
+       QString command=RunProcess(cstring);
 
+
+       logfile("amazon updates");
 
         if (onoff == "enable")
-           { if (command.contains("enabled"))
-               return true;
-            else return false;
+           {
+
+            if (command.contains("enabled"))
+               {
+                logfile(cstring);
+                logfile(command);
+                return true;
+            }
+
+            else
+
+            {
+                logfile(cstring);
+                logfile(command);
+                return false;
+            }
+
+
            }
 
+
+
+
         if (onoff == "disable")
-           { if (command.contains("disabled"))
-               return true;
-            else return false;
+           {
+
+            if (command.contains("disabled"))
+              {
+                logfile(cstring);
+                logfile(command);
+                return true;
+            }
+
+            else
+
+            {
+                logfile(cstring);
+                logfile(command);
+                return false;
+            }
+
            }
 
         return false;
@@ -230,9 +350,31 @@ bool amazon_updates(QString onoff)
 void createTables()
 {
 
+
+    logfile("creating adbfire.db");
+
+    QString sqlstatement = "create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , usbcheck int, ftvupdate int)";
+
     QSqlQuery query;
-    query.exec("create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , usbcheck int, ftvupdate int)");
-    query.exec("insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',0,0 )");
+    query.exec(sqlstatement);
+
+    if (query.lastError().isValid())
+     {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+
+    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',0,1 )";
+    query.exec(sqlstatement);
+
+    if (query.lastError().isValid())
+     {
+      logfile(sqlstatement);
+      logfile("SqLite error:" + query.lastError().text());
+      logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+    }
 
 }
 
@@ -241,11 +383,14 @@ void createTables()
 void updateTables()
 {
 
+
+ // QMessageBox::critical(0, "",daddr,QMessageBox::Cancel);
+
+
+    logfile("updating database adbfire.db");
+
     QString str1;
     QString str2;
-
-
-
 
     str1.setNum(usbcheck);
     str2.setNum(ftvupdate);
@@ -253,25 +398,83 @@ void updateTables()
     QSqlQuery query;
 
     QString sqlstatement = "UPDATE device SET name='"+daddr+"' WHERE Id=1";
-    query.exec(sqlstatement);
+     query.exec(sqlstatement);
+
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
 
     sqlstatement = "UPDATE device SET sldir='"+sldir+"' WHERE Id=1";
      query.exec(sqlstatement);
 
-     sqlstatement = "UPDATE device SET pushdir='"+pushdir+"' WHERE Id=1";
-      query.exec(sqlstatement);
 
-      sqlstatement = "UPDATE device SET pulldir='"+pulldir+"' WHERE Id=1";
-       query.exec(sqlstatement);
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
 
-      sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"' WHERE Id=1";
-       query.exec(sqlstatement);
+    sqlstatement = "UPDATE device SET pushdir='"+pushdir+"' WHERE Id=1";
+     query.exec(sqlstatement);
 
-        sqlstatement = "UPDATE device SET usbcheck='"+str1+"' WHERE Id=1";
-         query.exec(sqlstatement);
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
 
-         sqlstatement = "UPDATE device SET ftvupdate='"+str2+"' WHERE Id=1";
-          query.exec(sqlstatement);
+    sqlstatement = "UPDATE device SET pulldir='"+pulldir+"' WHERE Id=1";
+     query.exec(sqlstatement);
+
+
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+    sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"' WHERE Id=1";
+     query.exec(sqlstatement);
+
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+
+
+    sqlstatement = "UPDATE device SET usbcheck='"+str1+"' WHERE Id=1";
+     query.exec(sqlstatement);
+
+
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+
+    sqlstatement = "UPDATE device SET ftvupdate='"+str2+"' WHERE Id=1";
+     query.exec(sqlstatement);
+
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+
 
 }
 
@@ -279,50 +482,126 @@ void updateTables()
 void readTables()
 {
 
+  QString sqlstatement;
 
+
+    logfile("reading database");
 
      QSqlQuery query;
-       query.exec("SELECT name FROM device");
+
+
+     sqlstatement= "SELECT name FROM device";
+     query.exec(sqlstatement);
          while (query.next()) {
               daddr = query.value(0).toString();
          }
 
 
-          query.exec("SELECT sldir FROM device");
+         // QMessageBox::critical(0, "",daddr,QMessageBox::Cancel);
+
+
+         if (query.lastError().isValid())
+          {
+            logfile(sqlstatement);
+            logfile("SqLite error:" + query.lastError().text());
+            logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+           }
+
+
+         sqlstatement="SELECT sldir FROM device";
+         query.exec(sqlstatement);
            while (query.next()) {
                 sldir = query.value(0).toString();
           }
 
-           query.exec("SELECT pushdir FROM device");
+
+
+           if (query.lastError().isValid())
+            {
+              logfile(sqlstatement);
+              logfile("SqLite error:" + query.lastError().text());
+              logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+             }
+
+
+           sqlstatement="SELECT pushdir FROM device";
+           query.exec(sqlstatement);
             while (query.next()) {
                  pushdir = query.value(0).toString();
            }
 
 
-            query.exec("SELECT pulldir FROM device");
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
+
+
+           sqlstatement="SELECT pulldir FROM device";
+            query.exec(sqlstatement);
             while (query.next()) {
                   pulldir = query.value(0).toString();
             }
 
-            query.exec("SELECT xbmcpackage FROM device");
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
+
+
+
+            sqlstatement="SELECT xbmcpackage FROM device";
+            query.exec(sqlstatement);
             while (query.next()) {
                   xbmcpackage = query.value(0).toString();
             }
 
 
-            query.exec("SELECT usbcheck FROM device");
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
+
+
+
+            sqlstatement="SELECT usbcheck FROM device";
+            query.exec(sqlstatement);
             while (query.next()) {
                   usbcheck = query.value(0).toInt();
             }
 
-            query.exec("SELECT ftvupdate FROM device");
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
+
+
+            sqlstatement="SELECT ftvupdate FROM device";
+            query.exec(sqlstatement);
             while (query.next()) {
                   ftvupdate = query.value(0).toInt();
             }
 
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
 
 
-if (sldir.isEmpty())
+     if (sldir.isEmpty())
          sldir = hdir;
 
      if (pushdir.isEmpty())
@@ -339,10 +618,6 @@ if (sldir.isEmpty())
      else
          updatecheck=true;
 
-
-
-   // qDebug() << query.isSelect();
-   // qDebug() << query.isValid();
 
 }
 
@@ -371,8 +646,11 @@ void open_pref_database()
         QMessageBox::critical(0, qApp->tr("Cannot open database"),
             "Database error:\n"+dbstring
                      , QMessageBox::Cancel);
+     logfile("error opening database "+dbstring);
 
     }
+
+
 
 }
 
@@ -385,6 +663,7 @@ void open_pref_database()
 {
 
 
+QString command = "";
 
      ui->setupUi(this);
 
@@ -392,18 +671,10 @@ void open_pref_database()
     this->setFixedSize(this->size().width(), this->size().height());
 
 
-
-
-
            if (usbcheck == 1)
                ui->usbBox->setChecked(true);
            else
               ui->usbBox->setChecked(false);
-
-
-
-
-
 
 
     if(isConnected)
@@ -444,35 +715,36 @@ void open_pref_database()
      xmldir = adbdir+"xml/";
     }
 
+
+  rotate_logfile();
+
+
+  logfile("adbFire logfile");
+
   hdir = QDir::homePath();
   open_pref_database();
 
    if (!dbexists)
-      createTables();
-    else
-   readTables();
+    createTables();
 
+   readTables();
 
 
    if (usbcheck == 1)
        ui->usbBox->setChecked(true);
    else
       ui->usbBox->setChecked(false);
-    ui->device->setText(daddr);
+
+   ui->device->setText(daddr);
 
     if (!(os == 1))
       {  QString cstring = "chmod 0755 "+adb;
-         QProcess adb_chmod;
-         adb_chmod.setProcessChannelMode(QProcess::MergedChannels);
-         adb_chmod.start(cstring);
-         adb_chmod.waitForFinished(-1);
-         command=adb_chmod.readAll();
-         
+         QString command=RunProcess(cstring);
        }
 
     kill_server();
     start_server();
-
+    logfile("starting server");
     if (serverRunning)
      { ui->server_running->setText(adbstr1);
 
@@ -503,12 +775,103 @@ MainWindow::~MainWindow()
 
     kill_server();
     open_pref_database();
+    logfile("open database for update");
     updateTables();
+    logfile("closing database");
     db.close();
-
+    logfile("closing program");
     delete ui;
 
 }
+
+
+//////////////////////////////////////////////////////////////////////
+void MainWindow::on_actionQuit_triggered()
+{
+    QCoreApplication::quit();
+}
+/////////////////////////////////////////////////////
+void MainWindow::TimerEvent()
+{
+  int value = ui->progressBar->value();
+  ui->progressBar->setValue(value+1);
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+void MainWindow::on_sideload_Button_clicked()
+{
+
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
+   QString fileName = QFileDialog::getOpenFileName(this,
+          tr("Select app to install"), sldir , tr("APK Files (*.apk)"));
+
+
+    if (!fileName.isEmpty() )
+    {
+
+    QFileInfo finfo(fileName);
+    sldir = finfo.absolutePath();
+
+    QMessageBox::StandardButton reply;
+      reply = QMessageBox::question(this, "Install", "Install "+fileName+"?\n",
+                                    QMessageBox::Yes|QMessageBox::No);
+      if (reply == QMessageBox::Yes)
+      {
+
+
+
+
+
+
+
+          ui->progressBar->setHidden(false);
+          ui->progressBar->setValue(0);
+
+          QTimer *timer = new QTimer(this);
+          connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+          timer->start(tsvalue);
+
+          QString cstring = adb + " install -r " + '"'+ fileName+'"';
+
+          QString command=RunProcess2(cstring);
+
+           ui->progressBar->setHidden(true);
+
+           logfile(cstring);
+           logfile(command);
+
+           nMilliseconds = rtimer.elapsed();
+           logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+           if (command.contains("Success"))
+
+               QMessageBox::information(this,"","Installed");
+              else      
+               QMessageBox::critical(this,"","Install failed");
+
+    }
+
+  }
+
+
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////
 void MainWindow::on_uninstall_Button_clicked()
@@ -526,7 +889,12 @@ bool keepbox = false;
               return;
         }
 
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
 
+
+    logfile("open uninstall dialog");
 
     uninstallDialog dialog;
     dialog.setModal(true);
@@ -555,6 +923,8 @@ bool keepbox = false;
                      "",
                      package +" not installed");
                   return;
+
+            logfile("Error: "+ package +" not installed");
             }
 
 
@@ -571,33 +941,39 @@ bool keepbox = false;
                       timer->start(tsvalue);
 
 
-                      QProcess uninstall_package;
-                      uninstall_package.setProcessChannelMode(QProcess::MergedChannels);
-
                       if (!keepbox)
                       cstring = adb + " -s " +daddr+port+ " shell pm uninstall " + package;
                       else
                       cstring = adb + " -s " +daddr+port+ " shell pm uninstall -k " + package;
 
-                      uninstall_package.start(cstring);
+                      QString command=RunProcess2(cstring);
 
-                      while(uninstall_package.state() != QProcess::NotRunning)
-                          qApp->processEvents();
 
-                      command=uninstall_package.readAll();
-                      
                       ui->progressBar->setHidden(true);
 
+                      logfile(cstring);
+
+                      nMilliseconds = rtimer.elapsed();
+                      logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
                       if (!command.contains("Success"))
-                       QMessageBox::critical(
+
+                         {   logfile(command);
+                          QMessageBox::critical(
                                       this,
                                      "",
                                       "Uninstall failed");
-                          else                
+                        }
+                          else
+                      {
+                            logfile(command);
                              QMessageBox::information(
                                       this,
                                       "",
                                       "Uninstalled");
+                       }
+
 
                   }
 }
@@ -618,26 +994,23 @@ void MainWindow::on_connButton_clicked()
           return;
     }
 
-    // QMessageBox::critical(this,"","xxxx");
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
+
 
     port = ":5555";
 
     daddr = ui->device->text();
     QString cstring = adb + " connect " +daddr+port;
-    QProcess connect_device;
-    connect_device.setProcessChannelMode(QProcess::MergedChannels);
-    connect_device.start(cstring);
-    connect_device.waitForFinished(-1);
-    command=connect_device.readAll();
 
+    QString command=RunProcess(cstring);
 
-
-       if (command.contains("connected to"))
+    if (command.contains("connected to"))
            isConnected=true;
        else
         isConnected=false;
-
-
 
      if(isConnected)
        {
@@ -657,93 +1030,13 @@ void MainWindow::on_connButton_clicked()
      }
 
         firstrun=false;
-}
 
-/////////////////////////////////////////////////////////////////////
-void MainWindow::TimerEvent()
-{
-  int value = ui->progressBar->value();
-  ui->progressBar->setValue(value+1);
+        nMilliseconds = rtimer.elapsed();
+        logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-void MainWindow::on_sideload_Button_clicked()
-{
-
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-  command = "";
-
-   QString fileName = QFileDialog::getOpenFileName(this,
-          tr("Select app to install"), sldir , tr("APK Files (*.apk)"));
-
-
-
-
-
-
-    // qDebug() << fileInfo.absolutePath();
-   // qDebug() << fileInfo.fileName();
-
-    if (!fileName.isEmpty() )
-    {
-
-    QFileInfo finfo(fileName);
-    sldir = finfo.absolutePath();
-
-    QMessageBox::StandardButton reply;
-      reply = QMessageBox::question(this, "Install", "Install "+fileName+"?\n",
-                                    QMessageBox::Yes|QMessageBox::No);
-      if (reply == QMessageBox::Yes)
-      {
-
-
-          ui->progressBar->setHidden(false);
-          ui->progressBar->setValue(0);
-
-          QTimer *timer = new QTimer(this);
-          connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-          timer->start(tsvalue);
-
-
-          QProcess install_apk;
-          install_apk.setProcessChannelMode(QProcess::MergedChannels);
-          QString cstring = adb + " install -r " + '"'+ fileName+'"';
-          install_apk.start(cstring);
-
-           while(install_apk.state() != QProcess::NotRunning)
-               qApp->processEvents();
-
-           command=install_apk.readAll();
-           
-           ui->progressBar->setHidden(true);
-
-           if (command.contains("Success"))
-              QMessageBox::information(
-                          this,
-                         "",
-                          "Installed");
-              else
-              QMessageBox::critical(
-                          this,
-                          "",
-                          "Install failed");
-
-          }
-
- }
-
-
-
-      }
 
 
 
@@ -771,19 +1064,22 @@ void MainWindow::on_disButton_clicked()
     }
 
 
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
 
         ui->usbBox->setDisabled(true);
         daddr = ui->device->text();
         QString cstring = adb + " disconnect "+daddr+port ;
-        QProcess disconnect_device;
-        disconnect_device.setProcessChannelMode(QProcess::MergedChannels);
-        disconnect_device.start(cstring);
-        disconnect_device.waitForFinished(-1);
-        command=disconnect_device.readAll();
-        
+
+        QString command=RunProcess(cstring);
 
         isConnected=false;
          ui->device_connected->setText("  Device not connected.");
+
+
+         nMilliseconds = rtimer.elapsed();
+         logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
 }
 
@@ -792,12 +1088,22 @@ void MainWindow::on_disButton_clicked()
 void MainWindow::on_astart_Button_clicked()
 {
 
-   kill_server();
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
+
+    kill_server();
     start_server();
     if (serverRunning)
       ui->server_running->setText(adbstr1);
     else
      ui->server_running->setText(adbstr2);
+
+    nMilliseconds = rtimer.elapsed();
+    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
 
 }
 
@@ -806,14 +1112,13 @@ void MainWindow::on_astart_Button_clicked()
 void MainWindow::on_akill_Button_clicked()
 {
 
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
 
     QString cstring = adb + "  disconnect "+daddr+port ;
-    QProcess disconnect_device;
-    disconnect_device.setProcessChannelMode(QProcess::MergedChannels);
-    disconnect_device.start(cstring);
-    disconnect_device.waitForFinished(-1);
-    command=disconnect_device.readAll();
-    
+    QString command=RunProcess(cstring);
 
     isConnected=false;
      ui->device_connected->setText(devstr2);
@@ -825,17 +1130,13 @@ void MainWindow::on_akill_Button_clicked()
       ui->server_running->setText(adbstr1);
     else
      ui->server_running->setText(adbstr2);
+
+    nMilliseconds = rtimer.elapsed();
+    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
 }
 
-
-
-
-//////////////////////////////////////////////////////////////////////
-void MainWindow::on_actionQuit_triggered()
-{
-
-    QCoreApplication::quit();
-}
 
 /////////////////////////////////////////////////////////////////////////
 void MainWindow::on_actionAbout_triggered()
@@ -850,6 +1151,7 @@ void MainWindow::on_actionAbout_triggered()
 //////////////////////////////////////////////
 void MainWindow::on_actionHelp_triggered()
 {
+    logfile("opening help");
     helpDialog helpdialog;
     helpdialog.setModal(true);
     helpdialog.exec();
@@ -880,8 +1182,14 @@ void MainWindow::on_backupButton_clicked()
    }
 
 
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
+
+
+
 QString hdir = QDir::homePath();
- command = "";
+ QString command = "";
  QString xpath = "/sdcard/Android/data/"+xbmcpackage;
 
  QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Destination"),
@@ -907,30 +1215,31 @@ QString hdir = QDir::homePath();
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
        timer->start(tsvalue);
 
-
-       QProcess pull_adb;
-       pull_adb.setProcessChannelMode(QProcess::MergedChannels);
-
        QString cstring = adb + " -s " + daddr + port + " pull "+xpath+" "+'"'+dir+'"';
-
-       pull_adb.start(cstring);
-
-        while(pull_adb.state() != QProcess::NotRunning)
-            qApp->processEvents();
-
-        command = pull_adb.readAll();
-        
+       QString command=RunProcess2(cstring);
 
        if (command.contains("bytes"))
-        QMessageBox::information(
+
+
+          {
+           logfile(cstring);
+           logfile(command);
+           QMessageBox::information(
                        this,
                       "",
                       "Backup done" );
+           }
            else
-            QMessageBox::critical(
+
+       {
+           logfile(cstring);
+           logfile(command);
+
+           QMessageBox::critical(
                        this,
                        "",
                     "Backup failed");
+       }
 
 
    }
@@ -939,6 +1248,10 @@ QString hdir = QDir::homePath();
 
 
 }
+
+ nMilliseconds = rtimer.elapsed();
+ logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
 
  ui->progressBar->setHidden(true);
 
@@ -964,6 +1277,11 @@ QString hdir = QDir::homePath();
                               return;
                         }
 
+                        QElapsedTimer rtimer;
+                        int nMilliseconds;
+                        rtimer.start();
+
+
 
                         QFile Fout1(rootfile1);
 
@@ -974,6 +1292,8 @@ QString hdir = QDir::homePath();
                                this,
                                tr("adbFire"),
                                rootfile1+" not found.");
+                               logfile(rootfile1+" not found.");
+
                                return;
                         }
 
@@ -987,11 +1307,9 @@ QString hdir = QDir::homePath();
                                this,
                                tr("adbFire"),
                                rootfile2+" not found.");
+                               logfile(rootfile2+" not found.");
                                return;
                         }
-
-
-                        command = "";
 
                               ui->progressBar->setHidden(false);
                               ui->progressBar->setValue(0);
@@ -1000,66 +1318,61 @@ QString hdir = QDir::homePath();
                               connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
                               timer->start(tsvalue);
 
-
-
-                              QProcess install_apk1;
                               QString cstring = adb + " -s " + daddr + port + " install -r "+rootfile1;
-                               install_apk1.start(cstring);
 
-                               while(install_apk1.state() != QProcess::NotRunning)
-                                   qApp->processEvents();
-
-                               command=install_apk1.readAll();
-                               
+                            QString command=RunProcess(cstring);
 
                               if (!command.contains("Success"))
-                                 { QMessageBox::information(
+                                 {
+                                  logfile(cstring);
+                                  logfile(command);
+                                  QMessageBox::information(
                                               this,
                                               "",
-                                              "tr.apk install failed");
-                                   QFile::remove(rootfile1);
+                                              "tr.apk install failed");                                 
                                    ui->progressBar->setHidden(true);
                                    return;
                                  }
+
                               else
                                   file1 = true;
 
+                              logfile(cstring);
+                              logfile(command);
 
-                                  command = "";
+                              cstring = adb + " -s " + daddr + port + " install -r "+rootfile2;
 
-
-
-                                    QProcess install_apk2;
-                                     cstring = adb + " -s " + daddr + port + " install -r "+rootfile2;
-                                     install_apk2.start(cstring);
-
-                                     while(install_apk2.state() != QProcess::NotRunning)
-                                         qApp->processEvents();
-
-                                     command=install_apk2.readAll();
+                              command=RunProcess2(cstring);
                                      
                                      ui->progressBar->setHidden(true);
 
                                      if (!command.contains("Success"))
-                                        { QMessageBox::information(
+                                        {
+                                         logfile(cstring);
+                                         logfile(command);
+                                         QMessageBox::information(
                                                      this,
                                                      "",
                                                      "su.apk install failed");
 
                                         }
                                      else
-                                         file2 = true;
+                                    file2 = true;
+
+                                     logfile(cstring);
+                                     logfile(command);
 
  if (file1 && file2)
  {
 
   QMessageBox::information( this,"","Root software installed.\nRun towelroot on the FireTV\n to finish rooting process.");
+  logfile("Root software installed.\nRun towelroot on the FireTV\n to finish rooting process.");
+
+  nMilliseconds = rtimer.elapsed();
+  logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
 
  }
-
-
-
-
 
  }
 
@@ -1076,6 +1389,12 @@ void MainWindow::on_fpushButton_clicked()
              devstr2);
           return;
     }
+
+
+
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
 
 
 
@@ -1131,6 +1450,7 @@ if (xpath != "/sdcard/")
            this,
            "",
            "XBMC not installed");
+       logfile("xbmc not installed. cant push to it.");
         return;
      }
 
@@ -1140,32 +1460,28 @@ if (xpath != "/sdcard/")
  "Push file to "+cname, pushdir, tr("Files (*)"));
 
 
-
-
-
-
  if (!fileName.isEmpty() )
  {
 
      QFileInfo finfo(fileName);
      pushdir = finfo.absolutePath();
 
+     QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath;
 
-     QProcess check_dir;
-      check_dir.setProcessChannelMode(QProcess::MergedChannels);
-      QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath;
-      check_dir.start(cstring);
-      check_dir.waitForFinished(-1);
-      command=check_dir.readAll();
-      
+     QString command=RunProcess(cstring);
 
       if (command.contains("No such file or directory"))
        { QMessageBox::critical(
                       this,
                      "",
                       "Destination path missing. Has XBMC had its first run to set up internal folders?");
-                      return;
+          logfile(xpath);
+          logfile("Destination path missing. Has XBMC had its first run to set up internal folders?");
+          return;
       }
+
+
+
 
 
      QMessageBox::StandardButton reply;
@@ -1173,38 +1489,47 @@ if (xpath != "/sdcard/")
            QMessageBox::Yes|QMessageBox::No);
        if (reply == QMessageBox::Yes) {
 
-           QProcess push_adb;
-           push_adb.setProcessChannelMode(QProcess::MergedChannels);
+
+           ui->progressBar->setHidden(false);
+           ui->progressBar->setValue(0);
+
+
+           QTimer *timer = new QTimer(this);
+           connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+           timer->start(tsvalue);
 
            cstring = adb + " -s " + daddr + port +  " push "+'"'+fileName+'"'+ " "+xpath;
 
-           push_adb.start(cstring);
-
-           // push_adb.waitForFinished(-1);
-
-            while(push_adb.state() != QProcess::NotRunning)
-                qApp->processEvents();
-
-            command = push_adb.readAll();
-            
+           command=RunProcess2(cstring);
 
            if (command.contains("bytes"))
-            QMessageBox::information(
+            {
+               logfile(cstring);
+               logfile(command);
+               QMessageBox::information(
                            this,
                           "",
                           "File Pushed." );
+           }
                else
-                QMessageBox::critical(
+           {
+               logfile(cstring);
+               logfile(command);
+
+               QMessageBox::critical(
                            this,
                            "",
                         "Push failed ");
-
+           }
 
    }
 
-
-
 }
+
+ ui->progressBar->setHidden(true);
+ nMilliseconds = rtimer.elapsed();
+ logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
 
 
 }
@@ -1233,13 +1558,32 @@ void MainWindow::on_restoreButton_clicked()
          return;
    }
 
- command = "";
 
- // "shell mkdir -p /sdcard/Android/data/org.xbmc.xbmc/files"
+
+
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
+
+
+
 
  QString xpath = "/sdcard/Android/data/";
 
  QString cstring;
+ QString command;
+
+
+ cstring = adb + " shell su -c ps | grep "+xbmcpackage;
+ command=RunProcess(cstring);
+
+
+ if (command.contains(xbmcpackage))
+    { QMessageBox::critical(this,"","Cannot restore while\n"+xbmcpackage+" is running!");
+      logfile(xbmcpackage+" running. Restore failed");
+      return;
+ }
+
 
  QString dir = QFileDialog::getExistingDirectory(this, tr("Choose restore folder"),
                                               hdir,
@@ -1263,49 +1607,43 @@ void MainWindow::on_restoreButton_clicked()
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
        timer->start(tsvalue);
 
-
-       QProcess rm_dir;
-       rm_dir.setProcessChannelMode(QProcess::MergedChannels);
        cstring = adb + " -s " + daddr + port + " shell rm -r "+xpath +xbmcpackage;
-       rm_dir.start(cstring);
 
-       while(rm_dir.state() != QProcess::NotRunning)
-           qApp->processEvents();
-
-       command = rm_dir.readAll();
-       
-
-       QProcess restore_xbmc;
-       restore_xbmc.setProcessChannelMode(QProcess::MergedChannels);
+       command=RunProcess2(cstring);
 
        cstring = adb + " -s " + daddr + port +  " push "+'"'+dir+'"'+ " "+xpath+xbmcpackage;
 
-       restore_xbmc.start(cstring);
+        command=RunProcess(cstring);
 
-        while(restore_xbmc.state() != QProcess::NotRunning)
-            qApp->processEvents();
-
-        command = restore_xbmc.readAll();
-        
         ui->progressBar->setHidden(true);
 
-       if (command.contains("bytes"))
-        QMessageBox::information(
+        logfile(cstring);
+        logfile(command);
+
+        nMilliseconds = rtimer.elapsed();
+        logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+
+        if (command.contains("bytes"))
+
+       {
+           QMessageBox::information(
                        this,
                       "",
                       "Restore complete." );
+       }
            else
-            QMessageBox::critical(
+
+       {
+
+           QMessageBox::critical(
                        this,
                        "",
                     "Restore failed ");
-
-
-
+       }
 
    }
-
-
 
 }
 
@@ -1335,6 +1673,11 @@ void MainWindow::on_pushRemote_clicked()
 
 QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps/";
 
+QElapsedTimer rtimer;
+int nMilliseconds;
+rtimer.start();
+
+
 
  QString fileName = QFileDialog::getOpenFileName(this,
  "Choose remote xml file", xmldir, tr("Files (*.xml)"));
@@ -1342,16 +1685,18 @@ QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keym
  if (!fileName.isEmpty() )
  {
 
-     QProcess check_dir;
-      check_dir.setProcessChannelMode(QProcess::MergedChannels);
+
       QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath;
-      check_dir.start(cstring);
-      check_dir.waitForFinished(-1);
-      command=check_dir.readAll();
-      
+
+       logfile(cstring);
+
+      QString command=RunProcess(cstring);
 
       if (command.contains("No such file or directory"))
-       { QMessageBox::critical(
+       {
+          logfile(cstring);
+          logfile(command);
+          QMessageBox::critical(
                       this,
                      "",
                       "Destination path missing");
@@ -1364,39 +1709,42 @@ QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keym
            QMessageBox::Yes|QMessageBox::No);
        if (reply == QMessageBox::Yes) {
 
-           QProcess push_adb;
-           push_adb.setProcessChannelMode(QProcess::MergedChannels);
 
            cstring = adb + " -s " + daddr + port +  " push "+'"'+fileName+'"'+ " "+xpath+"/keyboard.xml";
 
-           push_adb.start(cstring);
+           command=RunProcess(cstring);
 
-           // push_adb.waitForFinished(-1);
+           logfile(cstring);
+           logfile(command);
 
-            while(push_adb.state() != QProcess::NotRunning)
-                qApp->processEvents();
+           nMilliseconds = rtimer.elapsed();
+           logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
-            command = push_adb.readAll();
-            
+
 
            if (command.contains("bytes"))
-            QMessageBox::information(
+
+
+           {
+
+               QMessageBox::information(
                            this,
                           "",
                           "Remote xml installed." );
+           }
                else
-                QMessageBox::critical(
+
+           {
+
+               QMessageBox::critical(
                            this,
                            "",
-                        "Remote xml installation failed.");
+                        "Remote xml installation failed.");}
 
 
    }
 
-
-
 }
-
 
 }
 
@@ -1412,7 +1760,11 @@ void MainWindow::on_consoleButton_clicked()
           return;
        }
 
-QString cstring = "";
+
+
+    logfile("detaching console process");
+
+    QString cstring = "";
 
     if (os == 1)
        {
@@ -1434,7 +1786,8 @@ QString cstring = "";
 void MainWindow::on_actionPreferences_triggered()
 {
 
-    // updatecheck = true;
+    logfile("opening preferences dialog");
+
 
     preferencesDialog dialog;
     dialog.setPackagename(xbmcpackage);
@@ -1451,26 +1804,41 @@ void MainWindow::on_actionPreferences_triggered()
     updatecheck = dialog.updatecheck();
 
 
+
+  if (isConnected)
+  {
+
    if ( is_package("eu.chainfire.supersu"))
      {
 
     if (updatecheck)
      {
        if (amazon_updates("enable"))
-       QMessageBox::information(this,"","Amazon updates on\ncom.amazon.dcp enabled");
-     else
-        QMessageBox::critical(this,"","Problem: com.amazon.dcp not enabled!");
+         {QMessageBox::information(this,"","Amazon updates on\ncom.amazon.dcp enabled");
+           logfile("Amazon updates on, com.amazon.dcp enabled");
+        }
+
+
+       else
+        {QMessageBox::critical(this,"","Problem: com.amazon.dcp not enabled!");
+        logfile("Problem: com.amazon.dcp not enabled!");
+       }
     }
 
     else
     {
         if (amazon_updates("disable"))
-        QMessageBox::information(this,"","Amazon updates off\ncom.amazon.dcp disabled");
+           {QMessageBox::information(this,"","Amazon updates off\ncom.amazon.dcp disabled");
+            logfile("Amazon updates off, com.amazon.dcp disabled");
+             }
       else
-         QMessageBox::critical(this,"","Problem: com.amazon.dcp not disabled!");
+         { QMessageBox::critical(this,"","Problem: com.amazon.dcp not disabled!");
+            logfile("Problem: com.amazon.dcp not disabled!");
+          }
     }
   }
 
+}
     open_pref_database();
     updateTables();
     db.close();
@@ -1513,31 +1881,8 @@ void MainWindow::on_actionReboot_triggered()
      if (reply == QMessageBox::Yes) {
          isConnected=false;
          ui->device_connected->setText(devstr2);
-
-
-
-
-          QElapsedTimer rtimer;
-          int nMilliseconds;
-
-            QProcess reboot_device;
-            rtimer.start();
-            reboot_device.setProcessChannelMode(QProcess::MergedChannels);
-            cstring = adb + " -s " +daddr+port+ " reboot";
-            reboot_device.start(cstring);
-
-
-             while(reboot_device.state() != QProcess::NotRunning)
-               {
-                 qApp->processEvents();
-                  nMilliseconds = rtimer.elapsed();
-                if (nMilliseconds >= 5000)
-                    break;
-             }
-
-             
-
-
+        logfile("rebooting device");
+         rebootDevice(" reboot");
      }
 
 }
@@ -1573,29 +1918,9 @@ void MainWindow::on_actionRecovery_triggered()
      if (reply == QMessageBox::Yes) {
          isConnected=false;
          ui->device_connected->setText(devstr2);
-
-
-  QElapsedTimer rtimer;
-   int nMilliseconds;
-
-
-   QProcess reboot_recovery;
-    rtimer.start();
-   reboot_recovery.setProcessChannelMode(QProcess::MergedChannels);
-   cstring = adb + " -s " +daddr+port+ " reboot recovery";
-   reboot_recovery.start(cstring);
-
-   while(reboot_recovery.state() != QProcess::NotRunning)
-     {
-       qApp->processEvents();
-        nMilliseconds = rtimer.elapsed();
-      if (nMilliseconds >= 5000)
-          break;
-   }
-
-    
-
-}
+         logfile("rebooting device recovery");
+         rebootDevice(" reboot recovery");
+        }
 
 }
 ///////////////////////////////////////////////
@@ -1611,59 +1936,75 @@ void MainWindow::on_screenshotButton_clicked()
     }
 
 
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
+
+
         QDateTime dateTime = QDateTime::currentDateTime();
         QString dtstr = dateTime.toString("MMddyyhhmmss");
 
+        QString cstring = adb +" -s " + daddr+port +" shell screencap -p /sdcard/"+dtstr+".png";
 
-    QProcess screen_shot;
-    screen_shot.setProcessChannelMode(QProcess::MergedChannels);
-    QString cstring = adb +" -s " + daddr+port +" shell screencap -p /sdcard/"+dtstr+".png";
-    screen_shot.start(cstring);
-    screen_shot.waitForFinished(-1);
-    command=screen_shot.readAll();
-    
+
+    QString command=RunProcess(cstring);
 
     if (!command.isEmpty())
-     QMessageBox::critical(
+
+    {
+        logfile(cstring);
+        logfile(command);
+
+        QMessageBox::critical(
                     this,
                    "",
                     "Screenshot failed");
+    }
 
     else
     {
 
-        QProcess get_shot;
-        get_shot.setProcessChannelMode(QProcess::MergedChannels);
+        logfile(cstring);
+        logfile(command);
+
         QString cstring = adb +" -s " + daddr+port +" pull /sdcard/"+dtstr+".png " +pulldir;
-        get_shot.start(cstring);
-        get_shot.waitForFinished(-1);
-        command=get_shot.readAll();
-        
+
+        command=RunProcess(cstring);
+
+        logfile(cstring);
+        logfile(command);
 
 
         if (!command.contains("bytes"))
-         QMessageBox::critical(
+         {
+            logfile(cstring);
+            logfile(command);
+            QMessageBox::critical(
                         this,
                        "",
                         "Screenshot failed");
+        }
         else
+        {
+            logfile(cstring);
+            logfile(command);
 
             QMessageBox::information(
                            this,
                           "",
                            "Screenshot "+dtstr+ " copied to "+pulldir);
+        }
 
-
-        QProcess del_shot;
-        del_shot.setProcessChannelMode(QProcess::MergedChannels);
         cstring = adb +" -s " + daddr+port +" shell rm /sdcard/"+dtstr+".png " ;
-        del_shot.start(cstring);
-        del_shot.waitForFinished(-1);
-        command=del_shot.readAll();
-        
+        command=RunProcess(cstring);
+        logfile(cstring);
+
 
     }
 
+    nMilliseconds = rtimer.elapsed();
+    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
 
 }
@@ -1693,12 +2034,27 @@ void MainWindow::on_actionInstall_busybox_triggered()
    }
 
 
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
+
+
    QMessageBox::StandardButton reply;
          reply = QMessageBox::question(this, "Busybox", "Install Busybox?",
             QMessageBox::Yes|QMessageBox::No);
          if (reply == QMessageBox::No)
          return;
 
+
+         ui->progressBar->setHidden(false);
+         ui->progressBar->setValue(0);
+
+
+         QTimer *timer = new QTimer(this);
+         connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+         timer->start(tsvalue);
+
+    logfile("starting busybox install");
 
     QString busybox1  = adbdir+"binstall.sh";
     QString busybox2 = adbdir+"buninstall.sh";
@@ -1723,7 +2079,10 @@ void MainWindow::on_actionInstall_busybox_triggered()
             this,
             tr("adbFire"),
             busybox1+" not found.");
-             return;
+
+            logfile(busybox1+" not found.");
+            ui->progressBar->setHidden(true);
+            return;
              }
 
 
@@ -1736,6 +2095,8 @@ void MainWindow::on_actionInstall_busybox_triggered()
              this,
              tr("adbFire"),
               busybox2+" not found.");
+            logfile(busybox2+" not found.");
+            ui->progressBar->setHidden(true);
              return;
            }
 
@@ -1749,6 +2110,8 @@ void MainWindow::on_actionInstall_busybox_triggered()
             this,
             tr("adbFire"),
              busybox3+" not found.");
+           logfile(busybox3+" not found.");
+           ui->progressBar->setHidden(true);
             return;
           }
 
@@ -1762,6 +2125,8 @@ void MainWindow::on_actionInstall_busybox_triggered()
             this,
             tr("adbFire"),
              busybox4+" not found.");
+           logfile(busybox4+" not found.");
+           ui->progressBar->setHidden(true);
             return;
           }
 
@@ -1775,6 +2140,8 @@ void MainWindow::on_actionInstall_busybox_triggered()
             this,
             tr("adbFire"),
              busybox5+" not found.");
+           logfile(busybox5+" not found.");
+           ui->progressBar->setHidden(true);
             return;
           }
 
@@ -1788,144 +2155,143 @@ void MainWindow::on_actionInstall_busybox_triggered()
             this,
             tr("adbFire"),
              busybox6+" not found.");
+           logfile(busybox6+" not found.");
+           ui->progressBar->setHidden(true);
             return;
           }
 
 
-      command = "";
+      QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
 
+      QString command=RunProcess2(cstring);
 
-      QProcess install_apk1;
-       QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
-        install_apk1.start(cstring);
-
-
-        install_apk1.waitForFinished(-1);
-
-       command=install_apk1.readAll();
-        
-
-         if (!command.isEmpty())
+         if (!command.contains("bytes"))
            { QMessageBox::critical(
             this,
              "",
-             "busybox install failed ");
-              //ui->progressBar->setHidden(true);
+             "file1: busybox install failed ");
+             logfile("file1: busybox install failed ");
+             logfile(cstring);
+              logfile(command);
+              ui->progressBar->setHidden(true);
              return;
              }
             else
             file1 = true;
 
 
-             command = "";
+         logfile(cstring);
+         logfile(command);
 
-             QProcess install_apk2;
               cstring = adb + " -s " + daddr + port + " push "+busybox2+ " /sdcard/";
-              install_apk2.start(cstring);
+              command=RunProcess2(cstring);
 
-              install_apk2.waitForFinished(-1);
 
-              command=install_apk2.readAll();
-              
-              //ui->progressBar->setHidden(true);
-
-              if (!command.isEmpty())
-                 { QMessageBox::information(
+              if (!command.contains("bytes"))
+                 { QMessageBox::critical(
                               this,
                               "",
-                              "busybox install failed");
-
+                              "file2: busybox install failed");
+                  logfile("file2: busybox install failed ");
+                  logfile(cstring);
+                  logfile(command);
+                  ui->progressBar->setHidden(true);
+                  return;
                  }
               else
                   file2 = true;
 
+              logfile(cstring);
+              logfile(command);
 
 
-
-              command = "";
-
-              QProcess install_apk3;
                cstring = adb + " -s " + daddr + port + " push "+busybox3+ " /sdcard/";
-               install_apk3.start(cstring);
+               command=RunProcess2(cstring);
 
-               install_apk3.waitForFinished(-1);
-
-               command=install_apk3.readAll();
-               
-               //ui->progressBar->setHidden(true);
-
-               if (!command.isEmpty())
-                  { QMessageBox::information(
+               if (!command.contains("bytes"))
+                  { QMessageBox::critical(
                                this,
                                "",
-                               "busybox install failed");
-
+                               "file3: busybox install failed");
+                   logfile("file3: busybox install failed ");
+                   logfile(cstring);
+                   logfile(command);
+                   ui->progressBar->setHidden(true);
+                   return;
                   }
                else
                    file3 = true;
 
-               QProcess install_apk4;
+
+               logfile(cstring);
+               logfile(command);
+
+
                 cstring = adb + " -s " + daddr + port + " push "+busybox4+ " /sdcard/";
-                install_apk4.start(cstring);
+                command=RunProcess(cstring);
 
-                install_apk4.waitForFinished(-1);
 
-                command=install_apk4.readAll();
-
-               // ui->progressBar->setHidden(true);
-
-                if (!command.isEmpty())
-                   { QMessageBox::information(
+                if (!command.contains("bytes"))
+                   { QMessageBox::critical(
                                 this,
                                 "",
-                                "busybox install failed");
+                                "file4: busybox install failed");
 
+                    logfile("file4: busybox install failed ");
+                    logfile(cstring);
+                    logfile(command);
+                    ui->progressBar->setHidden(true);
+                    return;
                    }
                 else
                     file4 = true;
 
 
-                QProcess install_apk5;
+                logfile(cstring);
+                logfile(command);
+
                  cstring = adb + " -s " + daddr + port + " push "+busybox5+ " /sdcard/";
-                 install_apk5.start(cstring);
 
-                 install_apk5.waitForFinished(-1);
+                 command=RunProcess2(cstring);
 
-                 command=install_apk5.readAll();
-
-                // ui->progressBar->setHidden(true);
-
-                 if (!command.isEmpty())
-                    { QMessageBox::information(
+                 if (!command.contains("bytes"))
+                    { QMessageBox::critical(
                                  this,
                                  "",
-                                 "busybox install failed");
+                                 "file5: busybox install failed");
 
+                     logfile("file5: busybox install failed ");
+                     logfile(cstring);
+                     logfile(command);
+                     ui->progressBar->setHidden(true);
+                     return;
                     }
                  else
                      file5 = true;
 
+                 logfile(cstring);
+                 logfile(command);
 
-                 QProcess install_apk6;
                   cstring = adb + " -s " + daddr + port + " push "+busybox6+ " /sdcard/";
-                  install_apk6.start(cstring);
+                  command=RunProcess2(cstring);
 
-                  install_apk6.waitForFinished(-1);
-
-                  command=install_apk6.readAll();
-
-                 // ui->progressBar->setHidden(true);
-
-                  if (!command.isEmpty())
-                     { QMessageBox::information(
+                  if (!command.contains("bytes"))
+                     { QMessageBox::critical(
                                   this,
                                   "",
-                                  "busybox install failed");
+                                  "file6: busybox install failed");
 
+                      logfile("file6: busybox install failed ");
+                      logfile(cstring);
+                      logfile(command);
+                      ui->progressBar->setHidden(true);
+                      return;
                      }
                   else
                       file6 = true;
 
+                  logfile(cstring);
+                  logfile(command);
 
  if (file1 && file2 && file3 && file4 && file5 && file6)
 
@@ -1933,133 +2299,112 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
       mount_system("rw");
 
-     QProcess copy_script1;
-     copy_script1.setProcessChannelMode(QProcess::MergedChannels);
+
      QString cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/binstall.sh /system/xbin";
-     copy_script1.start(cstring);
-     copy_script1.waitForFinished(-1);
-     command=copy_script1.readAll();
+     command=RunProcess2(cstring);
      
+     logfile(cstring);
+     logfile(command);
 
-
-     QProcess copy_script2;
-     copy_script2.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/buninstall.sh /system/xbin";
-     copy_script2.start(cstring);
-     copy_script2.waitForFinished(-1);
-     command=copy_script2.readAll();
+     command=RunProcess2(cstring);
      
+     logfile(cstring);
+     logfile(command);
 
-
-     QProcess copy_script3;
-     copy_script3.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/busybox /system/xbin";
-     copy_script3.start(cstring);
-     copy_script3.waitForFinished(-1);
-     command=copy_script3.readAll();
+     command=RunProcess2(cstring);
      
+     logfile(cstring);
+     logfile(command);
 
-
-     QProcess copy_script4;
-     copy_script4.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/ntfs-3g /system/xbin";
-     copy_script4.start(cstring);
-     copy_script4.waitForFinished(-1);
-     command=copy_script4.readAll();
+     command=RunProcess2(cstring);
 
+     logfile(cstring);
+     logfile(command);
 
-     QProcess copy_script5;
-     copy_script5.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/mount.exfat-fuse /system/xbin";
-     copy_script5.start(cstring);
-     copy_script5.waitForFinished(-1);
-     command=copy_script5.readAll();
+     command=RunProcess2(cstring);
 
-     QProcess copy_script6;
-     copy_script6.setProcessChannelMode(QProcess::MergedChannels);
+     logfile(cstring);
+     logfile(command);
+
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/mntdrives.sh /system/xbin";
-     copy_script6.start(cstring);
-     copy_script6.waitForFinished(-1);
-     command=copy_script6.readAll();
+     command=RunProcess2(cstring);
 
+     logfile(cstring);
+     logfile(command);
 
-
-     QProcess chmod_script1;
-     chmod_script1.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/binstall.sh";
-     chmod_script1.start(cstring);
-     chmod_script1.waitForFinished(-1);
-     command=chmod_script1.readAll();
-     
+     command=RunProcess2(cstring);
 
+     logfile(cstring);
+     logfile(command);
 
-     QProcess chmod_script2;
-     chmod_script2.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/buninstall.sh";
-     chmod_script2.start(cstring);
-     chmod_script2.waitForFinished(-1);
-     command=chmod_script2.readAll();
+     command=RunProcess2(cstring);
 
+     logfile(cstring);
+     logfile(command);
 
-
-
-     QProcess chmod_script3;
-     chmod_script3.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/busybox";
-     chmod_script3.start(cstring);
-     chmod_script3.waitForFinished(-1);
-     command=chmod_script3.readAll();
+     command=RunProcess2(cstring);
 
-     
-     QProcess chmod_script4;
-     chmod_script4.setProcessChannelMode(QProcess::MergedChannels);
+     logfile(cstring);
+     logfile(command);
+
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/ntfs-3g";
-     chmod_script4.start(cstring);
-     chmod_script4.waitForFinished(-1);
-     command=chmod_script4.readAll();
+     command=RunProcess2(cstring);
 
+     logfile(cstring);
+     logfile(command);
 
-     QProcess chmod_script5;
-     chmod_script5.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/mount.exfat-fuse";
-     chmod_script5.start(cstring);
-     chmod_script5.waitForFinished(-1);
-     command=chmod_script5.readAll();
+     command=RunProcess2(cstring);
 
+     logfile(cstring);
+     logfile(command);
 
-     QProcess chmod_script6;
-     chmod_script6.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/mntdrives.sh";
-     chmod_script6.start(cstring);
-     chmod_script6.waitForFinished(-1);
-     command=chmod_script5.readAll();
+     command=RunProcess2(cstring);
 
-     QProcess run_script1;
-     run_script1.setProcessChannelMode(QProcess::MergedChannels);
+     logfile(cstring);
+     logfile(command);
+
      cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/binstall.sh";
-     run_script1.start(cstring);
-     run_script1.waitForFinished(-1);
-     command=run_script1.readAll();
+     command=RunProcess2(cstring);
+
+     logfile(cstring);
+     logfile(command);
      
-
-
-
-      QProcess check_dir;
-      check_dir.setProcessChannelMode(QProcess::MergedChannels);
       cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/which";
-      check_dir.start(cstring);
-      check_dir.waitForFinished(-1);
-      command=check_dir.readAll();
+      command=RunProcess2(cstring);
       
+      logfile(cstring);
+      logfile(command);
 
         if (command.contains("No such file or directory"))
-          QMessageBox::critical( this,"","Busybox not installed!");
+          { logfile("busybox install failed!");
+            QMessageBox::critical( this,"","Busybox not installed!");
+        }
+
         else
+        {
          QMessageBox::information( this,"","Busybox installed!");
+         logfile("busybox installed!");
+        }
 
  }
 
 mount_system("ro");
+
+
+
+nMilliseconds = rtimer.elapsed();
+logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+ui->progressBar->setHidden(true);
 
 }
 
@@ -2087,78 +2432,117 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
    }
 
 
+
+   QString command;
+   QString cstring;
+
+   QString umntstring = "/system/xbin/umount /storage/usb/sd*/";
+   QString rmsd = "rm -r /storage/usb/sd*/";
+
+   QString rmsh = "rm /system/etc/install-recovery-2.sh";
+
+
+   cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/busybox";
+   command=RunProcess2(cstring);
+
+   logfile(cstring);
+   logfile(command);
+
+     if (command.contains("No such file or directory"))
+        {
+         QMessageBox::critical( this,"","Busybox not installed!");
+         return;
+        }
+
    QMessageBox::StandardButton reply;
          reply = QMessageBox::question(this, "Busybox", "Uninstall Busybox?",
             QMessageBox::Yes|QMessageBox::No);
          if (reply == QMessageBox::No)
          return;
 
-         QString cstring;
-         QString umntstring = "/system/xbin/umount /storage/sd\?\?/";
-         QString rmsd = "rm -r /storage/sd\?\?/";
+
+         ui->progressBar->setHidden(false);
+         ui->progressBar->setValue(0);
+
+         QTimer *timer = new QTimer(this);
+         connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+         timer->start(tsvalue);
 
 
 
+         QElapsedTimer rtimer;
+         int nMilliseconds;
+         rtimer.start();
 
-         QProcess check_usb;
-         check_usb.setProcessChannelMode(QProcess::MergedChannels);
-         cstring = adb + " -s " + daddr+port + " shell su -c ls /storage/sd\?\?/";
-         check_usb.start(cstring);
-         check_usb.waitForFinished(-1);
-         command=check_usb.readAll();
+         logfile("busybox uninstall");
 
-         if (!command.contains("No such file or directory"))
+         cstring = adb + " -s " + daddr+port + " shell su -c ls /storage/usb/sd\?\?/";
+         command=RunProcess2(cstring);
 
-         {
+       if (!command.contains("No such file or directory"))
+
+        {
+
+             logfile(cstring);
+             logfile(command);
+
              mount_root("rw");
 
 
-            QProcess umount_system;
-            umount_system.setProcessChannelMode(QProcess::MergedChannels);
-            cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
-            umount_system.start(cstring);
-            umount_system.waitForFinished(-1);
-            command=umount_system.readAll();
+         cstring = adb + " -s " + daddr+port + " shell su -c " + rmsh;
+         command=RunProcess2(cstring);;
+
+         logfile(cstring);
+         logfile(command);
+
+          cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
+          command=RunProcess2(cstring);;
+
+          logfile(cstring);
+          logfile(command);
+
+          cstring = adb + " -s " + daddr+port + " shell su -c " + rmsd;
+          command=RunProcess2(cstring);
+
+          logfile(cstring);
+          logfile(command);
+
+          mount_root("ro");
+
+      }
 
 
-            QProcess rm_sd;
-            rm_sd.setProcessChannelMode(QProcess::MergedChannels);
-            cstring = adb + " -s " + daddr+port + " shell su -c " + rmsd;
-            rm_sd.start(cstring);
-            rm_sd.waitForFinished(-1);
-            command=rm_sd.readAll();
 
-             mount_root("ro");
-
-           }
+        mount_system("rw");
 
 
-
-             mount_system("rw");
-
-         QProcess run_script1;
-         run_script1.setProcessChannelMode(QProcess::MergedChannels);
          cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/buninstall.sh";
-         run_script1.start(cstring);
-         run_script1.waitForFinished(-1);
-         
+         command=RunProcess2(cstring);
 
-        command = "";
+         logfile(cstring);
+         logfile(command);
 
-        QProcess check_dir;
-         check_dir.setProcessChannelMode(QProcess::MergedChannels);
-         cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/which";
-         check_dir.start(cstring);
-         check_dir.waitForFinished(-1);
-         command=check_dir.readAll();
+         cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/busybox";
+         command=RunProcess2(cstring);
          
+         logfile(cstring);
+         logfile(command);
 
            if (command.contains("No such file or directory"))
-             QMessageBox::information( this,"","Busybox uninstalled");
+            {
+               logfile("busybox uninstalled");
+               QMessageBox::information( this,"","Busybox uninstalled"); }
            else
-            QMessageBox::critical( this,"","Busybox not uninstalled!");
+           { logfile("busybox uninstall failed");
+               QMessageBox::critical( this,"","Busybox not uninstalled!");}
 
     mount_system("ro");
+
+    nMilliseconds = rtimer.elapsed();
+    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+    ui->progressBar->setHidden(true);
+    ui->usbBox->setChecked(false);
 
 }
 
@@ -2173,6 +2557,12 @@ void MainWindow::on_fdellButton_clicked()
                 devstr2);
              return;
        }
+
+
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
 
 
 
@@ -2227,6 +2617,8 @@ void MainWindow::on_fdellButton_clicked()
              this,
              "",
              "XBMC not installed");
+         logfile(xpath);
+         logfile("xbmc not installed, path not found");
           return;
        }
 
@@ -2235,16 +2627,16 @@ void MainWindow::on_fdellButton_clicked()
   QString cstring;
   QString pullfile;
 
-  QProcess test_file;
-  test_file.setProcessChannelMode(QProcess::MergedChannels);
+
   cstring = adb + " shell su -c find " +xpath+ " -type f ";
-  test_file.start(cstring);
-  test_file.waitForFinished(-1);
-  command=test_file.readAll();
+  QString command=RunProcess(cstring);
 
 
   if (command.isEmpty())
      { QMessageBox::critical(this,"","No files found");
+      logfile("no files found");
+      logfile(cstring);
+      logfile(command);
      return;
       }
 
@@ -2254,6 +2646,9 @@ void MainWindow::on_fdellButton_clicked()
     if(!file21.open(QFile::WriteOnly |
                   QFile::Text))
     {
+
+        logfile(adbdir+"temp.txt");
+        logfile("error creating file");
         QMessageBox::critical(this,"","Error creating file!");
         return;
     }
@@ -2269,7 +2664,6 @@ void MainWindow::on_fdellButton_clicked()
 
   usbfileDialog sddialog;
   sddialog.setModal(true);
-  // sddialog.setCstring(" shell su -c find " +xpath+ " -type f ");
   sddialog.setData("Select file to delete");
   if(sddialog.exec() == QDialog::Accepted)
   pullfile = sddialog.binfileName();
@@ -2288,24 +2682,34 @@ void MainWindow::on_fdellButton_clicked()
         return;
 
 
-             QProcess pull_file;
-             pull_file.setProcessChannelMode(QProcess::MergedChannels);
+
              cstring = adb + " -s " + daddr + port +  " shell rm "+pullfile;
-             pull_file.start(cstring);
-             pull_file.waitForFinished(-1);
-             command=pull_file.readAll();
+             command=RunProcess(cstring);
              
 
              if (command.contains("exist"))
-              QMessageBox::critical(
+              {
+                 logfile(cstring);
+                 logfile(command);
+                 logfile( "Deletion failed");
+                 QMessageBox::critical(
                              this,
                             "",
-                             "Deletion failed");
+                             "Deletion failed");}
                  else
-                  QMessageBox::information(
+                  {
+                    logfile(cstring);
+                    logfile(command);
+                    logfile("Deletion succeeded");
+                    QMessageBox::information(
                              this,
                              "",
-                             "Deletion succeeded");
+                             "Deletion succeeded");}
+
+
+ nMilliseconds = rtimer.elapsed();
+ logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
 
 }
 
@@ -2319,7 +2723,7 @@ void MainWindow::on_actionFirmware_install_triggered()
     QString updatezip = "--update_package=/cache/update.zip";
     QString commstr = adbdir+"command";
     QString tmpstr = adbdir+"tmpstr";
-    // bool ok;
+
 
     if (!isConnected)
        { QMessageBox::critical(
@@ -2343,39 +2747,46 @@ void MainWindow::on_actionFirmware_install_triggered()
    }
 
 
+ logfile("firmware installation query");
 
  QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "", "Install Firmware?",
                                  QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No)
-        return;
+      {logfile("firmware installation cancelled");
+        return;}
+
+
+    QElapsedTimer rtimer;
+     int nMilliseconds;
+
+    rtimer.start();
 
 
 
+    logfile("firmware installation started");
 
-
-     QProcess step_1;
-    step_1.setProcessChannelMode(QProcess::MergedChannels);
     cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /cache";
-    step_1.start(cstring);
-    step_1.waitForFinished(-1);
-    command=step_1.readAll();
+    QString command=RunProcess(cstring);
 
-    
+    logfile(cstring);
+    logfile(command);
+
     if (!command.isEmpty())
-     { QMessageBox::information( this,"","Error: "+command);
+     { logfile("chmod error. cancelling firmware installation");
+        QMessageBox::information( this,"","Error: "+command);
         return; }
 
-    QProcess step_2;
-    step_2.setProcessChannelMode(QProcess::MergedChannels);
+
     cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /cache/recovery";
-    step_2.start(cstring);
-    step_2.waitForFinished(-1);
-    command=step_2.readAll();
-    
+    command=RunProcess(cstring);
+
+    logfile(cstring);
+    logfile(command);
 
     if (!command.isEmpty())
-     { QMessageBox::information( this,"","Error: "+command);
+     {  logfile("chmod error. cancelling firmware installation");
+        QMessageBox::information( this,"","Error: "+command);
         return; }
 
 
@@ -2384,7 +2795,11 @@ void MainWindow::on_actionFirmware_install_triggered()
         if(!file.open(QFile::WriteOnly |
                       QFile::Text))
         {
-            QMessageBox::critical(this,"","Error creating file!");
+
+            logfile(cstring);
+            logfile(command);
+            logfile("error creating command file. cancelling firmware installation.");
+            QMessageBox::critical(this,"","Error creating command file!");
             return;
         }
 
@@ -2396,34 +2811,48 @@ void MainWindow::on_actionFirmware_install_triggered()
         file.close();
 
 
-    QProcess step_3;
 
-    step_3.setProcessChannelMode(QProcess::MergedChannels);
     cstring = adb + " -s " + daddr + port + " push "+commstr+ " /sdcard/";
-    step_3.start(cstring);
-    step_3.waitForFinished(-1);
-    command=step_3.readAll();
+    command=RunProcess(cstring);
     
     if (!command.contains("bytes"))
      { QMessageBox::information( this,"","Error: "+command);
+
+        logfile(cstring);
+        logfile(command);
+        logfile("error pushing command file. cancelling firmware installation.");
+
         return; }
 
-    QProcess step_4;
-    step_4.setProcessChannelMode(QProcess::MergedChannels);
     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/command /cache/recovery/";
-    step_4.start(cstring);
-    step_4.waitForFinished(-1);
-    command=step_4.readAll();
+    command=RunProcess(cstring);
 
+    if (!command.isEmpty())
+     { QMessageBox::information( this,"","Error: "+command);
 
+        logfile(cstring);
+        logfile(command);
+        logfile("error cp command file. cancelling firmware installation.");
 
-    QProcess step_5;
-    step_5.setProcessChannelMode(QProcess::MergedChannels);
+        return; }
+
+    logfile(cstring);
+    logfile(command);
+
     cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /cache/recovery/command";
-    step_5.start(cstring);
-    step_5.waitForFinished(-1);
-    command=step_5.readAll();
+    command=RunProcess(cstring);
 
+    if (!command.isEmpty())
+     { QMessageBox::information( this,"","Error: "+command);
+
+        logfile(cstring);
+        logfile(command);
+        logfile("error chmod command file. cancelling firmware installation.");
+
+        return; }
+
+    logfile(cstring);
+    logfile(command);
 
     QString fileName;
 
@@ -2433,19 +2862,22 @@ void MainWindow::on_actionFirmware_install_triggered()
       if (reply2 == QMessageBox::Yes)
          {
 
+          logfile("searching usb for files");
 
-          QProcess usbfile2;
-          usbfile2.setProcessChannelMode(QProcess::MergedChannels);
           cstring = adb + " shell su -c find /storage/usb -name *.bin -o -name *.zip";
-          usbfile2.start(cstring);
-          usbfile2.waitForFinished(-1);
-          command=usbfile2.readAll();
+          command=RunProcess(cstring);
 
           if (command.isEmpty())
              { QMessageBox::critical(this,"","No files found");
-             return;
+
+              logfile(cstring);
+              logfile("no files found");
+              return;
               }
 
+
+          logfile(cstring);
+          logfile(command);
 
           QFile file21(adbdir+"temp.txt");
 
@@ -2453,6 +2885,10 @@ void MainWindow::on_actionFirmware_install_triggered()
                           QFile::Text))
             {
                 QMessageBox::critical(this,"","Error creating file!");
+
+                logfile(cstring);
+                logfile(command);
+                logfile("error creating "+adbdir+ "temp.txt");
                 return;
             }
 
@@ -2466,7 +2902,6 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
           usbfileDialog sddialog;
-          // sddialog.setGeometry(0,0,300,300);
           sddialog.setModal(true);
           sddialog.setData("Select firmware file");
           if(sddialog.exec() == QDialog::Accepted)
@@ -2477,26 +2912,23 @@ void MainWindow::on_actionFirmware_install_triggered()
           if (fileName.isEmpty())
              {
               QMessageBox::critical(this,"","No file selected");
+
+              logfile("no file selected");
               return;
               }
 
 
 
           usbstick = true;
-
-          QProcess update_zip_exist;
-          update_zip_exist.setProcessChannelMode(QProcess::MergedChannels);
           cstring = adb + " -s " + daddr+port + " shell ls "+fileName;
-
-          //QMessageBox::information( this,"",cstring);
-
-          update_zip_exist.start(cstring);
-          update_zip_exist.waitForFinished(-1);
-          command=update_zip_exist.readAll();
+          command=RunProcess(cstring);
 
           if (command.contains("No such file or directory"))
            {
-              QMessageBox::information( this,"","Error: "+command);
+
+              logfile(cstring);
+              logfile("no such file or directory");
+              QMessageBox::critical(this,"","Error: "+command);
               return;
           }
 
@@ -2524,53 +2956,61 @@ void MainWindow::on_actionFirmware_install_triggered()
     timer->start(tsvalue);
 
     if (!usbstick)
-      { QProcess step_6;
-       step_6.setProcessChannelMode(QProcess::MergedChannels);
-       cstring = adb + " -s " +daddr+port+" push "  + '"' +   fileName + '"'   + " /sdcard/update.zip";
-       step_6.start(cstring);
+      {
+        logfile("pushing "+fileName+" to /sdcard/");
+        cstring = adb + " -s " +daddr+port+" push "  + '"' +   fileName + '"'   + " /sdcard/update.zip";
+        command=RunProcess2(cstring);
 
-    while(step_6.state() != QProcess::NotRunning)
-        qApp->processEvents();
+        logfile(cstring);
+        logfile(command);
 
-    command=step_6.readAll();
+        if (!command.contains("bytes"))
+        {
+          logfile("pushing "+fileName+" to /sdcard/ failed. Cancelling firmware installation");
+           return;
+        }
 
- }
+      }
 
 
-    QProcess step_7;
-    step_7.setProcessChannelMode(QProcess::MergedChannels);
 
     if (!usbstick)
     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/update.zip /cache/";
     else
     cstring = adb + " -s " + daddr+port + " shell su -c cp " + fileName + " /cache/update.zip";
 
-    step_7.start(cstring);
+    command=RunProcess2(cstring);
 
-    while(step_7.state() != QProcess::NotRunning)
-        qApp->processEvents();
+    if (!command.isEmpty())
+    {
 
-    command=step_7.readAll();
+     nMilliseconds = rtimer.elapsed();
+     logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+      logfile("cp of firmware file to /cache failed. Cancelling firmware installation");
+       return;
+    }
+
     
    if (!usbstick)
    {
-    QProcess step_8;
-    step_8.setProcessChannelMode(QProcess::MergedChannels);
     cstring = adb + " -s " + daddr+port + " shell rm /sdcard/update.zip";
-    step_8.start(cstring);
-    step_8.waitForFinished(-1);
-    command=step_8.readAll();
-    
+    command=RunProcess(cstring);
+    logfile(cstring);
+    logfile(command);
+
    }
 
+   logfile(cstring);
+   logfile(command);
 
 
-    QProcess step_9;
-    step_9.setProcessChannelMode(QProcess::MergedChannels);
+
     cstring = adb + " -s " + daddr+port + " shell rm /sdcard/command";
-    step_9.start(cstring);
-    step_9.waitForFinished(-1);
-    command=step_9.readAll();
+    command=RunProcess(cstring);
+
+    logfile(cstring);
+    logfile(command);
 
 
     QFile::remove(commstr);
@@ -2579,12 +3019,15 @@ void MainWindow::on_actionFirmware_install_triggered()
     if(Fout.exists())
     {
         QMessageBox::critical(this,"","Error: rm of PC: "+commstr+" script");
+        logfile("Error: rm of PC: "+commstr+" script");
     }
 
 
 
     ui->progressBar->setHidden(true);
 
+    nMilliseconds = rtimer.elapsed();
+   logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
 
     QMessageBox::StandardButton reply3;
@@ -2593,50 +3036,32 @@ void MainWindow::on_actionFirmware_install_triggered()
       if (reply3 == QMessageBox::No)
        {
 
-          QProcess rm_update1;
-          rm_update1.setProcessChannelMode(QProcess::MergedChannels);
+
+          logfile("firmware installation cancelled by user");
+
           cstring = adb + " -s " + daddr+port + " shell su -c rm /cache/update.zip";
-          rm_update1.start(cstring);
-          rm_update1.waitForFinished(-1);
-          command=rm_update1.readAll();
+          command=RunProcess(cstring);
 
+          logfile(cstring);
+          logfile(command);
 
-          QProcess rm_update2;
-          rm_update2.setProcessChannelMode(QProcess::MergedChannels);
           cstring = adb + " -s " + daddr+port + " shell su -c rm /cache/recovery/command";
-          rm_update2.start(cstring);
-          rm_update2.waitForFinished(-1);
-          command=rm_update2.readAll();
+          command=RunProcess(cstring);
 
+
+          logfile(cstring);
+          logfile(command);
 
           return;
 
        }
 
+      logfile("rebooting to recovery");
 
-    QElapsedTimer rtimer;
-     int nMilliseconds;
-
-    QProcess reboot_recovery;
-     rtimer.start();
-    reboot_recovery.setProcessChannelMode(QProcess::MergedChannels);
-    cstring = adb + " -s " +daddr+port+ " reboot recovery";
-    reboot_recovery.start(cstring);
-
-
-    while(reboot_recovery.state() != QProcess::NotRunning)
-      {
-        qApp->processEvents();
-         nMilliseconds = rtimer.elapsed();
-       if (nMilliseconds >= 5000)
-           break;
-    }
-
+      rebootDevice(" reboot recovery");
      
      isConnected=false;
      ui->device_connected->setText(devstr2);
-
-
 
     }
 
@@ -2668,6 +3093,13 @@ void MainWindow::on_mntButton_clicked()
    }
 
 
+
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
+
+
+
 QString cstring;
 
    ui->progressBar->setHidden(false);
@@ -2677,37 +3109,37 @@ QString cstring;
    connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
    timer->start(tsvalue);
 
-   QProcess check_bb;
-   check_bb.setProcessChannelMode(QProcess::MergedChannels);
    cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/mount";
-   check_bb.start(cstring);
-   check_bb.waitForFinished(-1);
-   command=check_bb.readAll();
+   QString command=RunProcess2(cstring);
 
 
      if (command.contains("No such file or directory"))
       { QMessageBox::critical( this,"","Busybox required for USB drive. Install it from the menu.");
-       return;
+
+         logfile(cstring);
+         logfile(command);
+         logfile("Busybox required for USB drive. Install it from the menu.");
+         return;
      }
 
 
-    QProcess mount_system;
-       mount_system.setProcessChannelMode(QProcess::MergedChannels);
+
        cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/mntdrives.sh";
-       mount_system.start(cstring);
+       command=RunProcess2(cstring);
 
-
-       while(mount_system.state() != QProcess::NotRunning)
-           qApp->processEvents();
-
-
-       command=mount_system.readAll();
+       logfile(cstring);
+       logfile(command);
 
        ui->progressBar->setHidden(true);
 
        if (command.isEmpty()  || command.contains("FUSE"))
         {
            QMessageBox::information( this,"","USB drive(s) mounted");
+
+           logfile("USB drive(s) mounted");
+           logfile(cstring);
+           logfile(command);
+
            return;
         }
 
@@ -2716,15 +3148,29 @@ QString cstring;
        if (command.contains("resource busy"))
         {
            QMessageBox::information( this,"","USB drive already mounted");
+
+           logfile("USB drive already mounted");
+           logfile(cstring);
+           logfile(command);
+
            return;
         }
 
 
        if (!command.isEmpty())
         {
+           logfile(cstring);
+           logfile(command);
+           logfile("error mounting usb drive");
            QMessageBox::information( this,"","Error: "+command);
            return;
         }
+
+
+       nMilliseconds = rtimer.elapsed();
+       logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
 
 }
 
@@ -2752,50 +3198,55 @@ void MainWindow::on_umntButton_clicked()
          return;
    }
 
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
 
 
-
-   QProcess check_bb;
-   check_bb.setProcessChannelMode(QProcess::MergedChannels);
    QString cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/umount";
-   check_bb.start(cstring);
-   check_bb.waitForFinished(-1);
-   command=check_bb.readAll();
+   QString command=RunProcess(cstring);
 
 
      if (command.contains("No such file or directory"))
       { QMessageBox::critical( this,"","Busybox required for USB drive. Install it from the menu.");
-       return;
+
+         logfile(cstring);
+         logfile(command);
+         logfile("Busybox required, not found");
+         return;
      }
 
 
-    QString umntstring = "/system/xbin/umount /storage/usb/sd\?\?/";
-    QString rmsd = "rm -r /storage/usb/sd\?\?/";
+    QString umntstring = "/system/xbin/umount /storage/usb/sd*/";
+    QString rmsd = "rm -r /storage/usb/sd*/";
+
 
     mount_root("rw");
 
-       QProcess umount_system;
-       umount_system.setProcessChannelMode(QProcess::MergedChannels);
        cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
-       umount_system.start(cstring);
-       umount_system.waitForFinished(-1);
-       command=umount_system.readAll();
-       
+       command=RunProcess(cstring);
+
+
 
        if (command.contains("failed"))
-         QMessageBox::critical( this,"","USB drive not found!");
+         { logfile(cstring);
+           logfile(command);
+           logfile("error unmounting usb drive");
+           QMessageBox::critical( this,"","USB drive not found!");}
        else
-        {
-           QProcess rm_sd;
-           rm_sd.setProcessChannelMode(QProcess::MergedChannels);
+        {           
            cstring = adb + " -s " + daddr+port + " shell su -c " + rmsd;
-           rm_sd.start(cstring);
-           rm_sd.waitForFinished(-1);
-           command=rm_sd.readAll();
-
+           command=RunProcess(cstring);
            QMessageBox::information( this,"","USB Drive(s) unmounted.");
-           mount_root("ro");
+           logfile(cstring);
+           logfile(command);
+           logfile("usb drive unmounted");
         }
+
+ mount_root("ro");
+
+ nMilliseconds = rtimer.elapsed();
+ logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
 
 }
@@ -2824,19 +3275,34 @@ void MainWindow::on_rwButton_clicked()
    }
 
 
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
+
 
 
    if (mount_system("rw"))
-    QMessageBox::information(
+
+      {
+
+       logfile("filesystem remounted r/w");
+       QMessageBox::information(
                    this,
                   "",
-                   "Filesystem mounted r/w");
+                   "Filesystem mounted r/w");}
     else
 
+   {
+
+       logfile("filesystem not remounted!");
        QMessageBox::critical(
                       this,
                      "",
-                      "Error: Filesystem not remounted!!");
+                      "Error: Filesystem not remounted r/w!");}
+
+
+   nMilliseconds = rtimer.elapsed();
+   logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
 
 }
@@ -2864,17 +3330,35 @@ void MainWindow::on_roButton_clicked()
    }
 
 
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
+
+
+
+
    if (mount_system("ro"))
-    QMessageBox::information(
+    {
+
+       logfile("filesystem remounted r/o");
+
+       QMessageBox::information(
                    this,
                   "",
-                   "Filesystem mounted r/o");
+                   "Filesystem mounted r/o");}
     else
 
+   {
+       logfile("filesystem not remounted r/o!");
        QMessageBox::critical(
                       this,
                      "",
-                      "Error: Filesystem not remounted!!");
+                      "Error: Filesystem not remounted r/o!");}
+
+
+   nMilliseconds = rtimer.elapsed();
+   logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
 
 }
 
@@ -2908,18 +3392,19 @@ QString hashbang = "#!/system/bin/sh";
 QString filename = adbdir+"install-recovery-2.sh";
 QString makepst = "/system/xbin/mntdrives.sh";
 
-QProcess busybox_installed;
-busybox_installed.setProcessChannelMode(QProcess::MergedChannels);
 cstring = adb + " -s " + daddr + port +  " shell su -c ls /system/xbin/mount";
-
- busybox_installed.start(cstring);
- busybox_installed.waitForFinished(-1);
- command = busybox_installed.readAll();
+QString command=RunProcess(cstring);
 
 if (command.contains("No such file or directory"))
 {
+
+    logfile(cstring);
+    logfile(command);
+    logfile("busybox required, not found");
+
     QMessageBox::critical(this,"","Busybox required for USB drive. Install it from the menu.");
     ui->usbBox->setChecked(false);
+
     return;
 }
 
@@ -2931,6 +3416,10 @@ if (command.contains("No such file or directory"))
 
           if(!file.open(QFile::WriteOnly))
                   {
+
+                     logfile(cstring);
+                     logfile(command);
+                     logfile("error creating sh script on PC!");
                       QMessageBox::critical(this,"","Error creating file on PC!");
                       return;
                   }
@@ -2943,60 +3432,72 @@ if (command.contains("No such file or directory"))
 
         mount_system("rw");
 
-         QProcess push_adb;
-         push_adb.setProcessChannelMode(QProcess::MergedChannels);
          cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-         push_adb.start(cstring);
-         push_adb.waitForFinished(-1);
-         command = push_adb.readAll();
+         command=RunProcess(cstring);
          if (!command.contains("bytes"))
               {
+
+
+                logfile(cstring);
+                logfile(command);
+                logfile("error pushing shell script to device!");
+
                  QMessageBox::critical(this,"","Error pushing file frpm PC to device!");
                  mount_system("ro");
                  return;
                }
 
 
-        QProcess move_file;
-        move_file.setProcessChannelMode(QProcess::MergedChannels);
+
         cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-        move_file.start(cstring);
-        move_file.waitForFinished(-1);
-        command=move_file.readAll();
+        QString command=RunProcess(cstring);
 
         if (!command.isEmpty())
              {
-                QMessageBox::critical(this,"","Error: cp /sdcard/install-recovery-2.sh /system/etc/ failed");
+
+               logfile(cstring);
+               logfile(command);
+               logfile("file copy error, sdcard to system/etc");
+
+               QMessageBox::critical(this,"","Error: cp /sdcard/install-recovery-2.sh /system/etc/ failed");
                 mount_system("ro");
                 return;
               }
 
 
-        QProcess chmod_file;
-        move_file.setProcessChannelMode(QProcess::MergedChannels);
+        logfile(cstring);
+        logfile(command);
+
         cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-        chmod_file.start(cstring);
-        chmod_file.waitForFinished(-1);
-        command=chmod_file.readAll();
+        command=RunProcess(cstring);
 
         if (!command.isEmpty())
              {
+
+            logfile(cstring);
+            logfile(command);
+            logfile("chmod error, system/etc/install-recovery-2.sh");
+
                 QMessageBox::critical(this,"","Error: chmod of install-recovery-2.sh failed");
                 mount_system("ro");
                 return;
               }
 
 
-        QProcess rm_file1;
-        rm_file1.setProcessChannelMode(QProcess::MergedChannels);
+        logfile(cstring);
+        logfile(command);
+
         cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-        rm_file1.start(cstring);
-        rm_file1.waitForFinished(-1);
-        command=rm_file1.readAll();
+       command=RunProcess(cstring);
 
         if (!command.isEmpty())
              {
-                QMessageBox::critical(this,"","Error: rm of /sdcard/install-recovery-2.sh failed");
+
+            logfile(cstring);
+            logfile(command);
+            logfile("error: rm system/etc/install-recovery-2.sh");
+
+              QMessageBox::critical(this,"","Error: rm of /sdcard/install-recovery-2.sh failed");
               }
 
          QFile::remove(filename);
@@ -3005,26 +3506,35 @@ if (command.contains("No such file or directory"))
 
          if(Fout.exists())
          {
+
+             logfile(cstring);
+             logfile(command);
+             logfile("error: rm PC: install-recovery-2.sh");
+
              QMessageBox::critical(this,"","Error: rm of PC: install-recovery-2.sh failed");
          }
 
 
-
-        QProcess check_file;
-        check_file.setProcessChannelMode(QProcess::MergedChannels);
         cstring = adb + " -s " + daddr + port +  " shell ls /system/etc/install-recovery-2.sh";
-        check_file.start(cstring);
-        check_file.waitForFinished(-1);
-        command=check_file.readAll();
+        command=RunProcess(cstring);
 
         if (!command.contains("/system/etc/install-recovery-2.sh"))
              {
-                QMessageBox::critical(this,"","Error: /etc/install-recovery-2.sh not created. USB drive is not persistent");
+
+            logfile(cstring);
+            logfile(command);
+            logfile("Error: /etc/install-recovery-2.sh not created. USB drive is not persistent");
+
+            QMessageBox::critical(this,"","Error: /etc/install-recovery-2.sh not created. USB drive is not persistent");
               }
 
          else
               {
-                QMessageBox::information(this,"","USB drive is persistent");
+
+            logfile(cstring);
+            logfile(command);
+            logfile("USB drive is now persistent");
+            QMessageBox::information(this,"","USB drive is persistent");
               }
 
 
@@ -3032,22 +3542,23 @@ if (command.contains("No such file or directory"))
 
 
 
-  else  /////  if(!checked)
+  else
 
     {
 
 
        mount_system("rw");
 
-        QProcess check_file;
-        check_file.setProcessChannelMode(QProcess::MergedChannels);
         cstring = adb + " -s " + daddr + port +  " shell su -c rm /system/etc/install-recovery-2.sh";
-        check_file.start(cstring);
-        check_file.waitForFinished(-1);
-        command=check_file.readAll();
+        command=RunProcess(cstring);
 
         QMessageBox::information(this,"","USB drive is not persistent.");
         mount_system("ro");
+
+        logfile(cstring);
+        logfile(command);
+        logfile("USB drive is not persistent");
+
         return;
 
          }
@@ -3070,8 +3581,12 @@ void MainWindow::on_fpullButton_clicked()
        }
 
 
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
 
-     // QString pulldir = QDir::homePath();
+
+
 
      QString xpath = "";
      QString cname = ui->comboBox->currentText();
@@ -3125,21 +3640,24 @@ void MainWindow::on_fpullButton_clicked()
                 this,
                 "",
                 "XBMC not installed");
+
+            logfile("xbmc not installed");
+            logfile("install xbmc for "+xpath);
+
              return;
           }
 
-
-     QProcess test_file;
-     test_file.setProcessChannelMode(QProcess::MergedChannels);
      cstring = adb + " shell su -c find " +xpath+ " -type f ";
-     test_file.start(cstring);
-     test_file.waitForFinished(-1);
-     command=test_file.readAll();
+     QString command=RunProcess(cstring);
 
 
      if (command.isEmpty())
         { QMessageBox::critical(this,"","No files found");
-        return;
+
+         logfile(cstring);
+         logfile(command);
+         logfile("no files found!");
+         return;
          }
 
 
@@ -3149,6 +3667,8 @@ void MainWindow::on_fpullButton_clicked()
                      QFile::Text))
        {
            QMessageBox::critical(this,"","Error creating file!");
+           logfile("error creating file: "+adbdir+"temp.txt");
+
            return;
        }
 
@@ -3163,7 +3683,6 @@ void MainWindow::on_fpullButton_clicked()
 
      usbfileDialog sddialog;
      sddialog.setModal(true);
-     // sddialog.setCstring(" shell su -c find " +xpath+ " -type f ");
      sddialog.setData("Select file to pull");
      if(sddialog.exec() == QDialog::Accepted)
      fileName = sddialog.binfileName();
@@ -3172,30 +3691,48 @@ void MainWindow::on_fpullButton_clicked()
      if (fileName.isEmpty())
         {
          QMessageBox::critical(this,"","No file selected");
+         logfile("no file selected");
          return;
          }
 
 
-             QProcess pull_file;
-             pull_file.setProcessChannelMode(QProcess::MergedChannels);
+     ui->progressBar->setHidden(false);
+     ui->progressBar->setValue(0);
+
+
+     QTimer *timer = new QTimer(this);
+     connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+     timer->start(tsvalue);
+
+
              cstring = adb + " -s " + daddr + port +  " pull "+fileName+" "+pulldir;
-             pull_file.start(cstring);
-             pull_file.waitForFinished(-1);
-             command=pull_file.readAll();
+             command=RunProcess2(cstring);
 
 
              if (command.contains("exist"))
-              QMessageBox::critical(
+              {
+                 logfile(cstring);
+                 logfile(command);
+                 logfile("pull failed");
+                 QMessageBox::critical(
                              this,
                             "",
-                             "Pull failed");
+                             "Pull failed");}
                  else
-                  QMessageBox::information(
+             {
+                 logfile(cstring);
+                 logfile(command);
+                 logfile("pull succeeded");
+                 QMessageBox::information(
                              this,
                              "",
-                             "Pull succeeded");
+                             "Pull succeeded");}
+
+             ui->progressBar->setHidden(true);
+             nMilliseconds = rtimer.elapsed();
+             logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
 
 }
-
 
 

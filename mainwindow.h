@@ -15,6 +15,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+
 private slots:
 
     void on_actionAbout_triggered();
@@ -61,7 +62,6 @@ private slots:
 
     void on_actionInstall_busybox_triggered();
 
-
     void on_actionUninstall_Busybox_triggered();
 
     void on_fdellButton_clicked();
@@ -77,6 +77,7 @@ private slots:
     void on_roButton_clicked();
 
     void on_usbBox_clicked(bool checked);
+
 
 
 private:
