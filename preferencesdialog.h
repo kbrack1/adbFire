@@ -36,6 +36,7 @@ public:
 private slots:
    void on_pfolderButton_clicked();
 
+
 private:
     Ui::preferencesDialog *ui;
 

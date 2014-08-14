@@ -59,3 +59,4 @@ void preferencesDialog::on_pfolderButton_clicked()
         ui->pulldir->setText(dir);
     }
 }
+

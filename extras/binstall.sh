@@ -10,5 +10,6 @@ rm /sdcard/buninstall.sh
 rm /sdcard/busybox
 rm /sdcard/ntfs-3g
 rm /sdcard/mount.exfat-fuse
+rm /sdcard/mntdrives.sh
 
 mount -o remount,ro /system

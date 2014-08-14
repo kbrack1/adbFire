@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.03</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
+<u><b>adbFire v1.04</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
 install (sideload) XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
 Additionally, it allows you to copy files to and from XBMC, backup and restore XBMC's data, root the AFTV (51.1.1.0 or earlier) and much more. <p>
@@ -63,7 +63,7 @@ The  <b>"Uninstall APK"</b> button uninstalls non-system apps from your Android 
 The <b>"Backup XBMC"</b> button backs up the org.xbmc.xbmc folder on the device. Please note that XBMC <u>MUST</u> have been run for the first time before using this function. Empty directories are not backed up.
 <p>
 
-The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc to the device.
+The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc (or fork) to the device. XBMC must be closed in order to  restore.
 <p>
 The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbFire</b></u> installation folder, Three xml files for the AFTV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
@@ -99,7 +99,8 @@ BusyBox combines tiny versions of many common UNIX utilities into a single small
 Removes BusyBox frpm your system.<p>
 
 <b><u>Install AFTV firmware</b></u><br>
-Install firmware to  AFTV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>When updating firmware from USB storage, adbFire looks on all devices for files with an extension of ".bin" or ".zip" and presents them for your choice.
+Install firmware to  AFTV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>When updating firmware from USB storage, adbFire looks on all devices for files with an extension of ".bin" or ".zip" and presents them for your choice.<p>
+Please note that installing firmware from a usb stick/drive is nearly twice as fast as installing a firmware file located on your PC or LAN.
 <p>
 <p>
 <b><u>Preferences</b></u>
@@ -112,7 +113,7 @@ In theory any fork should work if its file directory structure adheres to XBMC's
 <b><u>Pull Folder</b></u>, default: User's home directory.<br>
 Choose the folder where pulled XBMC files and screenshot pngs are placed.
 <p>
-<b><u>AFTV updates</b></u> Toggle AFTV updates on/off. This disables/enables com.amazon.dcp.
+<b><u>AFTV updates</b></u> Toggle AFTV updates on/off. This disables/enables com.amazon.dcp. Default is updates on. Changing this option requires root.
 <p>
 
 =============================
@@ -125,7 +126,8 @@ The adb binaries and dlls are part of the Android SDK.
 The busybox binary is v1.20.2-linusyang<p>
 The mount.exfat-fuse binary and ntfs-3g binary are from shardul_seth@xda.
 <p>
-adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire
+adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire<p>
 
-If you have questions or comments, please email jocala@jocala.com
+If you have questions or comments, please email jocala@jocala.com. adbFire produces a log file, adbfire.log, with each run. Include it in your email if you're having problems.<p>
+
 </body></html>
