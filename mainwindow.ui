@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>525</height>
+    <width>574</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -286,10 +286,10 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>240</y>
-      <width>321</width>
-      <height>211</height>
+      <width>351</width>
+      <height>271</height>
      </rect>
     </property>
     <property name="title">
@@ -298,10 +298,10 @@
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>30</y>
+       <x>30</x>
+       <y>40</y>
        <width>289</width>
-       <height>170</height>
+       <height>204</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -348,6 +348,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="screenshotButton">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot (saved to your &amp;quot;pull&amp;quot; folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>Screen shot</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="rootButton">
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Root Fire TV using Geohot's towelroot and Chainfire's SuperSU&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -382,12 +392,12 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="screenshotButton">
+         <widget class="QPushButton" name="pushSplash">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot (saved to your &amp;quot;pull&amp;quot; folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push splash screen png for XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
-           <string>Screen shot</string>
+           <string>Splash Screen</string>
           </property>
          </widget>
         </item>
@@ -398,6 +408,13 @@
           </property>
           <property name="text">
            <string>Filesystem R/O</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="llamaButton">
+          <property name="text">
+           <string>Llama Options</string>
           </property>
          </widget>
         </item>
@@ -419,7 +436,7 @@
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>390</x>
       <y>240</y>
       <width>131</width>
       <height>141</height>
@@ -499,22 +516,13 @@
      </item>
     </layout>
    </widget>
-   <zorder>device_connected</zorder>
-   <zorder>progressBar</zorder>
-   <zorder>groupBox_3</zorder>
-   <zorder>groupBox_5</zorder>
-   <zorder>groupBox_4</zorder>
-   <zorder>server_running</zorder>
-   <zorder>groupBox</zorder>
-   <zorder>usbgroupBox</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>566</width>
+     <width>574</width>
      <height>22</height>
     </rect>
    </property>

@@ -80,6 +80,10 @@ private slots:
 
 
 
+    void on_pushSplash_clicked();
+
+    void on_llamaButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 

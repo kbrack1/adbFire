@@ -3,6 +3,7 @@
 #include "dialog2.h"
 #include "helpdialog.h"
 #include "uninstalldialog.h"
+#include "llamadialog.h"
 #include "usbfiledialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
@@ -53,6 +54,7 @@ QString filename = "";
 QString adbdir =  "";
 QString adb = "";
 QString xmldir = "";
+QString splashdir = "";
 QString hdir = "";
 QString daddr="";
 QString sldir = "";
@@ -60,6 +62,7 @@ QString pushdir = "";
 QString pulldir = "";
 QString xbmcpackage ="";
 QString dbstring = "";
+
 
 
 QString adbstr1 = "ADB running. ";
@@ -663,6 +666,11 @@ void open_pref_database()
 {
 
 
+
+
+adbdir = QCoreApplication::applicationDirPath();
+adbdir = adbdir+"/adbfiles/";
+
 QString command = "";
 
      ui->setupUi(this);
@@ -697,24 +705,18 @@ QString command = "";
     ui->progressBar->setHidden(true);
     ui->statusBar->addPermanentWidget( ui->progressBar);
 
+
+    dbstring = adbdir+"adbfire.db";
+    xmldir = adbdir+"remotes/";
+    splashdir = adbdir+"splash/";
+
  if (os == 1)
-    {
-     adbdir = "./";
      adb = adbdir+"adb.exe";
-     dbstring = adbdir+"adbfire.db";
-     xmldir = adbdir+"xml/";
-    }
-
-
-  if (os == 2)
-    {
-     adbdir = "/Applications/adbFire/";
+  else
      adb = adbdir+"adb";
 
-     dbstring = adbdir+"adbfire.db";
-     xmldir = adbdir+"xml/";
-    }
 
+  // QMessageBox::critical(this,"",adb);
 
   rotate_logfile();
 
@@ -1775,7 +1777,36 @@ void MainWindow::on_consoleButton_clicked()
 
      if (os == 2)
        {
-        cstring = "open -a Terminal.app /Applications/adbFire/console.sh";
+
+
+         QString commstr = adbdir+"console.sh";
+         QFile file(commstr);
+
+             if(!file.open(QFile::WriteOnly |
+                           QFile::Text))
+             {
+
+
+
+                 logfile("error creating console.sh!");
+                 QMessageBox::critical(this,"","Error creating command file!");
+                 return;
+             }
+
+
+
+             QTextStream out(&file);
+             out  << "#!/bin/sh" << endl;
+             out  <<  adb+ " shell" << endl;
+
+
+             file.flush();
+             file.close();
+
+       cstring = "chmod 0755 " + commstr ;
+       QString command=RunProcess(cstring);
+
+        cstring = "open -a Terminal.app "+adbdir+"console.sh";
         QProcess::startDetached(cstring);
         }
 
@@ -1788,6 +1819,7 @@ void MainWindow::on_actionPreferences_triggered()
 
     logfile("opening preferences dialog");
 
+    bool currentupdate = updatecheck;
 
     preferencesDialog dialog;
     dialog.setPackagename(xbmcpackage);
@@ -1801,6 +1833,8 @@ void MainWindow::on_actionPreferences_triggered()
 
     xbmcpackage = dialog.xbmcpackageName();
     pulldir = dialog.pulldir();
+
+
     updatecheck = dialog.updatecheck();
 
 
@@ -1808,7 +1842,13 @@ void MainWindow::on_actionPreferences_triggered()
   if (isConnected)
   {
 
-   if ( is_package("eu.chainfire.supersu"))
+
+if (updatecheck != currentupdate) //  has update pref changed
+{
+
+     logfile("update preference changed.");
+
+    if ( is_package("eu.chainfire.supersu"))
      {
 
     if (updatecheck)
@@ -1838,7 +1878,11 @@ void MainWindow::on_actionPreferences_triggered()
     }
   }
 
+}  //  has update pref changed
+
 }
+
+
     open_pref_database();
     updateTables();
     db.close();
@@ -3731,6 +3775,398 @@ void MainWindow::on_fpullButton_clicked()
              ui->progressBar->setHidden(true);
              nMilliseconds = rtimer.elapsed();
              logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+}
+
+
+//////////////////////////////////////////////
+void MainWindow::on_pushSplash_clicked()
+{
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             "adbFire",
+             devstr2);
+          return;
+    }
+
+    is_package(xbmcpackage);
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "XBMC not installed");
+         return;
+   }
+
+
+QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
+
+QElapsedTimer rtimer;
+int nMilliseconds;
+rtimer.start();
+
+
+
+ QString fileName = QFileDialog::getOpenFileName(this,
+ "Choose splash screen file", splashdir, tr("Files (*.png)"));
+
+ if (!fileName.isEmpty() )
+ {
+
+
+      QString cstring = adb + " -s " + daddr + port +  " shell ls "+xpath;
+
+       logfile(cstring);
+
+      QString command=RunProcess(cstring);
+
+      if (command.contains("No such file or directory"))
+       {
+          logfile(cstring);
+          logfile(command);
+          QMessageBox::critical(
+                      this,
+                     "",
+                      "Destination path missing");
+                      return;
+      }
+
+
+     QMessageBox::StandardButton reply;
+       reply = QMessageBox::question(this, "Push", fileName+" selected. Continue?",
+           QMessageBox::Yes|QMessageBox::No);
+       if (reply == QMessageBox::Yes) {
+
+
+           cstring = adb + " -s " + daddr + port +  " push "+'"'+fileName+'"'+ " "+xpath+"/splash.png";
+
+           command=RunProcess(cstring);
+
+           logfile(cstring);
+           logfile(command);
+
+           nMilliseconds = rtimer.elapsed();
+           logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+
+           if (command.contains("bytes"))
+
+
+           {
+
+               QMessageBox::information(
+                           this,
+                          "",
+                          "Splash screen installed." );
+           }
+               else
+
+           {
+
+               QMessageBox::critical(
+                           this,
+                           "",
+                        "Splash screen installation failed.");}
+
+
+   }
+
+}
+
+}
+
+
+///////////////////////////////////////////
+void MainWindow::on_llamaButton_clicked()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             "adbFire",
+             devstr2);
+          return;
+    }
+
+
+
+
+ QString llama = adbdir+"llama.apk";
+ QString command;
+ QString cstring;
+
+ bool classicTV = false;
+ bool llamaInstall = false;
+ bool isLlama = false;
+
+ bool llamaRadio1;
+ bool llamaRadio2;
+ bool llamaRadio3;
+
+ int llamaEvent = 0;
+ int ctvIcon = 0;
+
+ bool ctvRadio1;
+ bool ctvRadio2;
+ bool ctvRadio3;
+
+  QFile Fout1(llama);
+   if(!Fout1.exists())
+    {
+    QMessageBox::critical(this,"",llama+" not found.");
+    logfile(llama+" not found.");
+     return;
+    }
+
+
+   QElapsedTimer rtimer;
+   int nMilliseconds;
+   rtimer.start();
+
+ is_package("com.adrise.profilms");
+   if (is_packageInstalled)
+    classicTV = true;
+
+   is_package("com.kebab.Llama");
+     if (is_packageInstalled)
+      isLlama = true;
+
+
+
+   logfile("opening Llama dialog");
+
+    llamaDialog dialog;
+
+    dialog.setModal(true);
+
+    if(dialog.exec() == QDialog::Accepted)
+    {
+
+
+       llamaInstall = dialog.llamacheck();
+
+       llamaRadio1 = dialog.llamaradio1();
+       llamaRadio2 = dialog.llamaradio2();
+       llamaRadio3 = dialog.llamaradio3();
+
+
+       ctvRadio1 = dialog.ctvradio1();
+       ctvRadio2 = dialog.ctvradio2();
+       ctvRadio3 = dialog.ctvradio3();
+
+       if (llamaRadio1)
+           llamaEvent = 1;
+
+       if (llamaRadio2)
+           llamaEvent = 2;
+
+       if (llamaRadio3)
+           llamaEvent = 3;
+
+
+       if (ctvRadio1)
+           ctvIcon = 1;
+
+       if (ctvRadio2)
+           ctvIcon = 2;
+
+       if (ctvRadio3)
+           ctvIcon = 3;
+
+
+       if (llamaInstall)
+
+        {
+
+         if (isLlama)
+          {
+
+             logfile("Uninstalling Llama");
+             cstring = adb + " -s " +daddr+port+ " shell pm uninstall com.kebab.Llama";
+             command=RunProcess2(cstring);
+
+             logfile(cstring);
+             logfile(command);
+
+         }
+
+           ui->progressBar->setHidden(false);
+           ui->progressBar->setValue(0);
+
+           QTimer *timer = new QTimer(this);
+           connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+           timer->start(tsvalue);
+
+           cstring = adb + " -s " + daddr + port + " install "+llama;
+           command=RunProcess2(cstring);
+
+           if (!command.contains("Success"))
+              {
+
+               logfile("llama.apk install failed");
+               logfile(cstring);
+               logfile(command);
+               QMessageBox::information(
+                           this,
+                           "",
+                           "llama.apk install failed");
+                ui->progressBar->setHidden(true);
+                return;
+              }
+
+
+       if (llamaEvent == 1)
+         {
+          cstring = adb + " push "+adbdir+"llama.ctv.only /sdcard/EVENTS.xml";
+          command=RunProcess2(cstring);
+          logfile(cstring);
+          logfile(command);
+       }
+
+
+       if (llamaEvent == 2)
+         {
+           cstring = adb + " push "+adbdir+"llama.xbmc.boot /sdcard/EVENTS.xml";
+           command=RunProcess2(cstring);
+           logfile(cstring);
+           logfile(command);
+         }
+
+
+       if (llamaEvent == 3)
+         {
+           cstring = adb + " push "+adbdir+"llama.ctvx.boot /sdcard/EVENTS.xml";
+           command=RunProcess2(cstring);
+           logfile(cstring);
+           logfile(command);
+       }
+
+
+         cstring = adb + " shell su -c mkdir -p /data/data/com.kebab.Llama/shared_prefs";
+         command=RunProcess2(cstring);
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring =  adb + " shell su -c cp /sdcard/EVENTS.xml /data/data/com.kebab.Llama/shared_prefs";
+         command=RunProcess2(cstring);
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs";
+         command=RunProcess2(cstring);
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs/*";
+         command=RunProcess2(cstring);
+         logfile(cstring);
+         logfile(command);
+
+         cstring =  adb + " shell rm /sdcard/EVENTS.xml";
+         command=RunProcess2(cstring);
+         logfile(cstring);
+         logfile(command);
+
+
+
+           ui->progressBar->setHidden(true);
+           logfile("llama.apk installed");
+           logfile(cstring);
+           logfile(command);
+
+
+
+
+           QMessageBox::information(
+                     this,
+                     "",
+                     "Llama installed and settings applied.\nPlease run Llama on the AFTV to activate!");
+       }
+
+
+   if (classicTV && ctvIcon < 3)
+       QMessageBox::information(
+                 this,
+                 "",
+                 "Classic TV " + QString::number(ctvIcon));
+
+
+
+
+           if (ctvIcon == 1)
+            {
+               cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+
+               cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+
+               cstring = adb + " push "+adbdir+ "xbmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+           }
+
+
+           if (ctvIcon == 2)
+            {
+               cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+
+               cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+
+               cstring = adb + " push "+adbdir+ "ctv.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+           }
+
+
+
+    }
+
+
+// /data/data/com.kebab.Llama/shared_prefs
+
+// llama.ctv.only
+// llama.ctvx.boot
+// llama.xbmc.boot
+
+
+    // com.adrise.profilms/
+// xbmc.icons
+// com.kebab.Llama.apk
+// /sdcard/.imagecache/com.amazon.venezia
+// adb push llama.xbmc.boot /sdcard/EVENTS.xml
+// adb shell su -c mkdir -p /data/data/com.kebab.Llama/shared_prefs
+// adb shell su -c cp /sdcard/EVENTS.xml /data/data/com.kebab.Llama/shared_prefs
+// adb shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs
+// adb shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs/*
+// adb shell su -c rm /sdcard/EVENTS.xml
+// adb push preview_84a70e233a1a6d1ac0d93d2e9f1f2de0e7c2d64d289f1e6f17434fe4c3752717.png /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms/B00IPRAZB4/ and hit 'Enter'.
+// adb push thumbnail_43127692f3ed9671e079492a40a450bbd51543bd84d74bba24baf55fe7e06afa.png /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms/B00IPRAZB4/ and hit 'Enter'.
+
+
+    nMilliseconds = rtimer.elapsed();
+    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
 
 
 }
