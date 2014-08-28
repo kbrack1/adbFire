@@ -4,18 +4,20 @@ adbFire 1.05 changelog
 Both the Windows version and the OS X version can now be installed
 wherever you wish.  
 
-The Windows version of adbFire unzips to a folder, also named 
-adbFire. Within that folder is the binary, adbFire.exe and a folder,
-adbfiles. The adbfiles folder is  where all files needed by adbFire.exe
+The Windows version of adbFire ships with a folder, named 
+adbfiles. You can install the adbFire.exe program wherever
+you wish, as long as the adbfiles folder is installed there also.
+
+The adbfiles folder is  where all files needed by adbFire.exe
 kept. This folder holds adb.exe, scripts and various other files. 
-you can move the adbFire folder anywhere on your hard drive.
 
 The OS X version of adbFire, adbFire.app is usually installed to
 the /Application folder on your Mac. However you can move it
-wherever you like.
+wherever you like. The Mac version of adbFire also has an adbfiles
+folder, but it's inside the adbFire.app bundle.
 
 adbFire now includes Llama, with permission from the developer at
-KebabApps.com. This allows:
+KebabApps.com. Llama allows us to:
 
 1. Boot AFTV directly to XBMC
 
@@ -24,8 +26,8 @@ AFTV's upper level menus.
 
 3. Both of the above.
 
-The option to change the Classic TV icon to a XBMC icon is included.
-This can also be reversed, restoring the Default Classic TV icon.
+The option to change the Classic TV icon to an XBMC or Kodi icon is
+included. This can also be reversed, restoring the Default Classic TV icon.
 
 
 The Preferences dialog has changed. If you open the 
@@ -42,8 +44,9 @@ Preferences also has a "Check for updates" button.
 A dedicated button to change the XBMC splash screen has been added.
 This was previously possible using the "adb push" button, selecting the
 destination folder "media", but there have been requests for a 
-dedicated button. Elmerhuso's XBMC splash.png is included, of
-course you can add your own.  
+dedicated button. Elmerhuso's XBMC splash screen and a Kodi splash
+screen are included, and of course you can add your own. Drop them
+into the "splash" folder.  
 
 Clickable URL links are now included. Links include adbFire's home
 page, jocala.com/adbfire.html, the XBMC wiki, and links to the forum

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.04</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
+<u><b>adbFire v1.05</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
 install (sideload) XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
 Additionally, it allows you to mount USB drives (when rooted) copy files to and from XBMC, backup and restore XBMC's data, root the AFTV (51.1.1.0 or earlier) and much more. <p>
@@ -68,7 +68,7 @@ The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc (or 
 The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbfiles</b></u> folder. (For OS X, the adbfiles folder is inside the adbFire.app bundle. Right click on this file to browse its contents.) Three xml files for the AFTV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
 <p>
-The <b>"Splash Screen"</b> button installs a png splash screen file to the "media" folder under .xbmc. Elmerhuso's Fire TV splash screen is included. You may also drop your own png files into the adbfiles/splash folder (For OS X, the adbfiles folder is inside the adbFire.app bundle. Right click on this file to browse its contents). Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
+The <b>"Splash Screen"</b> button installs a png splash screen file to the "media" folder under .xbmc. A Kodi splash screen and Elmerhuso's Gotham splash screen are included.<p> You may also drop your own png files into the adbfiles/splash folder (For OS X, the adbfiles folder is inside the adbFire.app bundle. Right click on this file to browse its contents). Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
 <b><u>Filesystem R/W</b></u> Makes /system partition writable.
 <p>
@@ -79,7 +79,7 @@ The <b>"Screen shot"</b> button takes a snapshot of the device's current screen,
 <p>
 <p>
 <b>Llama</b> is an app that tells a device to perform tasks when certain conditions are met. It's very handy in controlling the AFTV. The <b>"Llama Options"</b> button opens a dialog that offers different Llama related options:<p>
-The <b>"Install Llama or update Llama Events"</b> checkbox must be clicked for the next three options to operate:<p>
+The <b>"Install Llama"</b> Click this checkbox to install Llama.<p>
 <p>
 <b>1. Boot the AFTV to XBMC</b><br>
 Starts XBMC when the AFTV boots.
@@ -89,15 +89,20 @@ It's very irritating to have to drill down seven or eight steps to start sideloa
 <p>
 <b>3. Both</b><br>
 XBMC starts when the AFTV boots AND is linked to the Classic TV app.<p>
+<p>
+<b>4. No action</b><br>
+Do not adjust Llama settings.
+<p>
 
-The next three options relate to the Classic TV icon.<p>
+The next four options relate to the Classic TV icon.<p>
 <b>
 1. Replace Classic TV icon with XBMC icon<br>
-2. Restore default Classic TV icon<br>
-3. No action (the default)
+2. Replace Classic TV icon with Kodi icon<br>
+3. Restore default Classic TV icon<br>
+4. No action (the default)
 </b>
 <p>
-These Classic TV options above are evaluated whether or not the <b>"Install Llama or update Llama Events"</b> checkbox is ticked.
+
 <p>
 The <b>"Root AFTV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
 <p>

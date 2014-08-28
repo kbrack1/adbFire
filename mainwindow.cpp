@@ -1914,7 +1914,7 @@ void MainWindow::on_consoleButton_clicked()
 
     if (os == 1)
        {
-       cstring = "cmd /k adb -s "  + daddr + port + " shell";
+       cstring = "cmd /k " +   adbdir + "adb.exe -s "  + daddr + port + " shell";
        QProcess::startDetached(cstring);
        }
 
@@ -4066,8 +4066,8 @@ void MainWindow::on_llamaButton_clicked()
  bool llamaRadio3;
  bool llamaRadio4;
 
- int llamaEvent = 0;
- int ctvIcon = 0;
+ int llamaEvent = 5;
+ int ctvIcon = 5;
 
  bool ctvRadio1;
  bool ctvRadio2;
