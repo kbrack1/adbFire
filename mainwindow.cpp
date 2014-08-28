@@ -4193,6 +4193,9 @@ void MainWindow::on_llamaButton_clicked()
               }
           else
            {
+
+
+               isLlama = true;
                cstring = adb + " shell su -c mkdir -p /data/data/com.kebab.Llama/shared_prefs";
                command=RunProcess2(cstring);
                logfile(cstring);
@@ -4202,7 +4205,8 @@ void MainWindow::on_llamaButton_clicked()
        }
 
 
-     if (llamaEvent < 4)
+
+     if (llamaEvent < 4 && isLlama)
      {
 
          if (llamaEvent == 1)
@@ -4340,10 +4344,18 @@ void MainWindow::on_llamaButton_clicked()
 
     }
 
+else return;
+
 
     ui->progressBar->setHidden(true);
     logfile("exit llama function");
 
+    if (!isLlama)
+    {
+        QMessageBox::information(this,"","Llama not installed.");
+        logfile("Llama not installed.");
+        return;
+    }
 
 
        if (isLlama && llamaEvent < 4)
@@ -4354,6 +4366,7 @@ void MainWindow::on_llamaButton_clicked()
 
         if (ctvIcon < 4)
            s = s + "\n"+icontype;
+
 
         if (ctvIcon < 4 || llamaEvent < 4 || llamaInstall)
            QMessageBox::information(this,"",s);

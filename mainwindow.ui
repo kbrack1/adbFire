@@ -436,7 +436,7 @@
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>430</x>
+      <x>390</x>
       <y>60</y>
       <width>131</width>
       <height>141</height>
