@@ -27,6 +27,16 @@
 #include <QStringList>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QPixmap>
+#include <QIcon>
+#include <QObject>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QtNetwork/QNetworkInterface>
+
 // #include <QDebug>
 
 
@@ -39,6 +49,7 @@
 int os=2;
 #endif
 
+const QString version = "1.05";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -47,7 +58,7 @@ bool  mounted_op = false;
 bool firstrun=true;
 bool dbexists = false;
 bool updatecheck = true;
-
+bool versioncheck = true;
 
 QString port = ":5555";
 QString filename = "";
@@ -74,6 +85,8 @@ QString devstr2 = "  Device not connected.";
 int sshcheck;
 int usbcheck;
 int ftvupdate;
+int checkversion;
+
 int tsvalue = 4000;
 
 QSqlDatabase db;
@@ -356,7 +369,7 @@ void createTables()
 
     logfile("creating adbfire.db");
 
-    QString sqlstatement = "create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , usbcheck int, ftvupdate int)";
+    QString sqlstatement = "create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , usbcheck int, ftvupdate int, versioncheck int)";
 
     QSqlQuery query;
     query.exec(sqlstatement);
@@ -369,7 +382,7 @@ void createTables()
        }
 
 
-    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',0,1 )";
+    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',0,1,1 )";
     query.exec(sqlstatement);
 
     if (query.lastError().isValid())
@@ -394,9 +407,11 @@ void updateTables()
 
     QString str1;
     QString str2;
+    QString str3;
 
     str1.setNum(usbcheck);
     str2.setNum(ftvupdate);
+    str3.setNum(checkversion);
 
     QSqlQuery query;
 
@@ -477,6 +492,16 @@ void updateTables()
         logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
        }
 
+
+     sqlstatement = "UPDATE device SET versioncheck='"+str3+"' WHERE Id=1";
+      query.exec(sqlstatement);
+
+      if (query.lastError().isValid())
+       {
+         logfile(sqlstatement);
+         logfile("SqLite error:" + query.lastError().text());
+         logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+        }
 
 
 }
@@ -603,6 +628,21 @@ void readTables()
                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
               }
 
+            sqlstatement="SELECT versioncheck FROM device";
+            query.exec(sqlstatement);
+            while (query.next()) {
+                  checkversion = query.value(0).toInt();
+            }
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
+
+
+
 
      if (sldir.isEmpty())
          sldir = hdir;
@@ -621,7 +661,10 @@ void readTables()
      else
          updatecheck=true;
 
-
+     if (checkversion==0)
+         versioncheck=false;
+     else
+         versioncheck=true;
 }
 
 
@@ -657,6 +700,41 @@ void open_pref_database()
 
 }
 
+//////////////////////////////////
+bool isConnectedToNetwork()
+{
+    QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
+    bool result = false;
+
+    for (int i = 0; i < ifaces.count(); i++)
+    {
+        QNetworkInterface iface = ifaces.at(i);
+        if ( iface.flags().testFlag(QNetworkInterface::IsUp)
+             && !iface.flags().testFlag(QNetworkInterface::IsLoopBack) )
+        {
+
+
+            // this loop is important
+            for (int j=0; j<iface.addressEntries().count(); j++)
+            {
+
+                // we have an interface that is up, and has an ip address
+                // therefore the link is present
+
+                // we will only enable this check on first positive,
+                // all later results are incorrect
+
+                if (result == false)
+                    result = true;
+            }
+        }
+
+    }
+
+    return result;
+}
+
+
 
 
 //////////////////////////////////////////////
@@ -678,6 +756,10 @@ QString command = "";
 
     this->setFixedSize(this->size().width(), this->size().height());
 
+     QPixmap pix(":/assets/donate.png");
+     QIcon icon(pix);
+     ui->donate->setIcon(icon);
+     ui->donate->setIconSize(pix.size());
 
            if (usbcheck == 1)
                ui->usbBox->setChecked(true);
@@ -732,6 +814,7 @@ QString command = "";
    readTables();
 
 
+
    if (usbcheck == 1)
        ui->usbBox->setChecked(true);
    else
@@ -759,6 +842,10 @@ QString command = "";
     else
      ui->server_running->setText(adbstr2);
 
+
+    if (checkversion==1)
+         get_data();
+
 }
 
 
@@ -785,6 +872,65 @@ MainWindow::~MainWindow()
     delete ui;
 
 }
+
+
+//////////////////////////////////////////////////////////////////////
+void MainWindow::get_data() {
+   QNetworkRequest request;
+   request.setUrl(QUrl("http://www.jocala.com/version.txt"));
+
+   QNetworkAccessManager *nam = new QNetworkAccessManager();
+   QNetworkReply *reply = nam->get(request);
+
+   connect(reply, SIGNAL(finished()),
+           this, SLOT(onReqCompleted()));
+
+
+
+}
+
+void MainWindow::onReqCompleted() {
+   QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+
+
+   if (reply->error() != QNetworkReply::NoError)
+   {
+
+       int err = reply->error();
+       QString s2 = QString::number(err);
+       QMessageBox::critical(0, "","Network error: " + s2,QMessageBox::Cancel);
+       return;
+
+   }
+
+   QByteArray data = reply->readAll();
+
+   QString s1(data);
+
+       s1 = strip(s1);
+
+       int err = reply->error();
+
+       QString s2 = QString::number(err);
+
+       if (version != s1)
+       {
+           QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(0, "", "adbFire version "+s1+" is ready. Download?",
+                    QMessageBox::Yes|QMessageBox::No);
+              if (reply == QMessageBox::Yes)
+               {
+                  QString link = "http://www.jocala.com/adbfire.html";
+                  QDesktopServices::openUrl(QUrl(link));
+                }
+
+       }
+
+       delete reply;
+
+}
+
+
 
 
 //////////////////////////////////////////////////////////////////////
@@ -833,11 +979,6 @@ void MainWindow::on_sideload_Button_clicked()
                                     QMessageBox::Yes|QMessageBox::No);
       if (reply == QMessageBox::Yes)
       {
-
-
-
-
-
 
 
           ui->progressBar->setHidden(false);
@@ -1143,8 +1284,11 @@ void MainWindow::on_akill_Button_clicked()
 /////////////////////////////////////////////////////////////////////////
 void MainWindow::on_actionAbout_triggered()
 {
+
+
     Dialog2 dialog2;
     dialog2.setModal(true);
+    dialog2.setvLabel(version);
     dialog2.exec();
 
 }
@@ -1825,6 +1969,9 @@ void MainWindow::on_actionPreferences_triggered()
     dialog.setPackagename(xbmcpackage);
     dialog.setPulldir(pulldir);
     dialog.setftvUpdate(updatecheck);
+    dialog.setversioncheck(versioncheck);
+    dialog.setversionLabel(version);
+
     dialog.setModal(true);
 
 
@@ -1836,6 +1983,15 @@ void MainWindow::on_actionPreferences_triggered()
 
 
     updatecheck = dialog.updatecheck();
+    versioncheck = dialog.versioncheck();
+
+
+    if (versioncheck)
+        checkversion = 1;
+    else
+        checkversion = 0;
+
+
 
 
 
@@ -3898,6 +4054,8 @@ void MainWindow::on_llamaButton_clicked()
  QString llama = adbdir+"llama.apk";
  QString command;
  QString cstring;
+ QString icontype;
+ QString s = "";
 
  bool classicTV = false;
  bool llamaInstall = false;
@@ -3906,6 +4064,7 @@ void MainWindow::on_llamaButton_clicked()
  bool llamaRadio1;
  bool llamaRadio2;
  bool llamaRadio3;
+ bool llamaRadio4;
 
  int llamaEvent = 0;
  int ctvIcon = 0;
@@ -3913,6 +4072,7 @@ void MainWindow::on_llamaButton_clicked()
  bool ctvRadio1;
  bool ctvRadio2;
  bool ctvRadio3;
+ bool ctvRadio4;
 
   QFile Fout1(llama);
    if(!Fout1.exists())
@@ -3952,11 +4112,12 @@ void MainWindow::on_llamaButton_clicked()
        llamaRadio1 = dialog.llamaradio1();
        llamaRadio2 = dialog.llamaradio2();
        llamaRadio3 = dialog.llamaradio3();
-
+       llamaRadio4 = dialog.llamaradio4();
 
        ctvRadio1 = dialog.ctvradio1();
        ctvRadio2 = dialog.ctvradio2();
        ctvRadio3 = dialog.ctvradio3();
+       ctvRadio4 = dialog.ctvradio4();
 
        if (llamaRadio1)
            llamaEvent = 1;
@@ -3967,6 +4128,8 @@ void MainWindow::on_llamaButton_clicked()
        if (llamaRadio3)
            llamaEvent = 3;
 
+       if (llamaRadio4)
+           llamaEvent = 4;
 
        if (ctvRadio1)
            ctvIcon = 1;
@@ -3977,22 +4140,33 @@ void MainWindow::on_llamaButton_clicked()
        if (ctvRadio3)
            ctvIcon = 3;
 
+       if (ctvRadio4)
+           ctvIcon = 4;
+
+
+       if (!classicTV )
+         if (ctvIcon < 4)
+          {
+           QMessageBox::information(this,"","Please install Classic TV");
+           ui->progressBar->setHidden(true);
+           return;
+         }
+
+
+       if (!classicTV && llamaInstall)
+         if (llamaEvent > 1)
+          {
+           QMessageBox::information(this,"","Please install Classic TV");
+           ui->progressBar->setHidden(true);
+           return;
+         }
+
+
 
        if (llamaInstall)
 
         {
 
-         if (isLlama)
-          {
-
-             logfile("Uninstalling Llama");
-             cstring = adb + " -s " +daddr+port+ " shell pm uninstall com.kebab.Llama";
-             command=RunProcess2(cstring);
-
-             logfile(cstring);
-             logfile(command);
-
-         }
 
            ui->progressBar->setHidden(false);
            ui->progressBar->setValue(0);
@@ -4001,7 +4175,7 @@ void MainWindow::on_llamaButton_clicked()
            connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
            timer->start(tsvalue);
 
-           cstring = adb + " -s " + daddr + port + " install "+llama;
+           cstring = adb + " -s " + daddr + port + " install -r "+llama;
            command=RunProcess2(cstring);
 
            if (!command.contains("Success"))
@@ -4017,20 +4191,32 @@ void MainWindow::on_llamaButton_clicked()
                 ui->progressBar->setHidden(true);
                 return;
               }
+          else
+           {
+               cstring = adb + " shell su -c mkdir -p /data/data/com.kebab.Llama/shared_prefs";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+           }
+
+       }
 
 
-       if (llamaEvent == 1)
+     if (llamaEvent < 4)
+     {
+
+         if (llamaEvent == 1)
          {
-          cstring = adb + " push "+adbdir+"llama.ctv.only /sdcard/EVENTS.xml";
+          cstring = adb + " push "+adbdir+"llama.xbmc.boot /sdcard/EVENTS.xml";
           command=RunProcess2(cstring);
           logfile(cstring);
           logfile(command);
-       }
+          }
 
 
        if (llamaEvent == 2)
          {
-           cstring = adb + " push "+adbdir+"llama.xbmc.boot /sdcard/EVENTS.xml";
+           cstring = adb + " push "+adbdir+"llama.ctv.only /sdcard/EVENTS.xml";
            command=RunProcess2(cstring);
            logfile(cstring);
            logfile(command);
@@ -4039,69 +4225,57 @@ void MainWindow::on_llamaButton_clicked()
 
        if (llamaEvent == 3)
          {
+
            cstring = adb + " push "+adbdir+"llama.ctvx.boot /sdcard/EVENTS.xml";
            command=RunProcess2(cstring);
            logfile(cstring);
            logfile(command);
-       }
+         }
 
 
-         cstring = adb + " shell su -c mkdir -p /data/data/com.kebab.Llama/shared_prefs";
-         command=RunProcess2(cstring);
-         logfile(cstring);
-         logfile(command);
+       cstring =  adb + " shell su -c cp /sdcard/EVENTS.xml /data/data/com.kebab.Llama/shared_prefs";
+       command=RunProcess2(cstring);
+       logfile(cstring);
+       logfile(command);
 
 
-         cstring =  adb + " shell su -c cp /sdcard/EVENTS.xml /data/data/com.kebab.Llama/shared_prefs";
-         command=RunProcess2(cstring);
-         logfile(cstring);
-         logfile(command);
+       cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs";
+       command=RunProcess2(cstring);
+       logfile(cstring);
+       logfile(command);
 
 
-         cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs";
-         command=RunProcess2(cstring);
-         logfile(cstring);
-         logfile(command);
+       cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs/*";
+       command=RunProcess2(cstring);
+       logfile(cstring);
+       logfile(command);
 
-
-         cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs/*";
-         command=RunProcess2(cstring);
-         logfile(cstring);
-         logfile(command);
-
-         cstring =  adb + " shell rm /sdcard/EVENTS.xml";
-         command=RunProcess2(cstring);
-         logfile(cstring);
-         logfile(command);
+       cstring =  adb + " shell rm /sdcard/EVENTS.xml";
+       command=RunProcess2(cstring);
+       logfile(cstring);
+       logfile(command);
 
 
 
-           ui->progressBar->setHidden(true);
-           logfile("llama.apk installed");
-           logfile(cstring);
-           logfile(command);
+     }
 
 
 
 
-           QMessageBox::information(
-                     this,
-                     "",
-                     "Llama installed and settings applied.\nPlease run Llama on the AFTV to activate!");
-       }
 
 
-   if (classicTV && ctvIcon < 3)
-       QMessageBox::information(
-                 this,
-                 "",
-                 "Classic TV " + QString::number(ctvIcon));
+
+   if (classicTV && ctvIcon < 4)
+
+   {
 
 
 
 
            if (ctvIcon == 1)
             {
+
+               icontype = "XBMC icon applied";
                cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
                command=RunProcess2(cstring);
                logfile(cstring);
@@ -4121,6 +4295,29 @@ void MainWindow::on_llamaButton_clicked()
 
            if (ctvIcon == 2)
             {
+
+               icontype = "Kodi icon applied";
+               cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+
+               cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+
+               cstring = adb + " push "+adbdir+ "kodi.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+               command=RunProcess2(cstring);
+               logfile(cstring);
+               logfile(command);
+           }
+
+           if (ctvIcon == 3)
+            {
+
+
+               icontype = "Classic TV icon applied";
                cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
                command=RunProcess2(cstring);
                logfile(cstring);
@@ -4139,36 +4336,42 @@ void MainWindow::on_llamaButton_clicked()
 
 
 
+      }
+
     }
 
 
-// /data/data/com.kebab.Llama/shared_prefs
-
-// llama.ctv.only
-// llama.ctvx.boot
-// llama.xbmc.boot
+    ui->progressBar->setHidden(true);
+    logfile("exit llama function");
 
 
-    // com.adrise.profilms/
-// xbmc.icons
-// com.kebab.Llama.apk
-// /sdcard/.imagecache/com.amazon.venezia
-// adb push llama.xbmc.boot /sdcard/EVENTS.xml
-// adb shell su -c mkdir -p /data/data/com.kebab.Llama/shared_prefs
-// adb shell su -c cp /sdcard/EVENTS.xml /data/data/com.kebab.Llama/shared_prefs
-// adb shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs
-// adb shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs/*
-// adb shell su -c rm /sdcard/EVENTS.xml
-// adb push preview_84a70e233a1a6d1ac0d93d2e9f1f2de0e7c2d64d289f1e6f17434fe4c3752717.png /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms/B00IPRAZB4/ and hit 'Enter'.
-// adb push thumbnail_43127692f3ed9671e079492a40a450bbd51543bd84d74bba24baf55fe7e06afa.png /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms/B00IPRAZB4/ and hit 'Enter'.
+
+       if (isLlama && llamaEvent < 4)
+           s = "Llama settings applied.";
+
+        if (llamaInstall)
+           s = s + "\nPlease run Llama on the AFTV to activate!";
+
+        if (ctvIcon < 4)
+           s = s + "\n"+icontype;
+
+        if (ctvIcon < 4 || llamaEvent < 4 || llamaInstall)
+           QMessageBox::information(this,"",s);
+
 
 
     nMilliseconds = rtimer.elapsed();
     logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
-
+    ui->progressBar->setHidden(true);
 
 
 
 }
 
 
+void MainWindow::on_donate_clicked()
+{
+    QString link = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JA5E5UP3ZSWBN";
+    QDesktopServices::openUrl(QUrl(link));
+
+}

@@ -78,11 +78,15 @@ private slots:
 
     void on_usbBox_clicked(bool checked);
 
-
-
     void on_pushSplash_clicked();
 
     void on_llamaButton_clicked();
+
+    void on_donate_clicked();
+
+    void get_data();
+
+    void onReqCompleted();
 
 private:
     Ui::MainWindow *ui;

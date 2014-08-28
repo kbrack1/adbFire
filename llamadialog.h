@@ -28,6 +28,9 @@ public:
    bool llamaradio3();
 
 public:
+   bool llamaradio4();
+
+public:
    bool ctvradio1();
 
 public:
@@ -36,6 +39,8 @@ public:
 public:
    bool ctvradio3();
 
+public:
+   bool ctvradio4();
 
 private:
     Ui::llamaDialog *ui;

@@ -1,6 +1,7 @@
 #include "helpdialog.h"
 #include "ui_helpdialog.h"
-
+#include <QDesktopServices>
+#include <QUrl>
 
 helpDialog::helpDialog(QWidget *parent) :
     QDialog(parent),
@@ -8,7 +9,7 @@ helpDialog::helpDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->textBrowser->setSource(*new QUrl("qrc:/assets/adbfire.html"));
+    ui->textBrowser->setSource(*new QUrl("qrc:/assets/adbfhelp.html"));
 
     ui->textBrowser->setWindowTitle("adbFire Help");
 

@@ -1,0 +1,58 @@
+adbFire 1.05 changelog
+=======================
+
+Both the Windows version and the OS X version can now be installed
+wherever you wish.  
+
+The Windows version of adbFire unzips to a folder, also named 
+adbFire. Within that folder is the binary, adbFire.exe and a folder,
+adbfiles. The adbfiles folder is  where all files needed by adbFire.exe
+kept. This folder holds adb.exe, scripts and various other files. 
+you can move the adbFire folder anywhere on your hard drive.
+
+The OS X version of adbFire, adbFire.app is usually installed to
+the /Application folder on your Mac. However you can move it
+wherever you like.
+
+adbFire now includes Llama, with permission from the developer at
+KebabApps.com. This allows:
+
+1. Boot AFTV directly to XBMC
+
+2. Connect XBMC to the Classic TV app. This allows starting XBMC from
+AFTV's upper level menus.
+
+3. Both of the above.
+
+The option to change the Classic TV icon to a XBMC icon is included.
+This can also be reversed, restoring the Default Classic TV icon.
+
+
+The Preferences dialog has changed. If you open the 
+preferences dialog then exit without changes,  the
+"updates disabled/enabled" pop-up dialog is suppressed.  
+
+adbFire can now check for updates when it starts, and open
+the adbFire page to download the new version if desired.
+This option is on by default, but can be turned off in
+Preferences.
+
+Preferences also has a "Check for updates" button. 
+
+A dedicated button to change the XBMC splash screen has been added.
+This was previously possible using the "adb push" button, selecting the
+destination folder "media", but there have been requests for a 
+dedicated button. Elmerhuso's XBMC splash.png is included, of
+course you can add your own.  
+
+Clickable URL links are now included. Links include adbFire's home
+page, jocala.com/adbfire.html, the XBMC wiki, and links to the forum
+topics where adbFire is supported, xda and xbmc. 
+
+version number changed to constant. 
+
+Help expanded.
+ 
+
+
+

@@ -20,7 +20,10 @@ public:
 
       void setPackagename(const QString &packagename);
       void setPulldir(const QString &pulldir);
-      void setftvUpdate(const bool &updatecheck);
+      void setftvUpdate(const bool &updatecheck);  
+      void setversioncheck(const bool &versioncheck);
+      void setversionLabel(const QString &versiontext);
+
 
     ~preferencesDialog();
 
@@ -33,8 +36,18 @@ public:
 public:
    bool updatecheck();
 
+public:
+   bool versioncheck();
+
+
 private slots:
    void on_pfolderButton_clicked();
+
+
+   void on_getUpdate_clicked();
+
+
+   void onRequestCompleted();
 
 
 private:

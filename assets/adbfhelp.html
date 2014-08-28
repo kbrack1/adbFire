@@ -65,15 +65,40 @@ The <b>"Backup XBMC"</b> button backs up the org.xbmc.xbmc folder on the device.
 
 The <b>"Restore XBMC"</b> button restores a backed up copy of org.xbmc.xbmc (or fork) to the device. XBMC must be closed in order to  restore.
 <p>
-The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbFire</b></u> installation folder, Three xml files for the AFTV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
+The <b>"Push Remote"</b> button installs an xml file defining a remote for XBMC.<p> The remote xml files are located in a folder named "xml" in the <b><u>adbfiles</b></u> folder. (For OS X, the adbfiles folder is inside the adbFire.app bundle. Right click on this file to browse its contents.) Three xml files for the AFTV remote are included with <b><u>adbFire</b></u> (source: XBMC Wiki). Any xml file installed with this function is installled to userdata/keymaps/keyboard.xml. Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
-The <b>"Screen shot"</b> button takes a snapshot of the device's current screen, names it screen.png, and saves it to the pulled files folder (default: home directory).<p> Unfortunately, High-bandwidth Digital Content Protection (HDCP) prevents you from taking screenshots of most commercia video streams. Luckily, XBMC is not affected by HDCP.<p>
+<p>
+The <b>"Splash Screen"</b> button installs a png splash screen file to the "media" folder under .xbmc. Elmerhuso's Fire TV splash screen is included. You may also drop your own png files into the adbfiles/splash folder (For OS X, the adbfiles folder is inside the adbFire.app bundle. Right click on this file to browse its contents). Please note that XBMC <u>MUST</u> have been run for the first time before using this function.
 <p>
 <b><u>Filesystem R/W</b></u> Makes /system partition writable.
 <p>
 <b><u>Filesystem R/O</b></u> Makes /system partition read-only.
 <p>
+<p>
+The <b>"Screen shot"</b> button takes a snapshot of the device's current screen, gives it a date/time based name, and saves it to the pulled files folder (default: home directory).<p> Unfortunately, High-bandwidth Digital Content Protection (HDCP) prevents you from taking screenshots of most commercia video streams. Luckily, XBMC is not affected by HDCP.<p>
+<p>
+<p>
+<b>Llama</b> is an app that tells a device to perform tasks when certain conditions are met. It's very handy in controlling the AFTV. The <b>"Llama Options"</b> button opens a dialog that offers different Llama related options:<p>
+The <b>"Install Llama or update Llama Events"</b> checkbox must be clicked for the next three options to operate:<p>
+<p>
+<b>1. Boot the AFTV to XBMC</b><br>
+Starts XBMC when the AFTV boots.
+<p>
+<b>2. Link XBMC to Classic TV</b><br>
+It's very irritating to have to drill down seven or eight steps to start sideloaded apps on the AFTV. If you install the app "Classic TV" from the Amazon Store, Llama can hijack it, so when you press the CTV icon, XBMC starts. This way you have XBMC on the "Recent" and "Apps" menu of the AFTV. You will see the Classic TV app flash briefly before XBMC starts.
+<p>
+<b>3. Both</b><br>
+XBMC starts when the AFTV boots AND is linked to the Classic TV app.<p>
 
+The next three options relate to the Classic TV icon.<p>
+<b>
+1. Replace Classic TV icon with XBMC icon<br>
+2. Restore default Classic TV icon<br>
+3. No action (the default)
+</b>
+<p>
+These Classic TV options above are evaluated whether or not the <b>"Install Llama or update Llama Events"</b> checkbox is ticked.
+<p>
 The <b>"Root AFTV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
 <p>
 The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a AFTV. <p>
@@ -116,6 +141,10 @@ Choose the folder where pulled XBMC files and screenshot pngs are placed.
 <b><u>AFTV updates</b></u> Toggle AFTV updates on/off. This disables/enables com.amazon.dcp. Default is updates on. Changing this option requires root.
 <p>
 
+The <b>Check for updates at startup</b> checkbox causes adbFire to check its server for updates at startup. This is on by default.
+<p>
+The <b>Check for updates</b> button contacts the server for an immediate update check. If an update is available adbFire offers to connect for download.
+<p>
 =============================
 <p>
 When using Windows the <b><u>adbFire</b></u> binary and its companion folder adbfiles are located wherever you wish. The default folder is adbFire.<p>
@@ -128,6 +157,6 @@ The mount.exfat-fuse binary and ntfs-3g binary are from shardul_seth@xda.
 <p>
 adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire<p>
 
-If you have questions or comments, please email jocala@jocala.com. adbFire produces a log file, adbfire.log, with each run. Include it in your email if you're having problems.<p>
+If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
 
 </body></html>

@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>assets/adbfire.html</file>
+        <file>assets/adbfhelp.html</file>
+         <file>assets/donate.png</file>
+         <file>assets/goat.png</file>
     </qresource>
 </RCC>

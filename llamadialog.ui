@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>334</width>
-    <height>397</height>
+    <width>372</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,10 +29,10 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>30</x>
      <y>90</y>
      <width>221</width>
-     <height>111</height>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -44,30 +44,30 @@
       <x>20</x>
       <y>30</y>
       <width>178</width>
-      <height>58</height>
+      <height>77</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QRadioButton" name="llamaradio1">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Classic TV is launched, XBMC starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When the AFTV boots, XBMC automatically starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Link XBMC to Classic TV</string>
+        <string>Boot AFTV to XBMC</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QRadioButton" name="llamaradio2">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When the AFTV boots, XBMC automatically starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Classic TV is launched, XBMC starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Boot AFTV to XBMC</string>
+        <string>Link XBMC to Classic TV</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -82,6 +82,22 @@
        <property name="text">
         <string>Both</string>
        </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="llamaradio4">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Both actions above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>No action</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -90,9 +106,9 @@
   <widget class="QCheckBox" name="llamacheckBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>30</x>
      <y>60</y>
-     <width>271</width>
+     <width>121</width>
      <height>20</height>
     </rect>
    </property>
@@ -100,16 +116,16 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install Llama or update Llama Events&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="text">
-    <string>Install Llama or update Llama Events</string>
+    <string>Install Llama</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>210</y>
-     <width>291</width>
-     <height>111</height>
+     <x>30</x>
+     <y>230</y>
+     <width>311</width>
+     <height>131</height>
     </rect>
    </property>
    <property name="title">
@@ -118,10 +134,10 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>30</y>
+      <x>20</x>
+      <y>40</y>
       <width>275</width>
-      <height>58</height>
+      <height>77</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -133,10 +149,23 @@
        <property name="text">
         <string>Replace Classic TV icon with XBMC icon</string>
        </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QRadioButton" name="ctvradio2">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore default Classic TV icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Replace Classic TV icon with Kodi icon</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="ctvradio3">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore default Classic TV icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -146,7 +175,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="ctvradio3">
+      <widget class="QRadioButton" name="ctvradio4">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do nothing &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -161,11 +190,11 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>330</y>
+     <y>400</y>
      <width>164</width>
      <height>32</height>
     </rect>
@@ -186,6 +215,25 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>370</y>
+     <width>181</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;https://play.google.com/store/apps/details?id=com.kebab.Llama&quot;&gt;Get Llama for your phone!&lt;/a&gt;</string>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+   </property>
   </widget>
  </widget>
  <resources/>
