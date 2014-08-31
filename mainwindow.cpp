@@ -5,6 +5,7 @@
 #include "uninstalldialog.h"
 #include "llamadialog.h"
 #include "usbfiledialog.h"
+#include "creditsdialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QResource>
@@ -2262,6 +2263,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
     QString busybox4 = adbdir+"ntfs-3g";
     QString busybox5 = adbdir+"mount.exfat-fuse";
     QString busybox6 = adbdir+"mntdrives.sh";
+    QString busybox7 = adbdir+"samba.tar";
 
         bool file1 = false;
         bool file2 = false;
@@ -2269,6 +2271,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
         bool file4 = false;
         bool file5 = false;
         bool file6 = false;
+        bool file7 = false;
 
      QFile Fout1(busybox1);
 
@@ -2356,6 +2359,21 @@ void MainWindow::on_actionInstall_busybox_triggered()
             tr("adbFire"),
              busybox6+" not found.");
            logfile(busybox6+" not found.");
+           ui->progressBar->setHidden(true);
+            return;
+          }
+
+
+      QFile Fout7(busybox7);
+
+      if(!Fout7.exists())
+         {
+
+           QMessageBox::critical(
+            this,
+            tr("adbFire"),
+             busybox7+" not found.");
+             logfile(busybox7+" not found.");
            ui->progressBar->setHidden(true);
             return;
           }
@@ -2493,7 +2511,30 @@ void MainWindow::on_actionInstall_busybox_triggered()
                   logfile(cstring);
                   logfile(command);
 
- if (file1 && file2 && file3 && file4 && file5 && file6)
+                  cstring = adb + " -s " + daddr + port + " push "+busybox7+ " /sdcard/";
+                  command=RunProcess2(cstring);
+
+                  if (!command.contains("bytes"))
+                     { QMessageBox::critical(
+                                  this,
+                                  "",
+                                  "file7: busybox install failed");
+
+                      logfile("file7: busybox install failed ");
+                      logfile(cstring);
+                      logfile(command);
+                      ui->progressBar->setHidden(true);
+                      return;
+                     }
+                  else
+                      file7 = true;
+
+                  logfile(cstring);
+                  logfile(command);
+
+
+
+ if (file1 && file2 && file3 && file4 && file5 && file6 && file7)
 
  {
 
@@ -2535,6 +2576,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
      logfile(cstring);
      logfile(command);
+
 
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/binstall.sh";
      command=RunProcess2(cstring);
@@ -2591,6 +2633,23 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
         else
         {
+
+
+
+
+         cstring = adb + " -s " + daddr+port + " shell su -c tar -xf /sdcard/samba.tar -C /data/data";
+         command=RunProcess2(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+         cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/samba.tar";
+         command=RunProcess2(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
          QMessageBox::information( this,"","Busybox installed!");
          logfile("busybox installed!");
         }
@@ -2638,7 +2697,7 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
    QString umntstring = "/system/xbin/umount /storage/usb/sd*/";
    QString rmsd = "rm -r /storage/usb/sd*/";
-
+   QString rmsam = "rm -r /data/data/com.funkyfresh.samba/";
    QString rmsh = "rm /system/etc/install-recovery-2.sh";
 
 
@@ -2689,11 +2748,26 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
              mount_root("rw");
 
 
+
+             cstring = adb + " -s " + daddr+port + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc stop";
+             command=RunProcess2(cstring);;
+
+             logfile(cstring);
+             logfile(command);
+
+             cstring = adb + " -s " + daddr+port + " shell su -c " + rmsam;
+             command=RunProcess2(cstring);;
+
+             logfile(cstring);
+             logfile(command);
+
          cstring = adb + " -s " + daddr+port + " shell su -c " + rmsh;
          command=RunProcess2(cstring);;
 
          logfile(cstring);
          logfile(command);
+
+
 
           cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
           command=RunProcess2(cstring);;
@@ -3340,6 +3414,14 @@ QString cstring;
            logfile(cstring);
            logfile(command);
 
+
+           cstring = adb + " -s " + daddr+port + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc start";
+           command=RunProcess2(cstring);
+
+           logfile(cstring);
+           logfile(command);
+
+
            return;
         }
 
@@ -3422,6 +3504,13 @@ void MainWindow::on_umntButton_clicked()
 
 
     mount_root("rw");
+
+       logfile("stopping samba");
+       cstring = adb + " -s " + daddr+port + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc stop";
+       command=RunProcess(cstring);
+
+       logfile(cstring);
+       logfile(command);
 
        cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
        command=RunProcess(cstring);
@@ -4387,4 +4476,11 @@ void MainWindow::on_donate_clicked()
     QString link = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JA5E5UP3ZSWBN";
     QDesktopServices::openUrl(QUrl(link));
 
+}
+
+void MainWindow::on_actionCredits_triggered()
+{
+    creditsDialog credits;
+    credits.setModal(true);
+    credits.exec();
 }

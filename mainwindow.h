@@ -88,6 +88,8 @@ private slots:
 
     void onReqCompleted();
 
+    void on_actionCredits_triggered();
+
 private:
     Ui::MainWindow *ui;
 

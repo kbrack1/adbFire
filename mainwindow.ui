@@ -571,6 +571,7 @@
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
     <addaction name="actionFirmware_install"/>
+    <addaction name="actionCredits"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -654,6 +655,11 @@
    </property>
    <property name="toolTip">
     <string>Upgrade/downgrade Fire TV firmware </string>
+   </property>
+  </action>
+  <action name="actionCredits">
+   <property name="text">
+    <string>Credits</string>
    </property>
   </action>
  </widget>

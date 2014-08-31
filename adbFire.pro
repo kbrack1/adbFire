@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     uninstalldialog.cpp \
     preferencesdialog.cpp \
     usbfiledialog.cpp \
-    llamadialog.cpp
+    llamadialog.cpp \
+    creditsdialog.cpp
 
 RESOURCES = adbFire.qrc
 
@@ -29,7 +30,8 @@ HEADERS  += mainwindow.h \
     uninstalldialog.h \
     preferencesdialog.h \
     usbfiledialog.h \
-    llamadialog.h
+    llamadialog.h \
+    creditsdialog.h
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -37,7 +39,8 @@ FORMS    += mainwindow.ui \
     uninstalldialog.ui \
     preferencesdialog.ui \
     usbfiledialog.ui \
-    llamadialog.ui
+    llamadialog.ui \
+    creditsdialog.ui
 
 RC_FILE = adbFire.rc
 

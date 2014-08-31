@@ -2,21 +2,15 @@
 
 sleep 15
 
-# v3
-
 storage="/storage/usb"
 
 
-utf8=',utf8'
-utf8nls=',nls=utf8'
-
-if [ $(ls /dev/block | $busybox grep -c 'sd') -eq 0 ]; then 
+if [[ $(ls /dev/block | $busybox grep -c 'sd') -eq 0 ]]; then 
 	exit 0
 fi
 
 mount -o remount,rw / ;
 
-i=1
 
 for f in /dev/block/sd??; do 
         drive=`echo $f | sed -r 's/^.{11}//'`
@@ -47,5 +41,11 @@ for f in /dev/block/sd??; do
 done  
 
 mount -o remount,ro / 
+
+if [ $# -ge 1 ];
+then 
+   sleep 20
+   /data/data/com.funkyfresh.samba/files/samba-rc start
+fi
 
 
