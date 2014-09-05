@@ -2,6 +2,8 @@
 
 sleep 15
 
+# v3
+
 storage="/storage/usb"
 
 
@@ -21,7 +23,7 @@ for f in /dev/block/sd??; do
 
 
   if [[ $mountType == "" ]]; then
-        mount.exfat-fuse -o rw,umask=0 $f $storage/$drive
+        mount.exfat-fuse -o rw,umask=0 0 0 $f $storage/$drive
   fi
 
   if [[ $mountType == "vfat" ]]; then
