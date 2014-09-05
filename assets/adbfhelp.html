@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.05</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
+<u><b>adbFire v1.06</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
 install (sideload) XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
 Additionally, it allows you to mount USB drives (when rooted) copy files to and from XBMC, backup and restore XBMC's data, root the AFTV (51.1.1.0 or earlier) and much more. <p>
@@ -49,7 +49,8 @@ To delete files select the source folder from the dropdown widget, then press "D
 <u><b>"USB Drive" </b> </u>
 This mounts/unmounts all connected USB drives or sticks. If checked, the "persistence" checkbox mounts your devices at boot.
 <p>
-Mounting USB mass storage devices requires installation of busybox.
+Mounting USB mass storage devices requires installation of busybox. <p>
+Mounted drives (and /sdcard) are exported to the network via Samba. The Samba server you should see on your network is called adbFire. The storage is exported as sdcard and usb. Usb is a folder containing all your /storage/usb/sd* devices.
 <p>
 
 <b><u>System processes</u></b><br>
@@ -152,10 +153,19 @@ The <b>Check for updates</b> button contacts the server for an immediate update 
 <p>
 =============================
 <p>
-When using Windows the <b><u>adbFire</b></u> binary and its companion folder adbfiles are located wherever you wish. The default folder is adbFire.<p>
-Under OS X, adbFire.app may also be located wherever you wish. The adbfiles folder is internal to the adbFile.app bundle.
+For Windows XP and up, the <b><u>adbFire</b></u> folder can be located wherever you wish.<p>
+Under OS X, adbFire.app may also be located wherever you wish. <p>
+adbFire keeps two log files adbfire.log and adbfire.log.old. Log files for Windows are kept in the adbFire folder. For OS X, right-click on adbFire.app and select "Show Package Contents". Browse to "Contents/MacOS/adbfiles".
 <p>
 The adb binaries and dlls are part of the Android SDK.
+<p>
+adbFire depends on these apps:<br><br>
+com.geohot.towelroot<br>
+eu.chainfire.supersu<br>
+com.kebab.llama<br>
+com.funkyfresh.samba<br><br>
+They are copywritten by the respective developers. Please click the credits menu selection for links to these fine apps and please support the sevelopers with your donations!
+
 <p>
 The busybox binary is v1.20.2-linusyang<p>
 The mount.exfat-fuse binary and ntfs-3g binary are from shardul_seth@xda.
@@ -163,5 +173,4 @@ The mount.exfat-fuse binary and ntfs-3g binary are from shardul_seth@xda.
 adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire<p>
 
 If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
-
-</body></html>
+</body</html>

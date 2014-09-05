@@ -24,7 +24,6 @@ public:
       void setversioncheck(const bool &versioncheck);
       void setversionLabel(const QString &versiontext);
 
-
     ~preferencesDialog();
 
 public:

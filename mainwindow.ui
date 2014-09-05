@@ -443,7 +443,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>USB Drive</string>
+     <string>USB Drives/Samba</string>
     </property>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
@@ -494,28 +494,6 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>541</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>adbFire:  XBMC for Android Companion</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QPushButton" name="donate">
     <property name="geometry">
      <rect>
@@ -549,6 +527,22 @@
     </property>
     <property name="text">
      <string>Thanks for your donations!</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>10</y>
+      <width>248</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>adbFire:  XBMC for Android Companion</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>
