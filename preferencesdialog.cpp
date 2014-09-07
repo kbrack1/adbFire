@@ -74,8 +74,6 @@ bool preferencesDialog::versioncheck() {
 }
 
 
-
-
 void preferencesDialog::setPackagename(const QString &packagename)
 {
     ui->packagename->setText(packagename);
@@ -96,7 +94,6 @@ void preferencesDialog::setversioncheck(const bool &versioncheck)
 {
     ui->versioncheck->setChecked(versioncheck);
 }
-
 
 
 void preferencesDialog::setversionLabel(const QString &versiontext)

@@ -41,13 +41,12 @@ usbfileDialog::usbfileDialog(QWidget *parent) :
 
     ui->setupUi(this);
 
-    tmpdir1 = QCoreApplication::applicationDirPath();
-    tmpdir1 = tmpdir1+"/adbfiles/";
+
 
 
   if (ost1 == 1)
      {
-
+       tmpdir1 = "./";
        adb21 = tmpdir1+"adb.exe";
 
      }
@@ -55,6 +54,8 @@ usbfileDialog::usbfileDialog(QWidget *parent) :
 
    if (ost1 == 2)
      {
+       tmpdir1 = QCoreApplication::applicationDirPath();
+       tmpdir1 = tmpdir1+"/adbfiles/";
       adb21 = tmpdir1+"adb";
      }
 

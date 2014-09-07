@@ -61,7 +61,6 @@ bool dbexists = false;
 bool updatecheck = true;
 bool versioncheck = true;
 
-
 QString port = ":5555";
 QString filename = "";
 QString adbdir =  "";
@@ -88,7 +87,6 @@ int sshcheck;
 int usbcheck;
 int ftvupdate;
 int checkversion;
-
 
 int tsvalue = 4000;
 
@@ -263,8 +261,6 @@ bool is_package(QString package)
         return  is_packageInstalled;
 }
 
-
-
 /////////////////////////////////////////////////////
 bool mount_system(QString mnt)
 {
@@ -394,7 +390,7 @@ void createTables()
        }
 
 
-    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',0,1,1)";
+    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',0,1,1 )";
     query.exec(sqlstatement);
 
     if (query.lastError().isValid())
@@ -655,6 +651,7 @@ void readTables()
 
 
 
+
      if (sldir.isEmpty())
          sldir = hdir;
 
@@ -676,10 +673,6 @@ void readTables()
          versioncheck=false;
      else
          versioncheck=true;
-
-
-
-
 }
 
 
@@ -1940,7 +1933,7 @@ void MainWindow::on_consoleButton_clicked()
 
     if (os == 1)
        {
-       cstring = "cmd /k " +   adbdir + "adb.exe -s "  + daddr + port + " shell";
+       cstring = "cmd /k  adb -s  "  + daddr + port + " shell";
        QProcess::startDetached(cstring);
        }
 
@@ -1997,6 +1990,7 @@ void MainWindow::on_actionPreferences_triggered()
     dialog.setftvUpdate(updatecheck);
     dialog.setversioncheck(versioncheck);
     dialog.setversionLabel(version);
+
     dialog.setModal(true);
 
 
@@ -2010,10 +2004,14 @@ void MainWindow::on_actionPreferences_triggered()
     updatecheck = dialog.updatecheck();
     versioncheck = dialog.versioncheck();
 
+
     if (versioncheck)
         checkversion = 1;
     else
         checkversion = 0;
+
+
+
 
 
   if (isConnected)
@@ -2655,12 +2653,13 @@ void MainWindow::on_actionInstall_busybox_triggered()
         {
 
 
-
             cstring = adb + " -s " + daddr+port + " shell su -c tar xf /sdcard/samba.tar -C /data/data";
             command=RunProcess2(cstring);
 
             logfile(cstring);
             logfile(command);
+
+
 
          cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/samba.tar";
          command=RunProcess2(cstring);
@@ -2716,7 +2715,7 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
    QString umntstring = "/system/xbin/umount /storage/usb/sd*/";
    QString rmsd = "rm -r /storage/usb/sd*/";
-   // QString rmsam = "rm -r /data/data/com.funkyfresh.samba/";
+   QString rmsam = "rm -r /data/data/com.funkyfresh.samba/";
    QString rmsh = "rm /system/etc/install-recovery-2.sh";
 
 
@@ -2766,22 +2765,19 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
              mount_root("rw");
 
-             cstring = adb + " -s " +daddr+port+ " shell pm uninstall " + "com.funkyfresh.samba";
-             command=RunProcess2(cstring);
 
-              if (!command.contains("Success"))
-              {
-               logfile("samba uninstall failed");
-               logfile(cstring);
-               logfile(command);
-               }
-               else
-               {
-               logfile("samba uninstalled");
-               logfile(cstring);
-               logfile(command);
-               }
 
+             cstring = adb + " -s " + daddr+port + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc stop";
+             command=RunProcess2(cstring);;
+
+             logfile(cstring);
+             logfile(command);
+
+             cstring = adb + " -s " + daddr+port + " shell su -c " + rmsam;
+             command=RunProcess2(cstring);;
+
+             logfile(cstring);
+             logfile(command);
 
          cstring = adb + " -s " + daddr+port + " shell su -c " + rmsh;
          command=RunProcess2(cstring);;
@@ -3527,8 +3523,6 @@ void MainWindow::on_umntButton_clicked()
 
     mount_root("rw");
 
-
-
        logfile("stopping samba");
        cstring = adb + " -s " + daddr+port + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc stop";
        command=RunProcess(cstring);
@@ -3703,10 +3697,7 @@ void MainWindow::on_usbBox_clicked(bool checked)
 QString cstring;
 QString hashbang = "#!/system/bin/sh";
 QString filename = adbdir+"install-recovery-2.sh";
-QString makepst;
-
-
- makepst = "/system/xbin/mntdrives.sh samba";
+QString makepst = "/system/xbin/mntdrives.sh samba";
 
 cstring = adb + " -s " + daddr + port +  " shell su -c ls /system/xbin/mount";
 QString command=RunProcess(cstring);
