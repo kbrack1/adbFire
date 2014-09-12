@@ -1931,14 +1931,17 @@ void MainWindow::on_consoleButton_clicked()
 
     QString cstring = "";
 
+
     if (os == 1)
+
        {
        cstring = "cmd /k  adb -s  "  + daddr + port + " shell";
        QProcess::startDetached(cstring);
        }
 
 
-     if (os == 2)
+     else
+
        {
 
 
@@ -1969,7 +1972,14 @@ void MainWindow::on_consoleButton_clicked()
        cstring = "chmod 0755 " + commstr ;
        QString command=RunProcess(cstring);
 
+
+       if (os == 0)
+         cstring = "x-terminal-emulator -e "+adbdir+"console.sh";
+       if (os == 2)
         cstring = "open -a Terminal.app "+adbdir+"console.sh";
+
+
+
         QProcess::startDetached(cstring);
         }
 
