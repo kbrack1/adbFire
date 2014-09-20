@@ -50,7 +50,7 @@
 int os=2;
 #endif
 
-const QString version = "1.06";
+const QString version = "1.07";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -1972,6 +1972,8 @@ void MainWindow::on_consoleButton_clicked()
        cstring = "chmod 0755 " + commstr ;
        QString command=RunProcess(cstring);
 
+      //  cstring = "gnome-terminal -e "+adbdir+"console.sh";
+      //  cstring = "x-terminal-emulator -e "+adbdir+"console.sh";
 
        if (os == 0)
          cstring = "x-terminal-emulator -e "+adbdir+"console.sh";
