@@ -565,6 +565,7 @@
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
     <addaction name="actionFirmware_install"/>
+    <addaction name="actionInstall_Recovery"/>
     <addaction name="actionCredits"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -645,7 +646,7 @@
   </action>
   <action name="actionFirmware_install">
    <property name="text">
-    <string>Install AFTV firmware</string>
+    <string>Install Firmware</string>
    </property>
    <property name="toolTip">
     <string>Upgrade/downgrade Fire TV firmware </string>
@@ -654,6 +655,14 @@
   <action name="actionCredits">
    <property name="text">
     <string>Credits</string>
+   </property>
+  </action>
+  <action name="actionInstall_Recovery">
+   <property name="text">
+    <string>Install Recovery</string>
+   </property>
+   <property name="toolTip">
+    <string>Install CWM recovery</string>
    </property>
   </action>
  </widget>

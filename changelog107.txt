@@ -1,0 +1,15 @@
+adbFire 1.07 changelog
+=======================
+Qt framework updated to 5.3.2
+
+Linux bug for file selection on usb devices fixed.
+
+Support for CWM recovery installation added.
+
+various minor bugs fixed, forms adjusted, etc.
+
+Help expanded.
+ 
+
+
+
