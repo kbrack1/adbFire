@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>613</width>
+    <width>595</width>
     <height>576</height>
    </rect>
   </property>
@@ -61,8 +61,8 @@
    <widget class="QLabel" name="device_connected">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>600</y>
+      <x>20</x>
+      <y>630</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -283,156 +283,6 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>220</y>
-      <width>351</width>
-      <height>271</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>System processes</string>
-    </property>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>40</y>
-       <width>289</width>
-       <height>204</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QPushButton" name="sideload_Button">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install app to device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Install APK</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="backupButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Backup XBMC (or fork)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Backup XBMC</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushRemote">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push remote control definition xml to XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Push Remote</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="rwButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make /system partition writeable&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Filesystem R/W</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="screenshotButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot (saved to your &amp;quot;pull&amp;quot; folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Screen shot</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="rootButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Root Fire TV using Geohot's towelroot and Chainfire's SuperSU&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Root AFTV</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QPushButton" name="uninstall_Button">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall apk&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Uninstall APK</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="restoreButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore XBMC's data files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Restore XBMC</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushSplash">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push splash screen png for XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Splash Screen</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="roButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make /system partition read-only&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>Filesystem R/O</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="llamaButton">
-          <property name="text">
-           <string>Llama Options</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="consoleButton">
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open a terminal session on the connected device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="text">
-           <string>ADB Shell</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </widget>
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
@@ -539,11 +389,161 @@
      </rect>
     </property>
     <property name="text">
-     <string>adbFire:  XBMC for Android Companion</string>
+     <string>adbFire:  XBMC &amp; FireTV  Companion</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
+   </widget>
+   <widget class="QLabel" name="update_status">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>600</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>update status</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>240</y>
+      <width>285</width>
+      <height>204</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="sideload_Button">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install app to device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Install APK</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="backupButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Backup XBMC (or fork)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Backup XBMC</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushRemote">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push remote control definition xml to XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Push Remote</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rwButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make /system partition writeable&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Filesystem R/W</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="screenshotButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take screen shot (saved to your &amp;quot;pull&amp;quot; folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Screen shot</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="rootButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Root Fire TV using Geohot's towelroot and Chainfire's SuperSU&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Root AFTV</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QPushButton" name="uninstall_Button">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Uninstall apk&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Uninstall APK</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="restoreButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore XBMC's data files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Restore XBMC</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushSplash">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push splash screen png for XBMC&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Splash Screen</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="roButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make /system partition read-only&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Filesystem R/O</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="llamaButton">
+         <property name="text">
+          <string>Llama Options</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="consoleButton">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open a terminal session on the connected device&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>ADB Shell</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -551,7 +551,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>613</width>
+     <width>595</width>
      <height>22</height>
     </rect>
    </property>
@@ -565,6 +565,7 @@
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
     <addaction name="actionFirmware_install"/>
+    <addaction name="actionInstall_Recovery"/>
     <addaction name="actionCredits"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -645,7 +646,7 @@
   </action>
   <action name="actionFirmware_install">
    <property name="text">
-    <string>Install AFTV firmware</string>
+    <string>Install Firmware</string>
    </property>
    <property name="toolTip">
     <string>Upgrade/downgrade Fire TV firmware </string>
@@ -654,6 +655,14 @@
   <action name="actionCredits">
    <property name="text">
     <string>Credits</string>
+   </property>
+  </action>
+  <action name="actionInstall_Recovery">
+   <property name="text">
+    <string>Install Recovery</string>
+   </property>
+   <property name="toolTip">
+    <string>Install CWM recovery</string>
    </property>
   </action>
  </widget>

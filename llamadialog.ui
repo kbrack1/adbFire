@@ -67,7 +67,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Classic TV is launched, XBMC starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Link XBMC to Classic TV</string>
+        <string>Link XBMC to ikonoTV</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -129,7 +129,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Classic TV Icon</string>
+    <string>ikono TV Icon</string>
    </property>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -147,7 +147,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Replace Classic TV icon with XBMC icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Replace Classic TV icon with XBMC icon</string>
+        <string>Replace ikonoTV icon with XBMC icon</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -160,7 +160,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore default Classic TV icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Replace Classic TV icon with Kodi icon</string>
+        <string>Replace ikonoTV icon with Kodi icon</string>
        </property>
       </widget>
      </item>
@@ -170,7 +170,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore default Classic TV icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Restore default Classic TV icon</string>
+        <string>Restore default ikonoTV icon</string>
        </property>
       </widget>
      </item>

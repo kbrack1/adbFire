@@ -90,6 +90,8 @@ private slots:
 
     void on_actionCredits_triggered();
 
+    void on_actionInstall_Recovery_triggered();
+
 private:
     Ui::MainWindow *ui;
 

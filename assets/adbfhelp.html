@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.07</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
+<u><b>adbFire v1.08</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
 install (sideload) XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
 Additionally, it allows you to mount USB drives (when rooted) copy files to and from XBMC, backup and restore XBMC's data, root the AFTV (51.1.1.0 or earlier) and much more. <p>
@@ -53,7 +53,7 @@ Mounting USB mass storage devices requires installation of busybox. <p>
 Mounted drives (and /sdcard) are exported to the network via Samba, a form of the SMB/CIFS networking protocol. The Samba server you should see on your network is called adbFire. The storage is exported as sdcard and usb. Usb is a folder containing all your /storage/usb/sd* devices.
 <p>
 
-<b><u>System processes</u></b><br>
+<b><u>Other Buttons</u></b><br>
 The <b>"Install APK" </b> button installs or "sideloads"  apps. Click it and choose the APK file you want installed. All installs are done with the "-r" flag. <p>
 This has the effect of preserving a previously installed app's data. It has no effect when installing a new app. If you require a "clean" install of an existing app, uninstall it first.
 <p>
@@ -85,21 +85,21 @@ The <b>"Install Llama"</b> Click this checkbox to install Llama.<p>
 <b>1. Boot the AFTV to XBMC</b><br>
 Starts XBMC when the AFTV boots.
 <p>
-<b>2. Link XBMC to Classic TV</b><br>
-It's very irritating to have to drill down seven or eight steps to start sideloaded apps on the AFTV. If you install the app "Classic TV" from the Amazon Store, Llama can hijack it, so when you press the CTV icon, XBMC starts. This way you have XBMC on the "Recent" and "Apps" menu of the AFTV. You will see the Classic TV app flash briefly before XBMC starts.
+<b>2. Link XBMC to ikono TV</b><br>
+It's very irritating to have to drill down seven or eight steps to start sideloaded apps on the AFTV. If you install the app "ikono TV" from the Amazon Store, Llama can hijack it, so when you press the ikono icon, XBMC starts. This way you have XBMC on the "Recent" and "Apps" menu of the AFTV. You may see the ikono TV app flash briefly before XBMC starts.
 <p>
 <b>3. Both</b><br>
-XBMC starts when the AFTV boots AND is linked to the Classic TV app.<p>
+XBMC starts when the AFTV boots AND is linked to the ikono TV app.<p>
 <p>
 <b>4. No action</b><br>
 Do not adjust Llama settings.
 <p>
 
-The next four options relate to the Classic TV icon.<p>
+The next four options relate to the ikono TV icon.<p>
 <b>
-1. Replace Classic TV icon with XBMC icon<br>
-2. Replace Classic TV icon with Kodi icon<br>
-3. Restore default Classic TV icon<br>
+1. Replace ikono TV icon with XBMC icon<br>
+2. Replace ikono TV icon with Kodi icon<br>
+3. Restore default ikono TV icon<br>
 4. No action (the default)
 </b>
 <p>
@@ -131,8 +131,35 @@ Removes BusyBox frpm your system.<p>
 
 <b><u>Install AFTV firmware</b></u><br>
 Install firmware to  AFTV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>When updating firmware from USB storage, adbFire looks on all devices for files with an extension of ".bin" or ".zip" and presents them for your choice.<p>
-Please note that installing firmware from a usb stick/drive is nearly twice as fast as installing a firmware file located on your PC or LAN.
+Installing firmware from a usb stick/drive is nearly twice as fast as installing a firmware file located on your PC or LAN.<p>
 <p>
+Please note that installation of firmware via Amazon's Native Recovery (this method) has been effectively obsoleted with the availibility of ClockworkMod, compiled for the Fire TV by rbox@xda.
+<p>
+<p>
+IMPORTANT:  Do not attempt to install custom Clockwork Mod firmware via Amazon Native Recovery. It will not work!
+
+<p>
+<b><u>Install Recovery</b></u><br>
+Upgrade your AFTV recovery partition to ClockworkMod or return it to stock recovery.
+<p>
+The recovery partition on your Fire TV is a subsystem where system upgrades and other operations are performed. In effect, it's a "mini" operating system on your Fire TV. <p>
+As shipped by Amazon, the recovery partition is fairly useless; it allows the Fire TV to upgrade with offical Amazon images only.
+Thanks to rbox@xda we have a version of Koush's ClockworkMod Recovery, specially compiled for the Fire TV!<p>
+Clockwork Mod allows us to install custom pre-rooted images, backup our Fire TVs and more. adbFire includes (with permission from rbox) two recovery images:
+<p>
+firetv-cwm_recovery-6.0.5.1.1.img
+<p>
+recovery-stock-51.1.0.img
+<p>
+After clicking "Install Recovery" from the menu, select the image you wish to install, fire-cwm for Clockwork Mod or recovery-stock to restore Amazon's stock image.
+<p>
+To obtain updated recovery images click the CWM link below or the rbox link on the "Credits" adbFire menu item. You will be taken to rbox's CWM topic on xda where you
+will find image links. <p>
+Drop updated images into your "recovery" folder. For OS X users, right-click on adbFire.app and select "Show Package Contents" to browse to your recovery folder.
+
+<p>
+IMPORTANT:  Do not attempt to install stock Amazon firmware via Clockwork Mod. It will not work!
+
 <p>
 <b><u>Preferences</b></u>
 <p>
@@ -163,12 +190,14 @@ adbFire depends on these apps:<br><br>
 com.geohot.towelroot<br>
 eu.chainfire.supersu<br>
 com.kebab.llama<br>
-com.funkyfresh.samba<br><br>
+com.funkyfresh.samba<br>
+CWM Recovery<br><br>
 They are copywritten by the respective developers. Please click the credits menu selection for links to these fine apps and please support the sevelopers with your donations!
 
 <p>
 The busybox binary is v1.20.2-linusyang<p>
 The mount.exfat-fuse binary and ntfs-3g binary are from shardul_seth@xda.
+CWM Recovery is modified and compiled for Fire TV by rbox@xda
 <p>
 adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire<p>
 

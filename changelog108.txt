@@ -1,0 +1,30 @@
+adbFire 1.08 changelog
+=======================
+
+Llama options changed to require ikonoTV rather than Classic TV
+due to geographic restrictions. Classic TV is only available in the US.
+
+adbFire check for Amazon Updates now operates in realtime,
+rather than depending on a database field. 
+
+adbFire check for USB drive persistence now operates in realtime,
+rather than depending on a database field. 
+
+Database fields for USB drive persistence and Amazon Updates removed.
+
+Linux bug installed apks not displayed in uninstall dialog fixed.
+
+Firmware installaton recovery directory not found bug fixed.
+
+Support for CWM recovery installation re-coded. Images:
+
+firetv-cwm_recovery-6.0.5.1.1.img 
+recovery-stock-51.1.0.img 
+
+are now included with adbFire 1.08 with permission from rbox.
+
+Help re-written for firmware and recovery installation.
+
+various minor bugs fixed, forms adjusted, etc.
+
+
