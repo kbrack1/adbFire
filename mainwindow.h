@@ -92,11 +92,6 @@ private slots:
 
     void on_actionInstall_Recovery_triggered();
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 4f369cbd9022b88864cbc5cca087edea3893e8ff
 private:
     Ui::MainWindow *ui;
 
