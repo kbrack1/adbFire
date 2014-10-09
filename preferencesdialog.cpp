@@ -61,6 +61,10 @@ QString preferencesDialog::xbmcpackageName() {
    return ui->packagename->text();
 }
 
+QString preferencesDialog::sshpassword() {
+   return ui->sshpassword->text();
+}
+
 QString preferencesDialog::pulldir() {
    return ui->pulldir->text();
 }
@@ -68,6 +72,11 @@ QString preferencesDialog::pulldir() {
 bool preferencesDialog::updatecheck() {
    return ui->ftvupdatesBox->isChecked();
 }
+
+bool preferencesDialog::sshcheck() {
+   return ui->sshbox->isChecked();
+}
+
 
 bool preferencesDialog::versioncheck() {
    return ui->versioncheck->isChecked();
@@ -77,6 +86,12 @@ bool preferencesDialog::versioncheck() {
 void preferencesDialog::setPackagename(const QString &packagename)
 {
     ui->packagename->setText(packagename);
+}
+
+
+void preferencesDialog::setSSHpassword(const QString &sshpassword)
+{
+    ui->sshpassword->setText(sshpassword);
 }
 
 void preferencesDialog::setPulldir(const QString &pulldir)
@@ -90,10 +105,17 @@ void preferencesDialog::setftvUpdate(const bool &updatecheck)
 }
 
 
+void preferencesDialog::setsshBoot(const bool &sshcheck)
+{
+    ui->sshbox->setChecked(sshcheck);
+}
+
+
 void preferencesDialog::setversioncheck(const bool &versioncheck)
 {
     ui->versioncheck->setChecked(versioncheck);
 }
+
 
 
 void preferencesDialog::setversionLabel(const QString &versiontext)

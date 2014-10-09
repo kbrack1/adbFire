@@ -50,7 +50,7 @@
 int os=2;
 #endif
 
-const QString version = "1.08";
+const QString version = "1.09";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -60,6 +60,7 @@ bool firstrun=true;
 bool dbexists = false;
 bool updatecheck = true;
 bool versioncheck = true;
+bool sshcheck = false;
 
 QString port = ":5555";
 QString filename = "";
@@ -74,6 +75,7 @@ QString sldir = "";
 QString pushdir = "";
 QString pulldir = "";
 QString xbmcpackage ="";
+QString sshpassword = "";
 QString dbstring = "";
 
 
@@ -86,8 +88,10 @@ QString devstr2 = "  Device not connected.";
 QString amazon_update1 = "Amazon updates on.      ";
 QString amazon_update0 = "Amazon updates off.     ";
 
+QString sshserver1 = "SSH server on       ";
+QString sshserver2 = "SSH server off      ";
 
-int sshcheck;
+
 int usbcheck;
 int ftvupdate;
 int checkversion;
@@ -95,6 +99,31 @@ int checkversion;
 int tsvalue = 4000;
 
 QSqlDatabase db;
+
+
+/////////////////////////////////////////
+void delayTimer(int rdelay)
+{
+
+ QElapsedTimer rtimer;
+
+int nMilliseconds;
+ int i = 0;
+
+ rtimer.start();
+
+while(i == 0)
+  {
+    qApp->processEvents();
+     nMilliseconds = rtimer.elapsed();
+   if (nMilliseconds >= rdelay)
+       break;
+}
+
+
+}
+
+
 
 //////////////////////////////////////////////
 void rotate_logfile()
@@ -390,7 +419,7 @@ void createTables()
 
     logfile("creating adbfire.db");
 
-    QString sqlstatement = "create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , versioncheck int)";
+    QString sqlstatement = "create table device(id int primary key, name varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , sshpassword varchar(10) , versioncheck int)";
 
     QSqlQuery query;
     query.exec(sqlstatement);
@@ -403,7 +432,7 @@ void createTables()
        }
 
 
-    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc',1 )";
+    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc','password', 1 )";
     query.exec(sqlstatement);
 
     if (query.lastError().isValid())
@@ -490,7 +519,15 @@ void updateTables()
        }
 
 
+     sqlstatement = "UPDATE device SET sshpassword='"+sshpassword+"' WHERE Id=1";
+      query.exec(sqlstatement);
 
+      if (query.lastError().isValid())
+       {
+         logfile(sqlstatement);
+         logfile("SqLite error:" + query.lastError().text());
+         logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+        }
 
      sqlstatement = "UPDATE device SET versioncheck='"+str3+"' WHERE Id=1";
       query.exec(sqlstatement);
@@ -596,6 +633,24 @@ void readTables()
                logfile("SqLite error:" + query.lastError().text());
                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
               }
+
+
+            sqlstatement="SELECT sshpassword FROM device";
+            query.exec(sqlstatement);
+            while (query.next()) {
+                  sshpassword = query.value(0).toString();
+            }
+
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
+
+
+
 
 
             sqlstatement="SELECT versioncheck FROM device";
@@ -715,13 +770,22 @@ bool isConnectedToNetwork()
          adb = adbdir+"adb.exe";
         }
 
-    else
+   if (os == 2)
 
         {
           adbdir = QCoreApplication::applicationDirPath();
            adbdir = adbdir+"/adbfiles/";
-           adb = adbdir+"adb";
+           adb = adbdir+"adb.osx";
         }
+
+   if (os == 0)
+
+        {
+          adbdir = QCoreApplication::applicationDirPath();
+           adbdir = adbdir+"/adbfiles/";
+           adb = adbdir+"adb.linux";
+        }
+
 
 
       dbstring = adbdir+"adbfire.db";
@@ -730,6 +794,7 @@ bool isConnectedToNetwork()
       recoverydir = adbdir+"recovery/";
 
      ui->setupUi(this);
+
 
      ui->statusBar->addPermanentWidget(ui->update_status);
      ui->statusBar->addPermanentWidget(ui->server_running);
@@ -748,6 +813,8 @@ bool isConnectedToNetwork()
      ui->server_running->setText(adbstr2);
      ui->device_connected->setText(devstr2);
      ui->update_status->setText("");
+
+
 
   rotate_logfile();
 
@@ -791,6 +858,28 @@ bool isConnectedToNetwork()
 
     if (checkversion==1)
          get_data();
+
+
+    QString cstring = adb + " -s " + daddr + port + " shell sshstatus";
+    QString command=RunProcess(cstring);
+
+
+    if (command.contains("not found"))
+       {
+        logfile("ssh check");
+        logfile(cstring);
+        logfile(command);
+
+
+
+       }
+
+
+
+
+
+
+
 
 }
 
@@ -1104,6 +1193,8 @@ void MainWindow::on_connButton_clicked()
      if(isConnected)
        {
 
+
+
          cstring = adb + " -s " + daddr+port + " shell pm list packages -d";
          command=RunProcess(cstring);
 
@@ -1117,8 +1208,8 @@ void MainWindow::on_connButton_clicked()
           ui->update_status->setText(amazon_update1);
 
 
-         cstring = adb + " -s " + daddr + port +  " shell ls /etc/install-recovery-2.sh";
-                 command=RunProcess(cstring);
+         cstring = adb + " -s " + daddr + port +  " shell ls /etc/init.d/01mountusb";
+         command=RunProcess(cstring);
 
 
                  logfile("check usb persistence");
@@ -1131,14 +1222,18 @@ void MainWindow::on_connButton_clicked()
                      ui->usbBox->setChecked(true);
 
 
+
          ui->device_connected->setText(devstr1);
          ui->server_running->setText(adbstr1);
          serverRunning = true;
          ui->usbBox->setDisabled(false);
+
+
      }
        else
         { ui->device_connected->setText(devstr2);
          ui->usbBox->setDisabled(true);
+
          if (!firstrun)
          QMessageBox::critical(
                       this,
@@ -1194,7 +1289,6 @@ void MainWindow::on_disButton_clicked()
         isConnected=false;
          ui->device_connected->setText("  Device not connected.");
          ui->update_status->setText("");
-
          nMilliseconds = rtimer.elapsed();
          logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
@@ -1950,9 +2044,30 @@ void MainWindow::on_actionPreferences_triggered()
 
     QString cstring;
     QString command;
+    QString oldpass;
 
 
-     cstring = adb + " -s " + daddr+port + " shell pm list packages -d";
+    oldpass = sshpassword;
+
+
+    cstring = adb + " -s " + daddr+port + " shell su -c ls /system/etc/init.d/02sshd";
+    command=RunProcess(cstring);
+
+   logfile(cstring);
+   logfile(command);
+
+   if (command.contains("No such file or directory"))
+      {
+       sshcheck = false;
+      }
+    else
+   {
+    sshcheck = true;
+   }
+
+
+
+   cstring = adb + " -s " + daddr+port + " shell pm list packages -d";
      command=RunProcess(cstring);
 
     logfile(cstring);
@@ -1973,15 +2088,16 @@ void MainWindow::on_actionPreferences_triggered()
 
 
 
-
     logfile("opening preferences dialog");
 
     bool currentupdate = updatecheck;
 
     preferencesDialog dialog;
     dialog.setPackagename(xbmcpackage);
+    dialog.setSSHpassword(sshpassword);
     dialog.setPulldir(pulldir);
     dialog.setftvUpdate(updatecheck);
+    dialog.setsshBoot(sshcheck);
     dialog.setversioncheck(versioncheck);
     dialog.setversionLabel(version);
 
@@ -1991,12 +2107,17 @@ void MainWindow::on_actionPreferences_triggered()
     if(dialog.exec() == QDialog::Accepted)
     {
 
+    mount_system("rw");
+
     xbmcpackage = dialog.xbmcpackageName();
+    sshpassword = dialog.sshpassword();
     pulldir = dialog.pulldir();
 
 
     updatecheck = dialog.updatecheck();
     versioncheck = dialog.versioncheck();
+    sshcheck = dialog.sshcheck();
+
 
 
 
@@ -2007,9 +2128,161 @@ void MainWindow::on_actionPreferences_triggered()
 
 
 
+
   if (isConnected)
   {
 
+
+      if (!sshcheck)
+
+      {
+
+            cstring = adb + " -s " + daddr+port + " shell su -c rm /system/etc/init.d/02sshd";
+            command=RunProcess(cstring);
+
+           logfile(cstring);
+           logfile(command);
+
+           if (command.isEmpty())
+               logfile("/system/etc/init.d/02sshd deleted");
+           else
+               logfile("/system/etc/init.d/02sshd not deleted");
+
+
+
+      }
+
+
+       else
+
+      {
+          logfile("write 02sshd");
+
+          QString hashbang = "#!/system/bin/sh";
+          QString filename = adbdir+"02sshd";
+          QString makepst = "/system/xbin/sshstart " + sshpassword;
+
+
+          QFile file(filename);
+
+            //  if(!file.open(QFile::WriteOnly |
+                          //  QFile::Text))
+
+      if(!file.open(QFile::WriteOnly))
+
+              {
+
+                  logfile(cstring);
+                  logfile(command);
+                  logfile("error creating 02sshd file.");
+                  QMessageBox::critical(this,"","Error creating 02sshd file!");
+                  return;
+              }
+
+
+              QTextStream out(&file);
+              out  << hashbang + "\n";
+              out  << makepst + "\n";
+
+              file.flush();
+              file.close();
+
+              mount_system("rw");
+
+               cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+               command=RunProcess(cstring);
+               if (!command.contains("bytes"))
+                    {
+
+
+                      logfile(cstring);
+                      logfile(command);
+                      logfile("error pushing shell script to device!");
+
+                       QMessageBox::critical(this,"","Error pushing file frpm PC to device!");
+                       mount_system("ro");
+                       return;
+                     }
+
+
+
+              cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/02sshd /system/etc/init.d";
+              QString command=RunProcess(cstring);
+
+              if (!command.isEmpty())
+                   {
+
+                     logfile(cstring);
+                     logfile(command);
+                     logfile("file copy error, sdcard to system/etc");
+
+                     QMessageBox::critical(this,"","Error: cp /sdcard/01mountusb /system/etc/init.d failed");
+                      mount_system("ro");
+                      return;
+                    }
+
+
+              logfile(cstring);
+              logfile(command);
+
+              cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/init.d/02sshd";
+              command=RunProcess(cstring);
+
+              if (!command.isEmpty())
+                   {
+
+                  logfile(cstring);
+                  logfile(command);
+                  logfile("chmod error, system/etc/init.d/02sshd");
+
+                      QMessageBox::critical(this,"","Error: chmod of /system/etc/init.d/02sshd failed");
+                      mount_system("ro");
+                      return;
+                    }
+
+
+              logfile(cstring);
+              logfile(command);
+
+              cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/02sshd";
+             command=RunProcess(cstring);
+
+              if (!command.isEmpty())
+                   {
+
+                  logfile(cstring);
+                  logfile(command);
+                  logfile("error: rm /sdcard/02sshd");                
+                    }
+
+
+              cstring = adb + " -s " + daddr + port +  " shell ls /system/etc/init.d/02sshd";
+              command=RunProcess(cstring);
+
+              if (!command.contains("/system/etc/init.d/02sshd"))
+                   {
+
+                  logfile(cstring);
+                  logfile(command);
+                  logfile("Error: /etc/init.d/02sshd not created. SSH is not persistent");
+
+                  QMessageBox::critical(this,"","Error: /etc/init.d/02sshd not created.SSH is not persistent");
+                    }
+
+               else
+                    {
+
+                  logfile(cstring);
+                  logfile(command);
+                  logfile("SSH is now persistent");
+                  // QMessageBox::information(this,"","SSH is persistent");
+
+              }
+
+             mount_system("ro");
+             QFile::remove(filename);
+
+      }
 
 
    // QString s = QString::number(updatecheck);
@@ -2083,7 +2356,6 @@ void MainWindow::on_actionPreferences_triggered()
 
 
 
-
     open_pref_database();
     updateTables();
     db.close();
@@ -2130,7 +2402,7 @@ void MainWindow::on_actionReboot_triggered()
          ui->device_connected->setText(devstr2);
          ui->update_status->setText("");
         logfile("rebooting device");
-         rebootDevice(" reboot");
+        rebootDevice(" reboot");
      }
 
 }
@@ -2312,7 +2584,10 @@ void MainWindow::on_actionInstall_busybox_triggered()
     QString busybox5 = adbdir+"mount.exfat-fuse";
     QString busybox6 = adbdir+"mntdrives.sh";
     QString busybox7 = adbdir+"samba.tar";
+    QString busybox8 = adbdir+ "install-recovery-2.sh";
+    QString busybox9 = adbdir+"install-recovery.sh";
 
+/*
         bool file1 = false;
         bool file2 = false;
         bool file3 = false;
@@ -2320,6 +2595,9 @@ void MainWindow::on_actionInstall_busybox_triggered()
         bool file5 = false;
         bool file6 = false;
         bool file7 = false;
+        bool file8 = false;
+        bool file9 = false;
+*/
 
      QFile Fout1(busybox1);
 
@@ -2426,6 +2704,39 @@ void MainWindow::on_actionInstall_busybox_triggered()
             return;
           }
 
+      QFile Fout8(busybox8);
+
+      if(!Fout8.exists())
+         {
+
+           QMessageBox::critical(
+            this,
+            tr("adbFire"),
+             busybox8+" not found.");
+             logfile(busybox8+" not found.");
+           ui->progressBar->setHidden(true);
+            return;
+          }
+
+      QFile Fout9(busybox9);
+
+      if(!Fout9.exists())
+         {
+
+           QMessageBox::critical(
+            this,
+            tr("adbFire"),
+             busybox9+" not found.");
+             logfile(busybox9+" not found.");
+           ui->progressBar->setHidden(true);
+            return;
+          }
+
+
+
+
+
+
 
       QString cstring = adb + " -s " + daddr + port + " push "+busybox1+ " /sdcard/";
 
@@ -2442,8 +2753,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
               ui->progressBar->setHidden(true);
              return;
              }
-            else
-            file1 = true;
+
 
 
          logfile(cstring);
@@ -2464,8 +2774,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
                   ui->progressBar->setHidden(true);
                   return;
                  }
-              else
-                  file2 = true;
+
 
               logfile(cstring);
               logfile(command);
@@ -2485,8 +2794,6 @@ void MainWindow::on_actionInstall_busybox_triggered()
                    ui->progressBar->setHidden(true);
                    return;
                   }
-               else
-                   file3 = true;
 
 
                logfile(cstring);
@@ -2509,8 +2816,6 @@ void MainWindow::on_actionInstall_busybox_triggered()
                     ui->progressBar->setHidden(true);
                     return;
                    }
-                else
-                    file4 = true;
 
 
                 logfile(cstring);
@@ -2532,8 +2837,6 @@ void MainWindow::on_actionInstall_busybox_triggered()
                      ui->progressBar->setHidden(true);
                      return;
                     }
-                 else
-                     file5 = true;
 
                  logfile(cstring);
                  logfile(command);
@@ -2553,8 +2856,6 @@ void MainWindow::on_actionInstall_busybox_triggered()
                       ui->progressBar->setHidden(true);
                       return;
                      }
-                  else
-                      file6 = true;
 
                   logfile(cstring);
                   logfile(command);
@@ -2574,22 +2875,55 @@ void MainWindow::on_actionInstall_busybox_triggered()
                       ui->progressBar->setHidden(true);
                       return;
                      }
-                  else
-                      file7 = true;
 
                   logfile(cstring);
                   logfile(command);
 
 
+                  cstring = adb + " -s " + daddr + port + " push "+busybox8+ " /sdcard/";
+                  command=RunProcess(cstring);
 
- if (file1 && file2 && file3 && file4 && file5 && file6 && file7)
+                  if (!command.contains("bytes"))
+                     { QMessageBox::critical(
+                                  this,
+                                  "",
+                                  "file8: busybox install failed");
 
- {
+                      logfile("file8: busybox install failed ");
+                      logfile(cstring);
+                      logfile(command);
+                      ui->progressBar->setHidden(true);
+                      return;
+                     }
+
+                  logfile(cstring);
+                  logfile(command);
+
+
+                  cstring = adb + " -s " + daddr + port + " push "+busybox9+ " /sdcard/";
+                  command=RunProcess(cstring);
+
+                  if (!command.contains("bytes"))
+                     { QMessageBox::critical(
+                                  this,
+                                  "",
+                                  "file9: busybox install failed");
+
+                      logfile("file9: busybox install failed ");
+                      logfile(cstring);
+                      logfile(command);
+                      ui->progressBar->setHidden(true);
+                      return;
+                     }
+
+
+                  logfile(cstring);
+                  logfile(command);
 
       mount_system("rw");
 
 
-     QString cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/binstall.sh /system/xbin";
+     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/binstall.sh /system/xbin";
      command=RunProcess(cstring);
      
      logfile(cstring);
@@ -2698,11 +3032,46 @@ void MainWindow::on_actionInstall_busybox_triggered()
          logfile(command);
 
 
+         cstring = adb + " -s " + daddr+port + " shell su -c mkdir /system/etc/init.d";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+         cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /system/etc/init.d";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+
+         cstring = adb + " -s " + daddr+port + " shell su -c cp /sdcard/install-recovery*  /system/etc/";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+         cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/etc/install-recovery*";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/install-recovery*";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+         logfile(cstring);
+         logfile(command);
          QMessageBox::information( this,"","Busybox installed!");
          logfile("busybox installed!");
+         ui->progressBar->setHidden(false);
         }
-
- }
 
 mount_system("ro");
 
@@ -2838,6 +3207,13 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
         mount_system("rw");
 
 
+        cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/sshstop";
+        command=RunProcess(cstring);
+
+        logfile(cstring);
+        logfile(command);
+
+
          cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/buninstall.sh";
          command=RunProcess(cstring);
 
@@ -2858,7 +3234,12 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
            { logfile("busybox uninstall failed");
                QMessageBox::critical( this,"","Busybox not uninstalled!");}
 
-    mount_system("ro");
+
+
+
+
+
+           mount_system("ro");
 
     nMilliseconds = rtimer.elapsed();
     logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
@@ -3086,8 +3467,12 @@ void MainWindow::on_actionFirmware_install_triggered()
     logfile("firmware installation started");
 
 
-        cstring = adb + " -s " + daddr+port + " shell su -c chmod -R 777 /cache/recovery";
+        cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /cache";
         command=RunProcess(cstring);
+
+        cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /cache/recovery";
+        command=RunProcess(cstring);
+
 
         if (command.contains("No such file or directory"))
          {
@@ -3102,7 +3487,6 @@ void MainWindow::on_actionFirmware_install_triggered()
             logfile(cstring);
             logfile(command);
 
-
             if (!command.isEmpty())
              {
 
@@ -3113,7 +3497,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
 
-            cstring = adb + " -s " + daddr+port + " shell su -c chmod -R 777 /cache/recovery";
+            cstring = adb + " -s " + daddr+port + " shell su -c chmod 777 /cache/recovery";
             command=RunProcess(cstring);
 
             logfile(cstring);
@@ -3718,210 +4102,6 @@ void MainWindow::on_roButton_clicked()
 
 
 
-/////////////////////////////////////////////////
-void MainWindow::on_usbBox_clicked(bool checked)
-{
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
-
-
-  //
-
-   if (!is_su())
-      { QMessageBox::critical(
-            this,
-            "",
-            "Root required!");
-         return;
-   }
-
-QString cstring;
-QString hashbang = "#!/system/bin/sh";
-QString filename = adbdir+"install-recovery-2.sh";
-QString makepst = "/system/xbin/mntdrives.sh samba";
-
-cstring = adb + " -s " + daddr + port +  " shell su -c ls /system/xbin/mount";
-QString command=RunProcess(cstring);
-
-if (command.contains("No such file or directory"))
-{
-
-    logfile(cstring);
-    logfile(command);
-    logfile("busybox required, not found");
-
-    QMessageBox::critical(this,"","Busybox required for USB drive. Install it from the menu.");
-    ui->usbBox->setChecked(false);
-
-    return;
-}
-
-
-    if (checked)
-    {
-
-        QFile file(filename);
-
-          if(!file.open(QFile::WriteOnly))
-                  {
-
-                     logfile(cstring);
-                     logfile(command);
-                     logfile("error creating sh script on PC!");
-                      QMessageBox::critical(this,"","Error creating file on PC!");
-                      return;
-                  }
-
-
-        QTextStream out(&file);
-        out << hashbang << endl << makepst << endl;
-        file.flush();
-        file.close();
-
-        mount_system("rw");
-
-         cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-         command=RunProcess(cstring);
-         if (!command.contains("bytes"))
-              {
-
-
-                logfile(cstring);
-                logfile(command);
-                logfile("error pushing shell script to device!");
-
-                 QMessageBox::critical(this,"","Error pushing file frpm PC to device!");
-                 mount_system("ro");
-                 return;
-               }
-
-
-
-        cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/install-recovery-2.sh /system/etc/";
-        QString command=RunProcess(cstring);
-
-        if (!command.isEmpty())
-             {
-
-               logfile(cstring);
-               logfile(command);
-               logfile("file copy error, sdcard to system/etc");
-
-               QMessageBox::critical(this,"","Error: cp /sdcard/install-recovery-2.sh /system/etc/ failed");
-                mount_system("ro");
-                return;
-              }
-
-
-        logfile(cstring);
-        logfile(command);
-
-        cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/install-recovery-2.sh";
-        command=RunProcess(cstring);
-
-        if (!command.isEmpty())
-             {
-
-            logfile(cstring);
-            logfile(command);
-            logfile("chmod error, system/etc/install-recovery-2.sh");
-
-                QMessageBox::critical(this,"","Error: chmod of install-recovery-2.sh failed");
-                mount_system("ro");
-                return;
-              }
-
-
-        logfile(cstring);
-        logfile(command);
-
-        cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/install-recovery-2.sh";
-       command=RunProcess(cstring);
-
-        if (!command.isEmpty())
-             {
-
-            logfile(cstring);
-            logfile(command);
-            logfile("error: rm system/etc/install-recovery-2.sh");
-
-              QMessageBox::critical(this,"","Error: rm of /sdcard/install-recovery-2.sh failed");
-              }
-
-         QFile::remove(filename);
-
-         QFile Fout(filename);
-
-         if(Fout.exists())
-         {
-
-             logfile(cstring);
-             logfile(command);
-             logfile("error: rm PC: install-recovery-2.sh");
-
-             QMessageBox::critical(this,"","Error: rm of PC: install-recovery-2.sh failed");
-         }
-
-
-        cstring = adb + " -s " + daddr + port +  " shell ls /system/etc/install-recovery-2.sh";
-        command=RunProcess(cstring);
-
-        if (!command.contains("/system/etc/install-recovery-2.sh"))
-             {
-
-            logfile(cstring);
-            logfile(command);
-            logfile("Error: /etc/install-recovery-2.sh not created. USB drive is not persistent");
-
-            QMessageBox::critical(this,"","Error: /etc/install-recovery-2.sh not created. USB drive is not persistent");
-              }
-
-         else
-              {
-
-            logfile(cstring);
-            logfile(command);
-            logfile("USB drive is now persistent");
-            QMessageBox::information(this,"","USB drive is persistent");
-              }
-
-
-    }
-
-
-
-  else
-
-    {
-
-
-       mount_system("rw");
-
-        cstring = adb + " -s " + daddr + port +  " shell su -c rm /system/etc/install-recovery-2.sh";
-        command=RunProcess(cstring);
-
-        QMessageBox::information(this,"","USB drive is not persistent.");
-        mount_system("ro");
-
-        logfile(cstring);
-        logfile(command);
-        logfile("USB drive is not persistent");
-
-        return;
-
-         }
-
-
-    }
-
-
-
 /////////////////////////////////////////
 void MainWindow::on_fpullButton_clicked()
 {
@@ -4345,15 +4525,11 @@ void MainWindow::on_llamaButton_clicked()
                 ui->progressBar->setHidden(true);
                 return;
               }
-          else
+
+           else
            {
-
-
                isLlama = true;
-               cstring = adb + " shell su -c mkdir -p /data/data/com.kebab.Llama/shared_prefs";
-               command=RunProcess(cstring);
-               logfile(cstring);
-               logfile(command);
+
            }
 
        }
@@ -4363,9 +4539,16 @@ void MainWindow::on_llamaButton_clicked()
      if (llamaEvent < 4 && isLlama)
      {
 
+         cstring = adb + " -s " + daddr+port + " shell rm -r /sdcard/Llama";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
          if (llamaEvent == 1)
          {
-          cstring = adb + " push "+adbdir+"llama.xbmc.boot /sdcard/EVENTS.xml";
+          cstring = adb + " push "+adbdir+"llama_boot /sdcard/Llama/";
           command=RunProcess(cstring);
           logfile(cstring);
           logfile(command);
@@ -4374,7 +4557,7 @@ void MainWindow::on_llamaButton_clicked()
 
        if (llamaEvent == 2)
          {
-           cstring = adb + " push "+adbdir+"llama.ctv.only /sdcard/EVENTS.xml";
+           cstring = adb + " push "+adbdir+"llama_ctv /sdcard/Llama/";
            command=RunProcess(cstring);
            logfile(cstring);
            logfile(command);
@@ -4384,50 +4567,22 @@ void MainWindow::on_llamaButton_clicked()
        if (llamaEvent == 3)
          {
 
-           cstring = adb + " push "+adbdir+"llama.ctvx.boot /sdcard/EVENTS.xml";
+           cstring = adb + " push "+adbdir+"llama_both /sdcard/Llama";
            command=RunProcess(cstring);
            logfile(cstring);
            logfile(command);
          }
 
 
-       cstring =  adb + " shell su -c cp /sdcard/EVENTS.xml /data/data/com.kebab.Llama/shared_prefs";
-       command=RunProcess(cstring);
-       logfile(cstring);
-       logfile(command);
-
-
-       cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs";
-       command=RunProcess(cstring);
-       logfile(cstring);
-       logfile(command);
-
-
-       cstring =  adb + " shell su -c chown -R install.install  /data/data/com.kebab.Llama/shared_prefs/*";
-       command=RunProcess(cstring);
-       logfile(cstring);
-       logfile(command);
-
-       cstring =  adb + " shell rm /sdcard/EVENTS.xml";
-       command=RunProcess(cstring);
-       logfile(cstring);
-       logfile(command);
 
 
 
      }
 
 
-
-
-
-
-
    if (classicTV && ctvIcon < 4)
 
    {
-
-
 
 
            if (ctvIcon == 1)
@@ -4506,17 +4661,16 @@ else return;
 
     if (!isLlama)
     {
-        QMessageBox::information(this,"","Llama not installed.");
+        QMessageBox::information(this,"","Llama not installed. Click the Llama install checkbox to install Llama");
         logfile("Llama not installed.");
         return;
     }
 
 
        if (isLlama && llamaEvent < 4)
-           s = "Llama settings applied.";
-
-        if (llamaInstall)
-           s = s + "\nPlease run Llama on the AFTV to activate!";
+          { s = "Llama settings applied.";
+            s = s + "\nPlease run Llama and import settings from USB to activate!";
+          }
 
         if (ctvIcon < 4)
            s = s + "\n"+icontype;
@@ -4530,7 +4684,6 @@ else return;
     nMilliseconds = rtimer.elapsed();
     logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
     ui->progressBar->setHidden(true);
-
 
 
 }
@@ -4672,3 +4825,442 @@ void MainWindow::on_actionInstall_Recovery_triggered()
 }
 
 
+/////////////////////////////////////////////////
+void MainWindow::on_usbBox_clicked(bool checked)
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+   if (!is_su())
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+QString cstring;
+QString hashbang = "#!/system/bin/sh";
+QString filename = adbdir+"01mountusb";
+QString makepst = "/system/xbin/mntdrives.sh samba";
+
+cstring = adb + " -s " + daddr + port +  " shell su -c ls /system/xbin/mount";
+QString command=RunProcess(cstring);
+
+if (command.contains("No such file or directory"))
+{
+
+    logfile(cstring);
+    logfile(command);
+    logfile("busybox required, not found");
+
+    QMessageBox::critical(this,"","Busybox required for USB drive. Install it from the menu.");
+    ui->usbBox->setChecked(false);
+
+    return;
+}
+
+
+    if (checked)
+    {
+
+
+        mount_system("rw");
+
+         cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
+         command=RunProcess(cstring);
+         if (!command.contains("bytes"))
+              {
+
+
+                logfile(cstring);
+                logfile(command);
+                logfile("error pushing shell script to device!");
+
+                 QMessageBox::critical(this,"","Error pushing file frpm PC to device!");
+                 mount_system("ro");
+                 return;
+               }
+
+
+
+        cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/01mountusb /system/etc/init.d";
+        QString command=RunProcess(cstring);
+
+        if (!command.isEmpty())
+             {
+
+               logfile(cstring);
+               logfile(command);
+               logfile("file copy error, sdcard to system/etc");
+
+               QMessageBox::critical(this,"","Error: cp /sdcard/01mountusb /system/etc/init.d failed");
+                mount_system("ro");
+                return;
+              }
+
+
+        logfile(cstring);
+        logfile(command);
+
+        cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/init.d/01mountusb";
+        command=RunProcess(cstring);
+
+        if (!command.isEmpty())
+             {
+
+            logfile(cstring);
+            logfile(command);
+            logfile("chmod error, system/etc/init.d/01mountusb");
+
+                QMessageBox::critical(this,"","Error: chmod of /system/etc/init.d/01mountusb failed");
+                mount_system("ro");
+                return;
+              }
+
+
+        logfile(cstring);
+        logfile(command);
+
+        cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/01mountusb";
+       command=RunProcess(cstring);
+
+        if (!command.isEmpty())
+             {
+
+            logfile(cstring);
+            logfile(command);
+            logfile("error: rm /sdcard/01mountusb");
+
+              QMessageBox::critical(this,"","Error: rm of /sdcard/01mountusb failed");
+              }
+
+
+        cstring = adb + " -s " + daddr + port +  " shell ls /system/etc/init.d/01mountusb";
+        command=RunProcess(cstring);
+
+        if (!command.contains("/system/etc/init.d/01mountusb"))
+             {
+
+            logfile(cstring);
+            logfile(command);
+            logfile("Error: /etc/init.d/01mountusb not created. USB drive is not persistent");
+
+            QMessageBox::critical(this,"","Error: /etc/init.d/01mountusb not created. USB drive is not persistent");
+              }
+
+         else
+              {
+
+            logfile(cstring);
+            logfile(command);
+            logfile("USB drive is now persistent");
+            QMessageBox::information(this,"","USB drive is persistent");
+              }
+
+
+    }
+
+
+
+  else
+
+    {
+
+
+       mount_system("rw");
+
+        cstring = adb + " -s " + daddr + port +  " shell su -c rm /system/etc/init.d/01mountusb";
+        command=RunProcess(cstring);
+
+        QMessageBox::information(this,"","USB drive is not persistent.");
+        mount_system("ro");
+
+        logfile(cstring);
+        logfile(command);
+        logfile("USB drive is not persistent");
+
+        return;
+
+         }
+
+
+    }
+
+
+
+/////////////////////////////////////////////////
+void MainWindow::on_actionInstall_SSH_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+   if (!is_su())
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+   QString cstring;
+   QString command;
+
+
+   cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/busybox";
+   command=RunProcess(cstring);
+
+
+     if (command.contains("No such file or directory"))
+      { QMessageBox::critical( this,"","Busybox required for SSH. Install from the Root Menu.");
+
+         logfile(cstring);
+         logfile(command);
+         logfile("Busybox required for SSH.");
+         return;
+     }
+
+
+
+   logfile("ssh installation query");
+
+   QMessageBox::StandardButton reply;
+      reply = QMessageBox::question(this, "", "Install SSH?",
+                                   QMessageBox::Yes|QMessageBox::No);
+      if (reply == QMessageBox::No)
+        {logfile("ssh installation cancelled");
+          return;}
+
+
+
+
+
+      QElapsedTimer rtimer;
+         int nMilliseconds;
+         rtimer.start();
+
+
+         ui->progressBar->setHidden(false);
+         ui->progressBar->setValue(0);
+
+
+         QTimer *timer = new QTimer(this);
+         connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+         timer->start(tsvalue);
+
+
+          logfile("starting ssh install");
+
+
+
+
+   cstring = adb + " -s " + daddr + port + " push "+adbdir+ "/jocala.tar /sdcard/";
+   command=RunProcess(cstring);
+
+
+   if (!command.contains("bytes"))
+      { QMessageBox::critical(
+                   this,
+                   "",
+                   "SSH install failed");
+       logfile("jocala.tar: ssh install failed ");
+       logfile(cstring);
+       logfile(command);
+       ui->progressBar->setHidden(true);
+       return;
+      }
+
+   mount_system("rw");
+
+   cstring = adb + " -s " + daddr+port + " shell su -c tar xf /sdcard/jocala.tar -C /data";
+   command=RunProcess(cstring);
+
+   logfile(cstring);
+   logfile(command);
+
+cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/jocala.tar";
+command=RunProcess(cstring);
+
+logfile(cstring);
+logfile(command);
+
+
+cstring = adb + " -s " + daddr+port + " shell su -c /data/jocala/setupssh";
+command=RunProcess(cstring);
+
+logfile(cstring);
+logfile(command);
+
+
+cstring = adb + " -s " + daddr + port + " shell sshstatus";
+command=RunProcess(cstring);
+
+
+if (command.contains("not found"))
+   { QMessageBox::critical(
+                this,
+                "",
+                "SSH not installed");
+    logfile("ssh check");
+    logfile(cstring);
+    logfile(command);
+    mount_system("ro");
+    return;
+   }
+
+else
+
+   { QMessageBox::information(
+                this,
+                "",
+                "SSH installed");
+    logfile("ssh check passed");
+    logfile(cstring);
+    logfile(command);
+     cstring = adb + " -s " + daddr + port + " shell stopssh";
+     command=RunProcess(cstring);
+
+       }
+
+
+
+
+nMilliseconds = rtimer.elapsed();
+logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+ui->progressBar->setHidden(true);
+mount_system("ro");
+
+}
+
+////////////////////////////////////////////////////
+void MainWindow::on_actionUninstall_SSH_triggered()
+{
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+   if (!is_su())
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+   logfile("ssh uninstallation query");
+
+   QMessageBox::StandardButton reply;
+      reply = QMessageBox::question(this, "", "Uninstall SSH?",
+                                   QMessageBox::Yes|QMessageBox::No);
+      if (reply == QMessageBox::No)
+        {logfile("ssh uninstall cancelled");
+          return;}
+
+
+   mount_system("rw");
+
+   QString cstring;
+   QString command;
+
+
+   cstring = adb + " -s " + daddr + port + " shell /system/xbin/sshstatus";
+   command=RunProcess(cstring);
+
+
+   if (command.contains("not found"))
+      { QMessageBox::critical(
+                   this,
+                   "",
+                   "SSH not installed");
+       logfile("ssh check");
+       logfile(cstring);
+       logfile(command);
+       mount_system("ro");
+       return;
+      }
+
+   if (command.contains("running"))
+      {
+
+       cstring = adb + " -s " + daddr + port + " shell su -c /data/jocala/sshstop";
+       command=RunProcess(cstring);
+       logfile("ssh check");
+       logfile(cstring);
+       logfile(command);
+
+
+      }
+
+
+       logfile("uninstall ssh");
+
+       cstring = adb + " -s " + daddr + port + " shell su -c /data/jocala/rmssh";
+       command=RunProcess(cstring);
+
+       logfile("rm /system/xbin/ssh");
+       logfile(cstring);
+       logfile(command);
+
+       cstring = adb + " -s " + daddr + port + " shell su -c rm -r /data/jocala/";
+       command=RunProcess(cstring);
+
+       logfile("rm /system/xbin/ssh");
+       logfile(cstring);
+       logfile(command);
+
+
+       cstring = adb + " -s " + daddr + port + " shell su -c rm -r /system/etc/init.d/02sshd";
+       command=RunProcess(cstring);
+
+       logfile("rm /system/etc/init.d/02sshd");
+       logfile(cstring);
+       logfile(command);
+
+
+       cstring = adb + " -s " + daddr + port + " shell sshstatus";
+       command=RunProcess(cstring);
+
+
+
+
+       if (command.contains("not found"))
+          { QMessageBox::critical(
+                       this,
+                       "",
+                       "SSH uninstalled");
+           logfile("ssh check");
+           logfile(cstring);
+           logfile(command);
+
+
+
+
+          }
+
+
+     mount_system("ro");
+
+}

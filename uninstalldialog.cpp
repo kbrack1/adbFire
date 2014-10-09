@@ -56,7 +56,14 @@ uninstallDialog::uninstallDialog(QWidget *parent) :
        {
          tmpdir = QCoreApplication::applicationDirPath();
          tmpdir = tmpdir+"/adbfiles/";
-        adb2 = tmpdir+"adb";
+        adb2 = tmpdir+"adb.osx";
+       }
+
+     if (ost == 0)
+       {
+         tmpdir = QCoreApplication::applicationDirPath();
+         tmpdir = tmpdir+"/adbfiles/";
+        adb2 = tmpdir+"adb.linux";
        }
 
 

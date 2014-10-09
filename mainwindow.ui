@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>595</width>
-    <height>576</height>
+    <width>564</width>
+    <height>571</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,7 +33,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>600</y>
+      <y>570</y>
       <width>118</width>
       <height>16</height>
      </rect>
@@ -48,8 +48,8 @@
    <widget class="QLabel" name="server_running">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>600</y>
+      <x>170</x>
+      <y>570</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -61,8 +61,8 @@
    <widget class="QLabel" name="device_connected">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>630</y>
+      <x>240</x>
+      <y>570</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -74,7 +74,7 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>40</x>
       <y>40</y>
       <width>231</width>
       <height>101</height>
@@ -136,8 +136,8 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>220</y>
+      <x>340</x>
+      <y>200</y>
       <width>161</width>
       <height>171</height>
      </rect>
@@ -241,7 +241,7 @@
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>40</x>
       <y>150</y>
       <width>231</width>
       <height>71</height>
@@ -286,8 +286,8 @@
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>60</y>
+      <x>350</x>
+      <y>40</y>
       <width>131</width>
       <height>141</height>
      </rect>
@@ -347,7 +347,7 @@
    <widget class="QPushButton" name="donate">
     <property name="geometry">
      <rect>
-      <x>400</x>
+      <x>360</x>
       <y>440</y>
       <width>150</width>
       <height>50</height>
@@ -369,7 +369,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>350</x>
       <y>410</y>
       <width>181</width>
       <height>16</height>
@@ -398,8 +398,8 @@
    <widget class="QLabel" name="update_status">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>600</y>
+      <x>320</x>
+      <y>570</y>
       <width>111</width>
       <height>16</height>
      </rect>
@@ -408,10 +408,10 @@
      <string>update status</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>20</x>
       <y>240</y>
       <width>285</width>
       <height>204</height>
@@ -551,22 +551,18 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>595</width>
-     <height>22</height>
+     <width>564</width>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionPreferences"/>
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
-    <addaction name="actionInstall_busybox"/>
-    <addaction name="actionUninstall_Busybox"/>
-    <addaction name="actionFirmware_install"/>
-    <addaction name="actionInstall_Recovery"/>
     <addaction name="actionCredits"/>
+    <addaction name="actionPreferences"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -582,7 +578,19 @@
     </property>
     <addaction name="actionHelp"/>
    </widget>
+   <widget class="QMenu" name="menuRoot">
+    <property name="title">
+     <string>Root</string>
+    </property>
+    <addaction name="actionInstall_busybox"/>
+    <addaction name="actionUninstall_Busybox"/>
+    <addaction name="actionInstall_SSH"/>
+    <addaction name="actionUninstall_SSH"/>
+    <addaction name="actionFirmware_install"/>
+    <addaction name="actionInstall_Recovery"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuRoot"/>
    <addaction name="menuAbout"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -663,6 +671,16 @@
    </property>
    <property name="toolTip">
     <string>Install CWM recovery</string>
+   </property>
+  </action>
+  <action name="actionInstall_SSH">
+   <property name="text">
+    <string>Install SSH</string>
+   </property>
+  </action>
+  <action name="actionUninstall_SSH">
+   <property name="text">
+    <string>Uninstall SSH</string>
    </property>
   </action>
  </widget>

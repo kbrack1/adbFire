@@ -19,8 +19,10 @@ public:
     explicit preferencesDialog(QWidget *parent = 0 );
 
       void setPackagename(const QString &packagename);
+      void setSSHpassword(const QString &sshpassword);
       void setPulldir(const QString &pulldir);
       void setftvUpdate(const bool &updatecheck);  
+      void setsshBoot(const bool &sshcheck);
       void setversioncheck(const bool &versioncheck);
       void setversionLabel(const QString &versiontext);
 
@@ -30,10 +32,16 @@ public:
    QString xbmcpackageName();
 
 public:
+   QString sshpassword();
+
+public:
    QString pulldir();
 
 public:
    bool updatecheck();
+
+public:
+   bool sshcheck();
 
 public:
    bool versioncheck();

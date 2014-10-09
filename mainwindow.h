@@ -92,6 +92,10 @@ private slots:
 
     void on_actionInstall_Recovery_triggered();
 
+    void on_actionInstall_SSH_triggered();
+
+    void on_actionUninstall_SSH_triggered();
+
 private:
     Ui::MainWindow *ui;
 

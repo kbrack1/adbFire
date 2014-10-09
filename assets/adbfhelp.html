@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>adbFire</title></head><body>
 
-<u><b>adbFire v1.08</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
+<u><b>adbFire v1.09</b></u> is a companion program for Android XBMC and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
 install (sideload) XBMC and other apps to your Android device without the bother of installing the Android SDK. <p>
 
 Additionally, it allows you to mount USB drives (when rooted) copy files to and from XBMC, backup and restore XBMC's data, root the AFTV (51.1.1.0 or earlier) and much more. <p>
@@ -79,7 +79,7 @@ The <b>"Splash Screen"</b> button installs a png splash screen file to the "medi
 The <b>"Screen shot"</b> button takes a snapshot of the device's current screen, gives it a date/time based name, and saves it to the pulled files folder (default: home directory).<p> Unfortunately, High-bandwidth Digital Content Protection (HDCP) prevents you from taking screenshots of most commercia video streams. Luckily, XBMC is not affected by HDCP.<p>
 <p>
 <p>
-<b>Llama</b> is an app that tells a device to perform tasks when certain conditions are met. It's very handy in controlling the AFTV. The <b>"Llama Options"</b> button opens a dialog that offers different Llama related options:<p>
+<b>Llama</b> is an app that tells a device to perform tasks when certain conditions are met. It's very handy in controlling the AFTV. The <b>"Llama Options"</b> button opens a dialog that offers different Llama related events:<p>
 The <b>"Install Llama"</b> Click this checkbox to install Llama.<p>
 <p>
 <b>1. Boot the AFTV to XBMC</b><br>
@@ -103,9 +103,10 @@ The next four options relate to the ikono TV icon.<p>
 4. No action (the default)
 </b>
 <p>
-
+<b><u>Note:</u></b> After installing Llama and selecting an event, you must run Llama and select "import event from USB".  The events that adbFire installs start XBMC. They will need to be edited to start variants like SPMC.
 <p>
-The <b>"Root AFTV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by running the towelroot app. As of this writing, FireOS 51.1.0.2 and below are rootable.<p>
+<p>
+The <b>"Root AFTV"</b> button installs Chainfire Superuser and GeoHot's towelroot v 3.0. You must complete the process by running the towelroot app. Unfortunately, firmware 51.1.3.0 and above can't be rooted at this time. Check your Fire TV Settings/About to see your firmware ID.<p>
 <p>
 The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a AFTV. <p>
 <p>
@@ -121,14 +122,44 @@ The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe 
 <p>
 <b><u>Quit adbFire</b></u>  Terminates adbFire.
 <p>
-<b><u>Root only menu options</b></u>
+
+<p>
+<b><u>Preferences</b></u>
+<p>
+<b><u>XBMC Package name</b></u>, default: org.xbmc.xbmc. This varies depending on what variant of XBMC you're running.<p>
+If you are running a fork of XBMC, enter its packagename here, e.g. for Beyond XBMC enter "com.flumpster.xbmc".
+<p>Thus far, SPMC, BeyondXBMC, elmerohueso's XBMC Launcher, Gotham 13.1 and Helix nightlies have been tested with adbFire.<p>
+In theory any fork should work if its file directory structure adheres to XBMC's (/sdcard/Android/data/packagename/files/.xbmc) directory structure. YMMV.<p>
+<p>
+<b><u>Pull Folder</b></u>, default: User's home directory.<br>
+Choose the folder where pulled XBMC files and screenshot pngs are placed.
+<p>
+<b><u>AFTV updates</b></u> Toggle AFTV updates on/off. This disables/enables com.amazon.dcp. Default is updates on. Changing this option requires root.
+<p>
+<b><u>SSH server at boot</b></u> When checked this option has the SSH server start at boot. This option requires root.
+<p>
+The <b>Check for updates at startup</b> checkbox causes adbFire to check jocala.com for updates at startup. This is on by default.
+<p>
+The <b>Check for updates</b> button contacts jocala.com for an immediate update check. If an update is available adbFire offers to connect for download.
+<p>
+=================
+<p>
+<u><b>Root Menu items</b></u>
+<p>These items only work with root.<p>
 <p>
 <b><u>Install Busybox</b></u><br>
 BusyBox combines tiny versions of many common UNIX utilities into a single small executable. It provides replacements for most of the utilities you usually find on a Linux system. It has an extremely small footprint, under 2Mb
 <p>
 <b><u>Uninstall Busybox</b></u><br>
-Removes BusyBox frpm your system.<p>
-
+Removes BusyBox from your system.
+<p>
+<b><u>Install SSH</b></u><br>
+This option installs the Dropbear SSH server on your device. This allows you to open a secure shell on your Fire TV, somewhat like adb shell. Among many other things, it allows you to copy files to your device as root using the scp command and act as a backup entryway into your system in the case of a problem with adb. <p>
+SSH can be made persistant by checking the "SSH at boot" option in adbFire's preferences dialog. If you choose not to start SSH at boot it can be started and stopped via the command line:<p> Press "ADB Shell" then enter the command "sshstart password" where 'password' is the password you want SSH to use. <p>Stopping SSH is done via the command "sshstop", and you can find SSH's status with the command: "sshstatus".
+<p>Windows users will want to download the puTTY client, OS X and Linux users have default ssh clients.
+<p>
+<b><u>Uninstall Busybox</b></u><br>
+Removes SSH from your system.<p>
 <b><u>Install AFTV firmware</b></u><br>
 Install firmware to  AFTV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>When updating firmware from USB storage, adbFire looks on all devices for files with an extension of ".bin" or ".zip" and presents them for your choice.<p>
 Installing firmware from a usb stick/drive is nearly twice as fast as installing a firmware file located on your PC or LAN.<p>
@@ -147,7 +178,7 @@ As shipped by Amazon, the recovery partition is fairly useless; it allows the Fi
 Thanks to rbox@xda we have a version of Koush's ClockworkMod Recovery, specially compiled for the Fire TV!<p>
 Clockwork Mod allows us to install custom pre-rooted images, backup our Fire TVs and more. adbFire includes (with permission from rbox) two recovery images:
 <p>
-firetv-cwm_recovery-6.0.5.1.1.img
+firetv-cwm_recovery-6.0.5.1.2.img
 <p>
 recovery-stock-51.1.0.img
 <p>
@@ -160,24 +191,6 @@ Drop updated images into your "recovery" folder. For OS X users, right-click on 
 <p>
 IMPORTANT:  Do not attempt to install stock Amazon firmware via Clockwork Mod. It will not work!
 
-<p>
-<b><u>Preferences</b></u>
-<p>
-<b><u>XBMC Package name</b></u>, default: org.xbmc.xbmc. This varies depending on what variant of XBMC you're running.<p>
-If you are running a fork of XBMC, enter its packagename here, e.g. for Beyond XBMC enter "com.flumpster.xbmc".
-<p>Thus far, SPMC, BeyondXBMC, elmerohueso's XBMC Launcher, Gotham 13.1 and Helix nightlies have been tested with adbFire.<p>
-In theory any fork should work if its file directory structure adheres to XBMC's (/sdcard/Android/data/packagename/files/.xbmc) directory structure. YMMV.<p>
-<p>
-<b><u>Pull Folder</b></u>, default: User's home directory.<br>
-Choose the folder where pulled XBMC files and screenshot pngs are placed.
-<p>
-<b><u>AFTV updates</b></u> Toggle AFTV updates on/off. This disables/enables com.amazon.dcp. Default is updates on. Changing this option requires root.
-<p>
-
-The <b>Check for updates at startup</b> checkbox causes adbFire to check its server for updates at startup. This is on by default.
-<p>
-The <b>Check for updates</b> button contacts the server for an immediate update check. If an update is available adbFire offers to connect for download.
-<p>
 =============================
 <p>
 For Windows XP and up, the <b><u>adbFire</b></u> folder can be located wherever you wish.<p>

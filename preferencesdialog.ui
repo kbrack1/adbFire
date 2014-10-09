@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>344</height>
+    <width>334</width>
+    <height>384</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <rect>
      <x>100</x>
      <y>20</y>
-     <width>133</width>
+     <width>191</width>
      <height>16</height>
     </rect>
    </property>
@@ -29,9 +29,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>290</y>
-     <width>164</width>
+     <x>70</x>
+     <y>320</y>
+     <width>168</width>
      <height>32</height>
     </rect>
    </property>
@@ -52,13 +52,13 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>31</x>
-     <y>51</y>
-     <width>285</width>
-     <height>227</height>
+     <x>30</x>
+     <y>53</y>
+     <width>268</width>
+     <height>239</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -80,6 +80,24 @@
       </item>
       <item>
        <widget class="QLineEdit" name="packagename">
+        <property name="toolTip">
+         <string>Package name for XBMC or XBMC fork</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>SSH Password</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="sshpassword">
         <property name="toolTip">
          <string>Package name for XBMC or XBMC fork</string>
         </property>
@@ -124,6 +142,19 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="sshbox">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>SSH server at boot</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="versioncheck">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -139,7 +170,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
        <widget class="QPushButton" name="getUpdate">
         <property name="text">

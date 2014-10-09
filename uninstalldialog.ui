@@ -28,7 +28,7 @@
     <rect>
      <x>80</x>
      <y>20</y>
-     <width>91</width>
+     <width>141</width>
      <height>22</height>
     </rect>
    </property>
@@ -59,12 +59,12 @@
     <string>-k (keep app data)</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>40</x>
      <y>240</y>
-     <width>164</width>
+     <width>168</width>
      <height>32</height>
     </rect>
    </property>
