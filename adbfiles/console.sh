@@ -1,2 +1,2 @@
 #!/bin/sh
-/Users/jeff/buildfiretv/adbFire.app/Contents/MacOS/adbfiles/adb shell
+/Users/jeff/buildfirestat/adbFire.app/Contents/MacOS/adbfiles/adb shell

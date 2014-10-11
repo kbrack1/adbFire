@@ -1,0 +1,16 @@
+#!/system/bin/sh
+
+mount -o remount,rw /system
+
+rm  /system/xbin/ssh
+rm  /system/xbin/scp
+rm  /system/xbin/sshstatus
+rm  /system/xbin/startssh
+rm  /system/xbin/stopssh
+rm  /system/xbin/rsync
+
+rm -r /data/jocala
+
+rm /system/etc/init.d/02sshd
+
+mount -o remount,ro /system
