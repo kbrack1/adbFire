@@ -110,6 +110,14 @@ The <b>"Root AFTV"</b> button installs Chainfire Superuser and GeoHot's towelroo
 <p>
 The <b>"ADB Shell"</b> button opens a console (Terminal.app for OS X or cmd.exe for Windows) and runs adb shell against the connected device.<p>NOTE: Currently, under OS X, shell will fail if more than one device is detected by adb. e.g. adb devices reveals a phone AND a AFTV. <p>
 <p>
+
+<p>
+The <b>"SFTP"</b> button opens an sftp client connection to the Fire TV. For Windows it's PuTTY SFTP, which is pre-installed. For OS X and Linux adbFire starts the native sftp client.<p>
+<p>
+<p>
+The <b>"SSH"</b> button opens an ssh client connection to the Fire TV. For Windows it's PuTTY SSH, which is pre-installed. For OS X and Linux adbFire starts the native ssh client.<p>
+<p>
+
 <u><b>Menu items</b></u>
 <p>
 <u><b>About</b></u> Version information and home URL.
@@ -155,11 +163,13 @@ Removes BusyBox from your system.
 <p>
 <b><u>Install SSH</b></u><br>
 This option installs the Dropbear SSH server on your device. This allows you to open a secure shell on your Fire TV, somewhat like adb shell. Among many other things, it allows you to copy files to your device as root using the scp command and act as a backup entryway into your system in the case of a problem with adb. <p>
+The sftp option is also present, which allows an ftp-like connection to the Fire TV<p>
 SSH can be made persistant by checking the "SSH at boot" option in adbFire's preferences dialog. If you choose not to start SSH at boot it can be started and stopped via the command line:<p> Press "ADB Shell" then enter the command "sshstart password" where 'password' is the password you want SSH to use. <p>Stopping SSH is done via the command "sshstop", and you can find SSH's status with the command: "sshstatus".
-<p>Windows users will want to download the puTTY client, OS X and Linux users have default ssh clients.
+<p>For Windows users the puTTY ssh/sftp clients are pre-installed, OS X and Linux users have default ssh/sftp clients.
 <p>
-<b><u>Uninstall Busybox</b></u><br>
+<b><u>Uninstall SSH</b></u><br>
 Removes SSH from your system.<p>
+
 <b><u>Install AFTV firmware</b></u><br>
 Install firmware to  AFTV. Upgrade (or downgrade) your AFTV firmware. This works for firmware on a mounted USB drive/stick and for firmware on your PC.<p>When updating firmware from USB storage, adbFire looks on all devices for files with an extension of ".bin" or ".zip" and presents them for your choice.<p>
 Installing firmware from a usb stick/drive is nearly twice as fast as installing a firmware file located on your PC or LAN.<p>

@@ -96,6 +96,10 @@ private slots:
 
     void on_actionUninstall_SSH_triggered();
 
+    void on_puttyButton_clicked();
+
+    void on_sftpButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 

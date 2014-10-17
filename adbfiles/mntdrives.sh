@@ -22,8 +22,8 @@ for f in /dev/block/sd??; do
 
 
 
-  if [[ $mountType == "exfat" ]]; then
-        mount.exfat-fuse $f $storage/$drive
+  if [[ $mountType == "exfat" ]] then
+        mount.exfat-fuse -o rw $f $storage/$drive
   fi
 
   if [[ $mountType == "vfat" ]]; then
@@ -36,7 +36,7 @@ for f in /dev/block/sd??; do
   fi
   
   if [[ $mountType == "ext4" ]] || [[ $mountType == "ext3" ]] || [[ $mountType == "ext2" ]]; then
-  	busybox mount -t auto -o rw  $f $storage/$drive
+        busybox mount -t  auto -o rw  $f $storage/$drive
         chmod 777 $storage/$drive
   fi
 

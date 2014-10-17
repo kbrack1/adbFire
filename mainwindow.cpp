@@ -5069,7 +5069,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
 
 
-   cstring = adb + " -s " + daddr + port + " push "+adbdir+ "/jocala.tar /sdcard/";
+   cstring = adb + " -s " + daddr + port + " push "+adbdir+ "/ssh.tar /sdcard/";
    command=RunProcess(cstring);
 
 
@@ -5078,7 +5078,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
                    this,
                    "",
                    "SSH install failed");
-       logfile("jocala.tar: ssh install failed ");
+       logfile("ssh.tar: ssh install failed ");
        logfile(cstring);
        logfile(command);
        ui->progressBar->setHidden(true);
@@ -5087,20 +5087,20 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
    mount_system("rw");
 
-   cstring = adb + " -s " + daddr+port + " shell su -c tar xf /sdcard/jocala.tar -C /data";
+   cstring = adb + " -s " + daddr+port + " shell su -c tar xf /sdcard/ssh.tar -C /data";
    command=RunProcess(cstring);
 
    logfile(cstring);
    logfile(command);
 
-cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/jocala.tar";
+cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/ssh.tar";
 command=RunProcess(cstring);
 
 logfile(cstring);
 logfile(command);
 
 
-cstring = adb + " -s " + daddr+port + " shell su -c /data/jocala/setupssh";
+cstring = adb + " -s " + daddr+port + " shell su -c /data/jocala/ssh/setupssh";
 command=RunProcess(cstring);
 
 logfile(cstring);
@@ -5262,5 +5262,220 @@ void MainWindow::on_actionUninstall_SSH_triggered()
 
 
      mount_system("ro");
+
+}
+
+/////////////////////////////////////////////////////////////////////////
+void MainWindow::on_puttyButton_clicked()
+{
+
+
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+
+
+    if (!is_su())
+       { QMessageBox::critical(
+             this,
+             "",
+             "Root required!");
+          return;
+    }
+
+
+    QString cstring = "";
+    QString command = "";
+
+    cstring = adb + " -s " + daddr + port + " shell sshstatus";
+    command=RunProcess(cstring);
+
+
+    if (command.contains("not found"))
+       { QMessageBox::critical(
+                    this,
+                    "",
+                    "SSH not installed");
+
+
+        return;
+       }
+
+
+
+
+
+
+    logfile("detaching console process");
+
+
+
+    if (os == 1)
+
+       {
+        cstring = "./psftp.exe root@"+daddr;
+        cstring = "./putty.exe -ssh "+daddr;
+       QProcess::startDetached(cstring);
+       }
+
+
+     else
+
+       {
+
+
+         QString commstr = adbdir+"console.sh";
+         QFile file(commstr);
+
+             if(!file.open(QFile::WriteOnly |
+                           QFile::Text))
+             {
+
+
+
+                 logfile("error creating console.sh!");
+                 QMessageBox::critical(this,"","Error creating command file!");
+                 return;
+             }
+
+
+
+             QTextStream out(&file);
+             out  << "#!/bin/sh" << endl;
+             out  <<  "ssh root@"+daddr  << endl;
+
+
+             file.flush();
+             file.close();
+
+       cstring = "chmod 0755 " + commstr ;
+       command=RunProcess(cstring);
+
+      //  cstring = "gnome-terminal -e "+adbdir+"console.sh";
+      //  cstring = "x-terminal-emulator -e "+adbdir+"console.sh";
+
+       if (os == 0)
+         cstring = "x-terminal-emulator -e "+adbdir+"console.sh";
+       if (os == 2)
+        cstring = "open -a Terminal.app "+adbdir+"console.sh";
+
+
+
+        QProcess::startDetached(cstring);
+        }
+
+
+}
+
+//////////////////////////////////////////////////////////////////////
+void MainWindow::on_sftpButton_clicked()
+{
+
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+
+    if (!is_su())
+       { QMessageBox::critical(
+             this,
+             "",
+             "Root required!");
+          return;
+    }
+
+
+
+    QString cstring = "";
+    QString command = "";
+
+    cstring = adb + " -s " + daddr + port + " shell sshstatus";
+    command=RunProcess(cstring);
+
+
+    if (command.contains("not found"))
+       { QMessageBox::critical(
+                    this,
+                    "",
+                    "SSH not installed");
+
+
+        return;
+       }
+
+
+
+
+
+    logfile("detaching ssh process");
+
+
+
+
+    if (os == 1)
+
+       {
+        cstring = "./psftp.exe root@"+daddr;
+       QProcess::startDetached(cstring);
+       }
+
+
+     else
+
+       {
+
+
+         QString commstr = adbdir+"sftp.sh";
+         QFile file(commstr);
+
+             if(!file.open(QFile::WriteOnly |
+                           QFile::Text))
+             {
+
+
+
+                 logfile("error creating sftp.sh!");
+                 QMessageBox::critical(this,"","Error creating command file!");
+                 return;
+             }
+
+
+
+             QTextStream out(&file);
+             out  << "#!/bin/sh" << endl;
+             out  << "sftp root@"+daddr  << endl;
+
+
+             file.flush();
+             file.close();
+
+       cstring = "chmod 0755 " + commstr ;
+      command=RunProcess(cstring);
+
+
+
+       if (os == 0)
+         cstring = "x-terminal-emulator -e "+adbdir+"sftp.sh";
+       if (os == 2)
+        cstring = "open -a Terminal.app "+adbdir+"sftp.sh";
+
+
+
+        QProcess::startDetached(cstring);
+        }
+
 
 }

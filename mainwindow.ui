@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>564</width>
-    <height>571</height>
+    <width>620</width>
+    <height>565</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -136,7 +136,7 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>390</x>
       <y>200</y>
       <width>161</width>
       <height>171</height>
@@ -241,7 +241,7 @@
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>50</x>
       <y>150</y>
       <width>231</width>
       <height>71</height>
@@ -286,7 +286,7 @@
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>400</x>
       <y>40</y>
       <width>131</width>
       <height>141</height>
@@ -301,7 +301,7 @@
        <x>10</x>
        <y>30</y>
        <width>104</width>
-       <height>89</height>
+       <height>92</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -347,8 +347,8 @@
    <widget class="QPushButton" name="donate">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>440</y>
+      <x>410</x>
+      <y>420</y>
       <width>150</width>
       <height>50</height>
      </rect>
@@ -369,8 +369,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>410</y>
+      <x>400</x>
+      <y>390</y>
       <width>181</width>
       <height>16</height>
      </rect>
@@ -411,10 +411,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>50</x>
       <y>240</y>
       <width>285</width>
-      <height>204</height>
+      <height>242</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -480,6 +480,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="sftpButton">
+         <property name="text">
+          <string>SFTP</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -541,6 +548,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="puttyButton">
+         <property name="text">
+          <string>SSH</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
@@ -551,8 +565,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>564</width>
-     <height>20</height>
+     <width>620</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

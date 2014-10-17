@@ -1,2 +1,3 @@
 #!/system/bin/sh
-/system/xbin/sshstart z
+/system/xbin/sshstart password
+
