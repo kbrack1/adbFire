@@ -50,7 +50,7 @@
 int os=2;
 #endif
 
-const QString version = "1.09";
+const QString version = "1.10";
 
 bool isConnected = false;
 bool serverRunning = false;

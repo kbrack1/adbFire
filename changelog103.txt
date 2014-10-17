@@ -1,8 +1,0 @@
-adbFire 1.03 changelog
-
-USB drives/sticks now mount at /storage/usb/sd*
-Firmware install searches all /storage/usb/sd* for .bin and .zip files.
-USB Firmware install, Pull and Delete dialogs now utilize a file browser.
-Help system updated to reflect changes.
-
-

@@ -96,7 +96,6 @@ private slots:
 
     void on_actionUninstall_SSH_triggered();
 
-
 private:
     Ui::MainWindow *ui;
 

@@ -1,0 +1,17 @@
+<keymap>
+        <global>
+                <keyboard>
+                        <key id="61656">ContextMenu</key>
+                        <key id="61467">Back</key>
+                        <key id="61637">FastForward</key>
+                        <key id="61636">Rewind</key>
+                        <backspace>PreviousMenu</backspace>
+                </keyboard>
+        </global>
+        <FullscreenVideo>
+                <keyboard>
+                        <next_track>StepForward</next_track>
+                        <prev_track>StepBack</prev_track>
+                </keyboard>
+        </FullscreenVideo>
+</keymap>

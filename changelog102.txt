@@ -1,8 +1,0 @@
-adbFire 1.02 changelog
-
-addition of ntfs-3g for mounting ntfs media
-addition of mount.exfat-fuse for mounting exfat media
-addition of mounting for ext2,ext3,ext4 media
-mount now addresses all connected USB media, not just /dev/block/sda
-edit of help file to reflect mount changes
-screen shots saved to unique filename

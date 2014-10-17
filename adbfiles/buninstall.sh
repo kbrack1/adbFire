@@ -27,6 +27,9 @@ rm /system/xbin/buninstall.sh
 rm /system/xbin/ntfs-3g
 rm /system/xbin/mount.exfat-fuse
 rm /system/xbin/mntdrives.sh
+rm dropbear*
+rm rsync
+rm dbclient
 rm -r /system/etc/init.d
 rm -r /data/jocala
 
