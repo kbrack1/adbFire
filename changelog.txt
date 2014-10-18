@@ -1,13 +1,230 @@
-http://jocala.com/adbfire.html
+adbFire 1.10 changelog
+=======================
 
-adbFire Beta 4 changelog
+All XBMC options are now non-root.
+
+SSH completely updated to new build
+
+SFTP added
+
+SSH and SFTP buttons added. PuTTY SSH & SFTP
+now included for Windows users.  
+
+Help updated for SSH
+
+various minor bugs fixed, forms adjusted, etc.
+
+
+adbFire 1.09 changelog
+=======================
+
+Llama dialog options fixed to work with non-root users.
+
+Clockwork Mod Recovery updated to 6.0.5.1.2.
+
+Scripting at boot changed to init.d system.
+
+SSH server option added.
+
+Windows adb shell keyboard bug fixed.
+
+Menu structure changed: Files menu contains 'universal' 
+functions, Root menu contains root-only functions.
+ 
+various minor bugs fixed, forms adjusted, etc.
+
+adbFire 1.08 changelog
+=======================
+
+Llama options changed to require ikonoTV rather than Classic TV
+due to geographic restrictions. Classic TV is only available in the US.
+
+adbFire check for Amazon Updates now operates in realtime,
+rather than depending on a database field. 
+
+adbFire check for USB drive persistence now operates in realtime,
+rather than depending on a database field. 
+
+Database fields for USB drive persistence and Amazon Updates removed.
+
+Linux bug installed apks not displayed in uninstall dialog fixed.
+
+Firmware installaton recovery directory not found bug fixed.
+
+Support for CWM recovery installation re-coded. Images:
+
+firetv-cwm_recovery-6.0.5.1.1.img 
+recovery-stock-51.1.0.img 
+
+are now included with adbFire 1.08 with permission from rbox.
+
+Help re-written for firmware and recovery installation.
+
+various minor bugs fixed, forms adjusted, etc.
+
+
+adbFire 1.07 changelog
+=======================
+Qt framework updated to 5.3.2
+
+Linux bug for file selection on usb devices fixed.
+
+Support for CWM recovery installation added.
+
+various minor bugs fixed, forms adjusted, etc.
+
+Help expanded.
+ 
+adbFire 1.06 changelog
+=======================
+
+The Windows adbFire folder can now be installed
+wherever you wish.  It has been tested under Windows 7
+and XP. Shortcuts to adbFire.exe  work as expected. 
+
+The adbFire folder is  where all files needed by adbFire.exe
+kept. This folder holds adb.exe, scripts and various other files,
+in addition to the adbFire.exe program. 
+
+Samba networking has been added. Click  "Mount" and after your
+usb storage mounts, it's exported via samba. Your /sdcard folder
+is exported as well. The server name is adbfire and the exports 
+are /usb and /sdcard. Samba is persistent between boots if you 
+check mounting to be persistent. 
+
+In testing the adbfire server and exported folders /sdcard and /usb
+are visible to Windows XP and 7, OS X Mavericks and Linux Mint. Drag
+and drop and other file management work as expected between the FireTV
+and clients on the network. 
+
+Credits and links provided for all helper programs.
+
+
+various minor bugs fixed, forms adjusted, etc.
+
+Help expanded.
+
+adbFire 1.05 changelog
+=======================
+
+Both the Windows version and the OS X version can now be installed
+wherever you wish.  
+
+The Windows version of adbFire ships with a folder, named 
+adbfiles. You can install the adbFire.exe program wherever
+you wish, as long as the adbfiles folder is installed there also.
+
+The adbfiles folder is  where all files needed by adbFire.exe
+kept. This folder holds adb.exe, scripts and various other files. 
+
+The OS X version of adbFire, adbFire.app is usually installed to
+the /Application folder on your Mac. However you can move it
+wherever you like. The Mac version of adbFire also has an adbfiles
+folder, but it's inside the adbFire.app bundle.
+
+adbFire now includes Llama, with permission from the developer at
+KebabApps.com. Llama allows us to:
+
+1. Boot AFTV directly to XBMC
+
+2. Connect XBMC to the Classic TV app. This allows starting XBMC from
+AFTV's upper level menus.
+
+3. Both of the above.
+
+The option to change the Classic TV icon to an XBMC or Kodi icon is
+included. This can also be reversed, restoring the Default Classic TV icon.
+
+
+The Preferences dialog has changed. If you open the 
+preferences dialog then exit without changes,  the
+"updates disabled/enabled" pop-up dialog is suppressed.  
+
+adbFire can now check for updates when it starts, and open
+the adbFire page to download the new version if desired.
+This option is on by default, but can be turned off in
+Preferences.
+
+Preferences also has a "Check for updates" button. 
+
+A dedicated button to change the XBMC splash screen has been added.
+This was previously possible using the "adb push" button, selecting the
+destination folder "media", but there have been requests for a 
+dedicated button. Elmerhuso's XBMC splash screen and a Kodi splash
+screen are included, and of course you can add your own. Drop them
+into the "splash" folder.  
+
+Clickable URL links are now included. Links include adbFire's home
+page, jocala.com/adbfire.html, the XBMC wiki, and links to the forum
+topics where adbFire is supported, xda and xbmc. 
+
+version number changed to constant. 
+
+Help expanded.
+
+adbFire 1.04 changelog
+=======================
+
+Extensive log file now produced after each run.
+Function duration times recorded.
+XBMC restore bug fixed (restore prevented when XBMC running).
+Code calling external processes refactored for greater efficiency.
+Busybox install bug fixed (post-install file cleanup).
+Busybox uninstall bug fixed (post-uninstall file cleanup).
+USB unmounting tuned for multiple drives.
+ 
+adbFire 1.03 changelog
+
+USB drives/sticks now mount at /storage/usb/sd*
+Firmware install searches all /storage/usb/sd* for .bin and .zip files.
+USB Firmware install, Pull and Delete dialogs now utilize a file browser.
+Help system updated to reflect changes.
+
+
+adbFire 1.02 changelog
+
+addition of ntfs-3g for mounting ntfs media
+addition of mount.exfat-fuse for mounting exfat media
+addition of mounting for ext2,ext3,ext4 media
+mount now addresses all connected USB media, not just /dev/block/sda
+edit of help file to reflect mount changes
+screen shots saved to unique filenameadbFire 1.01 changelog
+
+adbFire 1.01 changelog
+=======================
+
+AFTV Firmware upgrade/downgrade
+
+USB /dev/block/sda1 drive/stick mounting with
+optional persistence
+
+Form redesign to support new features
+
+Screen shots are now saved to pull folder
+
+Help file update for new features
+
+bug cleanup in win32 file deletion routines
+
+=========================
+
+adbFire V1.0 changelog
 
 Fix for OS X Fire TV root
-
-Addition of support for XBMC forks
-
-
-
+Application home directory change: “adbFire”
+Addition of preferences dialog 
+Addition of support for XBMC forks (BeyondXBMC, XBMCLauncher, etc)
+Pulled files folder preference
+Addition of /sdcard/ to list of push/pull folders
+Addition of file deletion
+Towelroot and SuperSU updated
+Database error checks
+Reboot Device
+Reboot Recovery
+Fire TV updates off/on
+Mount /system  partition rw/ro
+Take screen shots
+Install/Uninstall Busybox
 Help file additions
 
 
