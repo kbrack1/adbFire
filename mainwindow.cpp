@@ -50,7 +50,7 @@
 int os=2;
 #endif
 
-const QString version = "1.10";
+const QString version = "1.11";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -212,10 +212,10 @@ QString RunProcess(QString cstring)
 bool is_su()
 {
 
-QString cstring = adb + " shell su -c find /system/xbin -name su";
+QString cstring = adb + " shell ls /system/xbin/su";
 QString command=RunProcess(cstring);
 
-if (command.isEmpty())
+if (command.contains("No such file or directory"))
    {
     logfile(cstring);
     logfile("su not found");
@@ -2050,41 +2050,57 @@ void MainWindow::on_actionPreferences_triggered()
     oldpass = sshpassword;
 
 
-    cstring = adb + " -s " + daddr+port + " shell su -c ls /system/etc/init.d/02sshd";
-    command=RunProcess(cstring);
-
-   logfile(cstring);
-   logfile(command);
-
-   if (command.contains("No such file or directory"))
-      {
-       sshcheck = false;
-      }
-    else
-   {
-    sshcheck = true;
-   }
-
-
-
-   cstring = adb + " -s " + daddr+port + " shell pm list packages -d";
-     command=RunProcess(cstring);
-
-    logfile(cstring);
-    logfile(command);
-
-    if (command.contains("package:com.amazon.dcp"))
+    if (is_su())
        {
-        ui->update_status->setText(amazon_update0);
-        updatecheck = false;
+        cstring = adb + " -s " + daddr+port + " shell su -c ls /system/etc/init.d/02sshd";
+        command=RunProcess(cstring);
+
+       logfile(cstring);
+       logfile(command);
+
+       if (command.contains("No such file or directory"))
+          {
+           sshcheck = false;
+          }
+        else
+       {
+        sshcheck = true;
        }
 
-    else
 
-    {
-     ui->update_status->setText(amazon_update1);
-     updatecheck = true;
+       cstring = adb + " -s " + daddr+port + " shell pm list packages -d";
+         command=RunProcess(cstring);
+
+        logfile(cstring);
+        logfile(command);
+
+        if (command.contains("package:com.amazon.dcp"))
+           {
+            ui->update_status->setText(amazon_update0);
+            updatecheck = false;
+           }
+
+        else
+
+        {
+         ui->update_status->setText(amazon_update1);
+         updatecheck = true;
+        }
+
     }
+
+ else
+
+  {
+
+    sshcheck = false;
+    updatecheck = true;
+    }
+
+
+
+
+
 
 
 
@@ -2131,6 +2147,12 @@ void MainWindow::on_actionPreferences_triggered()
 
   if (isConnected)
   {
+
+
+
+
+ if (is_su())
+    {
 
 
       if (!sshcheck)
@@ -2284,12 +2306,7 @@ void MainWindow::on_actionPreferences_triggered()
 
       }
 
-
-   // QString s = QString::number(updatecheck);
-   // QMessageBox::information(this,"",s);
-
-
-
+}
 
       if (updatecheck != currentupdate) //  has update pref changed
    {
@@ -4181,7 +4198,9 @@ void MainWindow::on_fpullButton_clicked()
              return;
           }
 
-     cstring = adb + " shell su -c find " +xpath+ " -type f ";
+     // cstring = adb + " shell find " +xpath+ " -type f ";
+
+     cstring = adb + " shell ls " +xpath;
      QString command=RunProcess(cstring);
 
 
@@ -4239,7 +4258,7 @@ void MainWindow::on_fpullButton_clicked()
      timer->start(tsvalue);
 
 
-             cstring = adb + " -s " + daddr + port +  " pull "+fileName+" "+pulldir;
+             cstring = adb + " -s " + daddr + port +  " pull "+xpath+fileName+" "+pulldir;
              command=RunProcess(cstring);
 
 
@@ -5320,8 +5339,7 @@ void MainWindow::on_puttyButton_clicked()
     if (os == 1)
 
        {
-        cstring = "./psftp.exe root@"+daddr;
-        cstring = "./putty.exe -ssh "+daddr;
+        cstring = "./putty.exe -ssh root@"+daddr;
        QProcess::startDetached(cstring);
        }
 

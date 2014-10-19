@@ -1,3 +1,14 @@
+adbFire 1.11 changelog
+=======================
+
+All XBMC options are now non-root.
+(hopefully)
+
+SSH helper apps updated.
+
+various minor bugs fixed, forms adjusted, etc.
+
+
 adbFire 1.10 changelog
 =======================
 
