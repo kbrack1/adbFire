@@ -2,4 +2,5 @@ adbFire.pro.user*
 adbfire.log
 adbfire.log.old
 adbfire.db
+*.autosave
 *~

@@ -1,3 +1,49 @@
+adbFire 1.14 changelog
+=======================
+
+Help system completely rebuilt.
+Opens with alphabetized menu of
+links to individual topics. 
+
+Rbox's CWM Recovery updated to 6.0.5.1.4
+
+Rbox's Bootloader lock/unlock added.
+
+Full Kodi support added. 
+
+Swap /data to external drive added.
+This feature allows you to use any
+USB flash storage device as the 
+FireTV's /data partition, giving
+you unlimited space for games,apps
+etc. This drive mounts by UUID. It
+does not depend on a fixed device
+location (/dev/block/sda1, etc).
+
+External drive mounting via UUID added.
+When you are mounting multiple drives
+there is no guarantee that the original
+device name (/dev/block/sda1, etc) will
+remain the same. Mounting by UUID insures
+that your drives mount in the same place
+every time. 
+
+Progress bar updater fine-tuned.  
+
+Various minor bugs fixed, forms adjusted, etc.
+
+
+adbFire 1.12 changelog
+=======================
+
+Bug in XBMC file delete routine fixed
+
+CWM Recovery updated to 6.0.5.1.3
+
+Log file viewer added 
+
+various minor bugs fixed, forms adjusted, etc.
+
 adbFire 1.11 changelog
 =======================
 
@@ -7,6 +53,7 @@ All XBMC options are now non-root.
 SSH helper apps updated.
 
 various minor bugs fixed, forms adjusted, etc.
+
 
 
 adbFire 1.10 changelog
@@ -237,7 +284,6 @@ Mount /system  partition rw/ro
 Take screen shots
 Install/Uninstall Busybox
 Help file additions
-
 
 
 

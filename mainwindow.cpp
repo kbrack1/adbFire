@@ -37,6 +37,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QtNetwork/QNetworkInterface>
+#include <adblogdialog.h>
 
 // #include <QDebug>
 
@@ -50,7 +51,7 @@
 int os=2;
 #endif
 
-const QString version = "1.11";
+const QString version = "1.14";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -130,16 +131,16 @@ void rotate_logfile()
 
 {
 
- QFile file(adbdir+"adbfire.log.old");
+ QFile file(adbdir+"adbfire.old.log");
 
  if( file.exists() )
-     QFile::remove(adbdir+"adbfire.log.old");
+     QFile::remove(adbdir+"adbfire.old.log");
 
 
 QFile file2(adbdir+"adbfire.log");
 
 if( file2.exists() )
-    file2.rename(adbdir+"adbfire.log.old");
+    file2.rename(adbdir+"adbfire.old.log");
 
 
 }
@@ -977,7 +978,17 @@ void MainWindow::on_actionQuit_triggered()
 void MainWindow::TimerEvent()
 {
   int value = ui->progressBar->value();
+
+  if (value >= 100)
+      {
+         value = 0;
+         ui->progressBar->reset();
+     }
+
+
   ui->progressBar->setValue(value+1);
+
+  // zzzz
 }
 
 
@@ -1208,7 +1219,7 @@ void MainWindow::on_connButton_clicked()
           ui->update_status->setText(amazon_update1);
 
 
-         cstring = adb + " -s " + daddr + port +  " shell ls /etc/init.d/01mountusb";
+         cstring = adb + " -s " + daddr + port +  " shell ls /etc/init.d/01mntdrives";
          command=RunProcess(cstring);
 
 
@@ -1391,7 +1402,7 @@ void MainWindow::on_backupButton_clicked()
       { QMessageBox::critical(
             this,
             "",
-            "XBMC not installed");
+            "Kodi not installed");
          return;
    }
 
@@ -1614,36 +1625,45 @@ void MainWindow::on_fpushButton_clicked()
 
  QString xpath = "";
 
+ QString hidden;
+
+
+ if (xbmcpackage.contains(".kodi"))
+    hidden=".kodi";
+  else
+      hidden=".xbmc";
+
+
 
  QString cname = ui->comboBox->currentText();
 
 switch(ui->comboBox->currentIndex() ){
 case 0:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
 break;
 
 case 1:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps";
 break;
 
 case 2:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
 break;
 
 case 3:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/sounds/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/sounds/";
 break;
 
 case 4:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/.xbmc/system/";
+xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/"+hidden+"/system/";
 break;
 
 case 5:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/";
 break;
 
 case 6:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/temp/";
 break;
 
 case 7:
@@ -1651,7 +1671,7 @@ xpath = "/sdcard/";
 break;
 
 default:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
 break;
 }
 
@@ -1663,7 +1683,7 @@ if (xpath != "/sdcard/")
      { QMessageBox::critical(
            this,
            "",
-           "XBMC not installed");
+           "Kodi not installed");
        logfile("xbmc not installed. cant push to it.");
         return;
      }
@@ -1688,9 +1708,9 @@ if (xpath != "/sdcard/")
        { QMessageBox::critical(
                       this,
                      "",
-                      "Destination path missing. Has XBMC had its first run to set up internal folders?");
+                      "Destination path missing. Has Kodi had its first run to set up internal folders?");
           logfile(xpath);
-          logfile("Destination path missing. Has XBMC had its first run to set up internal folders?");
+          logfile("Destination path missing. Has Kodi had its first run to set up internal folders?");
           return;
       }
 
@@ -1768,7 +1788,7 @@ void MainWindow::on_restoreButton_clicked()
       { QMessageBox::critical(
             this,
             "",
-            "XBMC not installed");
+            "Kodi not installed");
          return;
    }
 
@@ -1809,7 +1829,7 @@ void MainWindow::on_restoreButton_clicked()
 
 
  QMessageBox::StandardButton reply;
-   reply = QMessageBox::question(this, "Restore", "Restore XBMC from "+dir+"\n"+"\n"+"This will overwrite the existing setup!",
+   reply = QMessageBox::question(this, "Restore", "Restore Kodi from "+dir+"\n"+"\n"+"This will overwrite the existing setup!",
                                  QMessageBox::Yes|QMessageBox::No);
    if (reply == QMessageBox::Yes) {
 
@@ -1880,12 +1900,19 @@ void MainWindow::on_pushRemote_clicked()
       { QMessageBox::critical(
             this,
             "",
-            "XBMC not installed");
+            "Kodi not installed");
          return;
    }
 
 
-QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps/";
+   QString hidden;
+
+   if (xbmcpackage.contains(".kodi"))
+      hidden=".kodi";
+    else
+        hidden=".xbmc";
+
+QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps/";
 
 QElapsedTimer rtimer;
 int nMilliseconds;
@@ -2594,27 +2621,14 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
     logfile("starting busybox install");
 
-    QString busybox1  = adbdir+"binstall.sh";
-    QString busybox2 = adbdir+"buninstall.sh";
-    QString busybox3 = adbdir+"busybox";
-    QString busybox4 = adbdir+"ntfs-3g";
-    QString busybox5 = adbdir+"mount.exfat-fuse";
-    QString busybox6 = adbdir+"mntdrives.sh";
-    QString busybox7 = adbdir+"samba.tar";
-    QString busybox8 = adbdir+ "install-recovery-2.sh";
-    QString busybox9 = adbdir+"install-recovery.sh";
 
-/*
-        bool file1 = false;
-        bool file2 = false;
-        bool file3 = false;
-        bool file4 = false;
-        bool file5 = false;
-        bool file6 = false;
-        bool file7 = false;
-        bool file8 = false;
-        bool file9 = false;
-*/
+    QString busybox1 = adbdir+"busybox";
+    QString busybox2 = adbdir+"samba.tar";
+    QString busybox3 = adbdir+ "install-recovery-2.sh";
+    QString busybox4 = adbdir+"install-recovery.sh";
+    QString busybox5 = adbdir+"xbin.tar";
+
+
 
      QFile Fout1(busybox1);
 
@@ -2690,65 +2704,6 @@ void MainWindow::on_actionInstall_busybox_triggered()
            ui->progressBar->setHidden(true);
             return;
           }
-
-
-      QFile Fout6(busybox6);
-
-      if(!Fout6.exists())
-         {
-
-           QMessageBox::critical(
-            this,
-            tr("adbFire"),
-             busybox6+" not found.");
-           logfile(busybox6+" not found.");
-           ui->progressBar->setHidden(true);
-            return;
-          }
-
-
-      QFile Fout7(busybox7);
-
-      if(!Fout7.exists())
-         {
-
-           QMessageBox::critical(
-            this,
-            tr("adbFire"),
-             busybox7+" not found.");
-             logfile(busybox7+" not found.");
-           ui->progressBar->setHidden(true);
-            return;
-          }
-
-      QFile Fout8(busybox8);
-
-      if(!Fout8.exists())
-         {
-
-           QMessageBox::critical(
-            this,
-            tr("adbFire"),
-             busybox8+" not found.");
-             logfile(busybox8+" not found.");
-           ui->progressBar->setHidden(true);
-            return;
-          }
-
-      QFile Fout9(busybox9);
-
-      if(!Fout9.exists())
-         {
-
-           QMessageBox::critical(
-            this,
-            tr("adbFire"),
-             busybox9+" not found.");
-             logfile(busybox9+" not found.");
-           ui->progressBar->setHidden(true);
-            return;
-          }
-
 
 
 
@@ -2858,134 +2813,13 @@ void MainWindow::on_actionInstall_busybox_triggered()
                  logfile(cstring);
                  logfile(command);
 
-                  cstring = adb + " -s " + daddr + port + " push "+busybox6+ " /sdcard/";
-                  command=RunProcess(cstring);
-
-                  if (!command.contains("bytes"))
-                     { QMessageBox::critical(
-                                  this,
-                                  "",
-                                  "file6: busybox install failed");
-
-                      logfile("file6: busybox install failed ");
-                      logfile(cstring);
-                      logfile(command);
-                      ui->progressBar->setHidden(true);
-                      return;
-                     }
-
-                  logfile(cstring);
-                  logfile(command);
-
-                  cstring = adb + " -s " + daddr + port + " push "+busybox7+ " /sdcard/";
-                  command=RunProcess(cstring);
-
-                  if (!command.contains("bytes"))
-                     { QMessageBox::critical(
-                                  this,
-                                  "",
-                                  "file7: busybox install failed");
-
-                      logfile("file7: busybox install failed ");
-                      logfile(cstring);
-                      logfile(command);
-                      ui->progressBar->setHidden(true);
-                      return;
-                     }
-
-                  logfile(cstring);
-                  logfile(command);
-
-
-                  cstring = adb + " -s " + daddr + port + " push "+busybox8+ " /sdcard/";
-                  command=RunProcess(cstring);
-
-                  if (!command.contains("bytes"))
-                     { QMessageBox::critical(
-                                  this,
-                                  "",
-                                  "file8: busybox install failed");
-
-                      logfile("file8: busybox install failed ");
-                      logfile(cstring);
-                      logfile(command);
-                      ui->progressBar->setHidden(true);
-                      return;
-                     }
-
-                  logfile(cstring);
-                  logfile(command);
-
-
-                  cstring = adb + " -s " + daddr + port + " push "+busybox9+ " /sdcard/";
-                  command=RunProcess(cstring);
-
-                  if (!command.contains("bytes"))
-                     { QMessageBox::critical(
-                                  this,
-                                  "",
-                                  "file9: busybox install failed");
-
-                      logfile("file9: busybox install failed ");
-                      logfile(cstring);
-                      logfile(command);
-                      ui->progressBar->setHidden(true);
-                      return;
-                     }
-
-
-                  logfile(cstring);
-                  logfile(command);
 
       mount_system("rw");
 
 
-     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/binstall.sh /system/xbin";
-     command=RunProcess(cstring);
-     
-     logfile(cstring);
-     logfile(command);
-
-     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/buninstall.sh /system/xbin";
-     command=RunProcess(cstring);
-     
-     logfile(cstring);
-     logfile(command);
-
      cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/busybox /system/xbin";
      command=RunProcess(cstring);
      
-     logfile(cstring);
-     logfile(command);
-
-     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/ntfs-3g /system/xbin";
-     command=RunProcess(cstring);
-
-     logfile(cstring);
-     logfile(command);
-
-     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/mount.exfat-fuse /system/xbin";
-     command=RunProcess(cstring);
-
-     logfile(cstring);
-     logfile(command);
-
-     cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/mntdrives.sh /system/xbin";
-     command=RunProcess(cstring);
-
-     logfile(cstring);
-     logfile(command);
-
-
-     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/binstall.sh";
-     command=RunProcess(cstring);
-
-     logfile(cstring);
-     logfile(command);
-
-     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/buninstall.sh";
-     command=RunProcess(cstring);
-
      logfile(cstring);
      logfile(command);
 
@@ -2995,23 +2829,46 @@ void MainWindow::on_actionInstall_busybox_triggered()
      logfile(cstring);
      logfile(command);
 
-     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/ntfs-3g";
+
+
+     cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/busybox tar xf /sdcard/xbin.tar -C /system";
      command=RunProcess(cstring);
 
+     logfile(cstring);
+     logfile(command);
+
+     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/*.sh";
+     command=RunProcess(cstring);
+
+     logfile(cstring);
+     logfile(command);
+
+     cstring = adb + " -s " + daddr+port + " shell su -c cp /system/xbin/mntdrives1.sh /system/xbin/mntdrives.sh";
+     command=RunProcess(cstring);
+
+     logfile(cstring);
+     logfile(command);
+
+     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/01mntdrives";
+     command=RunProcess(cstring);
+     logfile(cstring);
+     logfile(command);
+
+     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/02sshd";
+     command=RunProcess(cstring);
      logfile(cstring);
      logfile(command);
 
      cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/mount.exfat-fuse";
      command=RunProcess(cstring);
-
      logfile(cstring);
      logfile(command);
 
-     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/mntdrives.sh";
+     cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 /system/xbin/ntfs-3g";
      command=RunProcess(cstring);
-
      logfile(cstring);
      logfile(command);
+
 
      cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/binstall.sh";
      command=RunProcess(cstring);
@@ -3033,6 +2890,11 @@ void MainWindow::on_actionInstall_busybox_triggered()
         else
         {
 
+            cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/xbin.tar";
+            command=RunProcess(cstring);
+
+            logfile(cstring);
+            logfile(command);
 
             cstring = adb + " -s " + daddr+port + " shell su -c tar xf /sdcard/samba.tar -C /data/data";
             command=RunProcess(cstring);
@@ -3040,7 +2902,11 @@ void MainWindow::on_actionInstall_busybox_triggered()
             logfile(cstring);
             logfile(command);
 
+            cstring = adb + " -s " + daddr+port + " shell su -c ln -s /data/data/com.funkyfresh.samba/files/samba-rc /system/xbin/samba";
+            command=RunProcess(cstring);
 
+            logfile(cstring);
+            logfile(command);
 
          cstring = adb + " -s " + daddr+port + " shell su -c rm /sdcard/samba.tar";
          command=RunProcess(cstring);
@@ -3083,11 +2949,26 @@ void MainWindow::on_actionInstall_busybox_triggered()
          logfile(command);
 
 
+         cstring = adb + " -s " + daddr+port + " shell su -c cp /system/etc/init.bueller.sh  /system/etc/init.bueller.sh.old";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring = adb + " -s " + daddr+port + " shell su -c cp /system/xbin/init.bueller.sh  /system/etc/";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
          logfile(cstring);
          logfile(command);
          QMessageBox::information( this,"","Busybox installed!");
          logfile("busybox installed!");
          ui->progressBar->setHidden(false);
+
+
         }
 
 mount_system("ro");
@@ -3129,8 +3010,8 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
    QString command;
    QString cstring;
 
-   QString umntstring = "/system/xbin/umount /storage/usb/sd*/";
-   QString rmsd = "rm -r /storage/usb/sd*/";
+   QString umntstring = "/system/xbin/umount /storage/usb/drive*/";
+   QString rmsd = "rm -r /storage/usb/drive*/";
    QString rmsam = "rm -r /data/data/com.funkyfresh.samba/";
    QString rmsh = "rm /system/etc/install-recovery-2.sh";
 
@@ -3169,7 +3050,7 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
          logfile("busybox uninstall");
 
-         cstring = adb + " -s " + daddr+port + " shell su -c ls /storage/usb/sd\?\?/";
+         cstring = adb + " -s " + daddr+port + " shell su -c ls /storage/usb/drive*/";
          command=RunProcess(cstring);
 
        if (!command.contains("No such file or directory"))
@@ -3289,33 +3170,42 @@ void MainWindow::on_fdellButton_clicked()
      QString xpath = "";
      QString cname = ui->comboBox->currentText();
 
+
+     QString hidden;
+
+    if (xbmcpackage.contains(".kodi"))
+       hidden=".kodi";
+     else
+         hidden=".xbmc";
+
+
      switch(ui->comboBox->currentIndex() ){
      case 0:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
      break;
 
      case 1:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps/";
      break;
 
      case 2:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
      break;
 
      case 3:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/sounds/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/sounds/";
      break;
 
      case 4:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/system/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/system/";
      break;
 
      case 5:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/";
      break;
 
      case 6:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/temp/";
      break;
 
      case 7:
@@ -3323,7 +3213,7 @@ void MainWindow::on_fdellButton_clicked()
      break;
 
      default:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
      break;
      }
 
@@ -3336,7 +3226,7 @@ void MainWindow::on_fdellButton_clicked()
        { QMessageBox::critical(
              this,
              "",
-             "XBMC not installed");
+             "Kodi not installed");
          logfile(xpath);
          logfile("xbmc not installed, path not found");
           return;
@@ -3348,8 +3238,12 @@ void MainWindow::on_fdellButton_clicked()
   QString pullfile;
 
 
-  cstring = adb + " shell su -c find " +xpath+ " -type f ";
+  //cstring = adb + " shell su -c find " +xpath+ " -type f ";
+  //QString command=RunProcess(cstring);
+
+  cstring = adb + " shell ls " +xpath;
   QString command=RunProcess(cstring);
+
 
 
   if (command.isEmpty())
@@ -3403,9 +3297,14 @@ void MainWindow::on_fdellButton_clicked()
 
 
 
-             cstring = adb + " -s " + daddr + port +  " shell rm "+pullfile;
-             command=RunProcess(cstring);
+            // cstring = adb + " -s " + daddr + port +  " shell rm "+pullfile;
+           //  command=RunProcess(cstring);
              
+             cstring = adb + " -s " + daddr + port +  " shell rm "+xpath+pullfile;
+             command=RunProcess(cstring);
+
+
+
 
              if (command.contains("exist"))
               {
@@ -3951,6 +3850,8 @@ void MainWindow::on_umntButton_clicked()
    rtimer.start();
 
 
+
+
    QString cstring = adb + " -s " + daddr + port +  " shell ls /system/xbin/umount";
    QString command=RunProcess(cstring);
 
@@ -3965,8 +3866,17 @@ void MainWindow::on_umntButton_clicked()
      }
 
 
-    QString umntstring = "/system/xbin/umount /storage/usb/sd*/";
-    QString rmsd = "rm -r /storage/usb/sd*/";
+        ui->progressBar->setHidden(false);
+        ui->progressBar->setValue(0);
+
+        QTimer *timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+        timer->start(tsvalue);
+
+
+
+    QString umntstring = "/system/xbin/umount /storage/usb/*/";
+    QString rmsd = "rm -r /storage/usb/*/";
 
 
     mount_root("rw");
@@ -3981,7 +3891,7 @@ void MainWindow::on_umntButton_clicked()
        cstring = adb + " -s " + daddr+port + " shell su -c " + umntstring;
        command=RunProcess(cstring);
 
-
+        ui->progressBar->setHidden(true);
 
        if (command.contains("failed"))
          { logfile(cstring);
@@ -4002,6 +3912,8 @@ void MainWindow::on_umntButton_clicked()
 
  nMilliseconds = rtimer.elapsed();
  logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
 
 
 }
@@ -4144,33 +4056,40 @@ void MainWindow::on_fpullButton_clicked()
      QString fileName;
      QString cstring;
 
+     QString hidden;
+
+     if (xbmcpackage.contains(".kodi"))
+        hidden=".kodi";
+      else
+          hidden=".xbmc";
+
      switch(ui->comboBox->currentIndex() ){
      case 0:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
      break;
 
      case 1:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/keymaps/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps/";
      break;
 
      case 2:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
      break;
 
      case 3:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/sounds/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/sounds/";
      break;
 
      case 4:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/system/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/system/";
      break;
 
      case 5:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/userdata/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/";
      break;
 
      case 6:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/temp/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/temp/";
      break;
 
      case 7:
@@ -4179,7 +4098,7 @@ void MainWindow::on_fpullButton_clicked()
 
 
      default:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
      break;
      }
 
@@ -4190,7 +4109,7 @@ void MainWindow::on_fpullButton_clicked()
           { QMessageBox::critical(
                 this,
                 "",
-                "XBMC not installed");
+                "Kodi not installed");
 
             logfile("xbmc not installed");
             logfile("install xbmc for "+xpath);
@@ -4306,12 +4225,20 @@ void MainWindow::on_pushSplash_clicked()
       { QMessageBox::critical(
             this,
             "",
-            "XBMC not installed");
+            "Kodi not installed");
          return;
    }
 
 
-QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/.xbmc/media/";
+   QString hidden;
+
+   if (xbmcpackage.contains(".kodi"))
+      hidden=".kodi";
+    else
+        hidden=".xbmc";
+
+
+QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
 
 QElapsedTimer rtimer;
 int nMilliseconds;
@@ -4402,13 +4329,31 @@ void MainWindow::on_llamaButton_clicked()
     }
 
 
+    is_package(xbmcpackage);
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            "Kodi not installed");
+         return;
+   }
+
+
+   QString llamadir;
+
+   if (xbmcpackage.contains(".kodi"))
+      llamadir="kodillama";
+    else
+      llamadir="xbmcllama";
+
 
 
  QString llama = adbdir+"llama.apk";
  QString command;
  QString cstring;
  QString icontype;
- QString s = "";
+ QString str = "";
 
  bool classicTV = false;
  bool llamaInstall = false;
@@ -4548,7 +4493,7 @@ void MainWindow::on_llamaButton_clicked()
            else
            {
                isLlama = true;
-
+               str="Llama installed\n";
            }
 
        }
@@ -4567,7 +4512,7 @@ void MainWindow::on_llamaButton_clicked()
 
          if (llamaEvent == 1)
          {
-          cstring = adb + " push "+adbdir+"llama_boot /sdcard/Llama/";
+          cstring = adb + " push "+adbdir+llamadir+"/llama_boot /sdcard/Llama/";
           command=RunProcess(cstring);
           logfile(cstring);
           logfile(command);
@@ -4576,7 +4521,7 @@ void MainWindow::on_llamaButton_clicked()
 
        if (llamaEvent == 2)
          {
-           cstring = adb + " push "+adbdir+"llama_ctv /sdcard/Llama/";
+           cstring = adb + " push "+adbdir+llamadir+"/llama_ctv /sdcard/Llama/";
            command=RunProcess(cstring);
            logfile(cstring);
            logfile(command);
@@ -4586,7 +4531,7 @@ void MainWindow::on_llamaButton_clicked()
        if (llamaEvent == 3)
          {
 
-           cstring = adb + " push "+adbdir+"llama_both /sdcard/Llama";
+           cstring = adb + " push "+adbdir+llamadir+"/llama_both /sdcard/Llama";
            command=RunProcess(cstring);
            logfile(cstring);
            logfile(command);
@@ -4687,16 +4632,17 @@ else return;
 
 
        if (isLlama && llamaEvent < 4)
-          { s = "Llama settings applied.";
-            s = s + "\nPlease run Llama and import settings from USB to activate!";
+          { str = str + "Llama settings applied.";
+            str = str + "\nPlease run Llama and import settings from USB to activate!";
           }
 
         if (ctvIcon < 4)
-           s = s + "\n"+icontype;
-
+           str = str + "\n"+icontype;
 
         if (ctvIcon < 4 || llamaEvent < 4 || llamaInstall)
-           QMessageBox::information(this,"",s);
+          {
+            QMessageBox::information(this,"",str);
+        }
 
 
 
@@ -4867,7 +4813,7 @@ void MainWindow::on_usbBox_clicked(bool checked)
 
 QString cstring;
 QString hashbang = "#!/system/bin/sh";
-QString filename = adbdir+"01mountusb";
+QString filename = adbdir+"01mntdrives";
 QString makepst = "/system/xbin/mntdrives.sh samba";
 
 cstring = adb + " -s " + daddr + port +  " shell su -c ls /system/xbin/mount";
@@ -4893,24 +4839,8 @@ if (command.contains("No such file or directory"))
 
         mount_system("rw");
 
-         cstring = adb + " -s " + daddr + port +  " push " +filename+ " /sdcard/";
-         command=RunProcess(cstring);
-         if (!command.contains("bytes"))
-              {
 
-
-                logfile(cstring);
-                logfile(command);
-                logfile("error pushing shell script to device!");
-
-                 QMessageBox::critical(this,"","Error pushing file frpm PC to device!");
-                 mount_system("ro");
-                 return;
-               }
-
-
-
-        cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /sdcard/01mountusb /system/etc/init.d";
+        cstring = adb + " -s " + daddr+port + " shell su -c cp " + " /system/xbin/01mntdrives /system/etc/init.d";
         QString command=RunProcess(cstring);
 
         if (!command.isEmpty())
@@ -4918,9 +4848,9 @@ if (command.contains("No such file or directory"))
 
                logfile(cstring);
                logfile(command);
-               logfile("file copy error, sdcard to system/etc");
+               logfile("file copy error, xbin to system/etc");
 
-               QMessageBox::critical(this,"","Error: cp /sdcard/01mountusb /system/etc/init.d failed");
+               QMessageBox::critical(this,"","Error: cp /system/xbin/01mntdrives /system/etc/init.d failed");
                 mount_system("ro");
                 return;
               }
@@ -4929,7 +4859,7 @@ if (command.contains("No such file or directory"))
         logfile(cstring);
         logfile(command);
 
-        cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/init.d/01mountusb";
+        cstring = adb + " -s " + daddr+port + " shell su -c chmod 0755 " + " /system/etc/init.d/01mntdrives";
         command=RunProcess(cstring);
 
         if (!command.isEmpty())
@@ -4937,9 +4867,9 @@ if (command.contains("No such file or directory"))
 
             logfile(cstring);
             logfile(command);
-            logfile("chmod error, system/etc/init.d/01mountusb");
+            logfile("chmod error, system/etc/init.d/01mntdrives");
 
-                QMessageBox::critical(this,"","Error: chmod of /system/etc/init.d/01mountusb failed");
+                QMessageBox::critical(this,"","Error: chmod of /system/etc/init.d/01mntdrives failed");
                 mount_system("ro");
                 return;
               }
@@ -4948,31 +4878,19 @@ if (command.contains("No such file or directory"))
         logfile(cstring);
         logfile(command);
 
-        cstring = adb + " -s " + daddr+port + " shell rm " + " /sdcard/01mountusb";
-       command=RunProcess(cstring);
-
-        if (!command.isEmpty())
-             {
-
-            logfile(cstring);
-            logfile(command);
-            logfile("error: rm /sdcard/01mountusb");
-
-              QMessageBox::critical(this,"","Error: rm of /sdcard/01mountusb failed");
-              }
 
 
-        cstring = adb + " -s " + daddr + port +  " shell ls /system/etc/init.d/01mountusb";
+        cstring = adb + " -s " + daddr + port +  " shell ls /system/etc/init.d/01mntdrives";
         command=RunProcess(cstring);
 
-        if (!command.contains("/system/etc/init.d/01mountusb"))
+        if (!command.contains("/system/etc/init.d/01mntdrives"))
              {
 
             logfile(cstring);
             logfile(command);
-            logfile("Error: /etc/init.d/01mountusb not created. USB drive is not persistent");
+            logfile("Error: /etc/init.d/01mntdrives not created. USB drive is not persistent");
 
-            QMessageBox::critical(this,"","Error: /etc/init.d/01mountusb not created. USB drive is not persistent");
+            QMessageBox::critical(this,"","Error: /etc/init.d/01mntdrives not created. USB drive is not persistent");
               }
 
          else
@@ -5497,3 +5415,291 @@ void MainWindow::on_sftpButton_clicked()
 
 
 }
+
+void MainWindow::on_actionView_Log_triggered()
+{
+
+
+    logfile("opening adblog dialog");
+
+     adblogDialog dialog;
+     dialog.setModal(true);
+     dialog.exec();
+
+
+}
+
+////////////////////////////////////////////////
+void MainWindow::on_actionSwap_data_triggered()
+{
+
+
+
+    QString cstring;
+    QString command;
+    QString uuid;
+    QString fileName;
+    bool worked = false;
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+   if (!is_su())
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+ logfile("swap /data to external ext4 drive");
+
+
+
+    logfile("swap routine started");
+
+
+          logfile("looking for drives");
+
+          cstring = adb + " shell su -c blkid /dev/block/sd* | grep ext4";
+          command=RunProcess(cstring);
+
+          if (command.isEmpty())
+             { QMessageBox::critical(this,"","No drives found");
+
+              logfile(cstring);
+              logfile("no drives found");
+              return;
+              }
+
+
+          logfile(cstring);
+          logfile(command);
+
+          QFile file21(adbdir+"temp.txt");
+
+            if(!file21.open(QFile::WriteOnly |
+                          QFile::Text))
+            {
+                QMessageBox::critical(this,"","Error creating drive file!");
+
+                logfile(cstring);
+                logfile(command);
+                logfile("error creating "+adbdir+ "drives temp.txt");
+                return;
+            }
+
+
+            QTextStream out1(&file21);
+            out1  << command << endl;
+
+            file21.flush();
+            file21.close();
+
+
+
+          usbfileDialog sddialog;
+          sddialog.setModal(true);
+          sddialog.setData("Select drive");
+          if(sddialog.exec() == QDialog::Accepted)
+          fileName = sddialog.binfileName();
+          else return;
+
+
+          if (fileName.isEmpty())
+             {
+              QMessageBox::critical(this,"","No drive selected");
+              logfile("no drive selected");
+              return;
+              }
+
+
+          QStringList driveElements = fileName.split(" ");
+
+          int r = driveElements.size();
+
+          if (r == 4)
+            uuid = driveElements[2];
+
+          if (r == 3)
+            uuid = driveElements[1];
+
+          if (r < 3 || r > 4)
+           { QMessageBox::critical(this,"","Unknown problem with this drive\nPlease check format");
+             return; }
+
+
+          QMessageBox::StandardButton reply2;
+            reply2 = QMessageBox::question(this, "", "Drive "+uuid+" selected.\n\nProceed with /data swap prep for this drive? This may be a lengthy process, depending on the amount of material on your Fire TV /data partition. \n\nA popup message will appear when prep is finished",
+                                          QMessageBox::Ok|QMessageBox::Cancel);
+            if (reply2 == QMessageBox::No)
+                return;
+
+
+            QElapsedTimer rtimer;
+            int nMilliseconds;
+            rtimer.start();
+
+
+            ui->progressBar->setHidden(false);
+            ui->progressBar->setValue(0);
+
+            QTimer *timer = new QTimer(this);
+            connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+            timer->start(tsvalue);
+
+
+         mount_system("rw");
+
+         cstring = adb + " shell su -c rm -r /system/temp";
+         command=RunProcess(cstring);
+
+         cstring = adb + " shell su -c mkdir /system/temp";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+         cstring = adb + " shell su -c busybox mount "+uuid+ " /system/temp";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+         cstring = adb + " shell su -c cp -av /data/. /system/temp/";
+         command=RunProcess(cstring);
+
+          logfile(cstring);
+          logfile(command);
+
+          cstring = adb + " shell su -c ls /system/temp/data/data";
+          command=RunProcess(cstring);
+
+          if (command.contains("No such file or directory"))
+           worked = true;
+           else
+           worked = false;
+
+           logfile(cstring);
+           logfile(command);
+
+          cstring = adb + " shell su -c busybox umount /system/temp/";
+          command=RunProcess(cstring);
+
+           logfile(cstring);
+           logfile(command);
+
+           cstring = adb + " shell su -c rm -r /system/temp/";
+           command=RunProcess(cstring);
+
+            logfile(cstring);
+            logfile(command);
+
+
+          cstring = adb + " shell su -c cp /system/xbin/mntdata.orig /system/xbin/mntdata.sh";
+          command=RunProcess(cstring);
+
+          logfile(cstring);
+          logfile(command);
+
+          cstring = adb + " shell su -c sed -i  's/fakeuuid/"+uuid+"/g' /system/xbin/mntdata.sh";
+          command=RunProcess(cstring);
+
+          logfile(cstring);
+          logfile(command);
+
+
+           ui->progressBar->setHidden(true);
+
+      if (worked)
+        {
+           QMessageBox::StandardButton reply3;
+             reply3 = QMessageBox::question(this, "", "Drive "+uuid+ "has been prepared to become /data when you reboot.\n\nWhen you reboot, you may see your screen go white or pixelated. This is temporary and does not not harm your devices.\n\nShould the reboot seem to go awry, simply disconnect the /data drive and reboot normally.\n\nReboot now?",
+                                           QMessageBox::Yes|QMessageBox::No);
+             if (reply3 == QMessageBox::Yes)
+                {
+                   ui->device_connected->setText(devstr2);
+                   mount_system("ro");
+                   rebootDevice(" reboot");
+                 }
+        }
+
+      else
+
+       {
+
+          QMessageBox::critical(this,"","Drive not properly prepared. Check logs and examine drive.");
+
+      }
+
+          mount_system("ro");
+
+
+          nMilliseconds = rtimer.elapsed();
+          logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+
+          return;
+
+
+
+
+    }
+
+
+/////////////////////////////////////////////////////////
+void MainWindow::on_actionUnlock_Bootloader_triggered()
+{
+
+    QString cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/aftv-unlock unlock";
+    QString command=RunProcess(cstring);
+
+         if (command.contains("All done"))
+            {
+             QMessageBox::information(this,"","Bootloader unlocked");
+             }
+
+         else
+
+         {
+             QMessageBox::critical(this,"","Bootloader NOT unlocked");
+         }
+
+         logfile(cstring);
+         logfile(command);
+
+
+}
+
+////////////////////////////////////////////////////
+void MainWindow::on_actionLock_Bootloader_triggered()
+{
+
+    QString cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/aftv-unlock lock";
+    QString command=RunProcess(cstring);
+
+         if (command.contains("All done"))
+            {
+             QMessageBox::information(this,"","Bootloader relocked");
+             }
+
+         else
+
+         {
+             QMessageBox::critical(this,"","Bootloader NOT relocked");
+         }
+
+         logfile(cstring);
+         logfile(command);
+
+
+}
+

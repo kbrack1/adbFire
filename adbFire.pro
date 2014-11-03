@@ -20,7 +20,9 @@ SOURCES += main.cpp\
     preferencesdialog.cpp \
     usbfiledialog.cpp \
     llamadialog.cpp \
-    creditsdialog.cpp
+    creditsdialog.cpp \
+    adblogdialog.cpp
+
 
 RESOURCES = adbFire.qrc
 
@@ -31,7 +33,8 @@ HEADERS  += mainwindow.h \
     preferencesdialog.h \
     usbfiledialog.h \
     llamadialog.h \
-    creditsdialog.h
+    creditsdialog.h \
+    adblogdialog.h \
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -40,7 +43,8 @@ FORMS    += mainwindow.ui \
     preferencesdialog.ui \
     usbfiledialog.ui \
     llamadialog.ui \
-    creditsdialog.ui
+    creditsdialog.ui \
+    adblogdialog.ui
 
 RC_FILE = adbFire.rc
 

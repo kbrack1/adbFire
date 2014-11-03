@@ -100,6 +100,14 @@ private slots:
 
     void on_sftpButton_clicked();
 
+    void on_actionView_Log_triggered();
+
+    void on_actionSwap_data_triggered();
+
+    void on_actionUnlock_Bootloader_triggered();
+
+    void on_actionLock_Bootloader_triggered();
+
 private:
     Ui::MainWindow *ui;
 

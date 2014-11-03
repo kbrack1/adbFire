@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>620</width>
-    <height>565</height>
+    <height>561</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -389,7 +389,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>adbFire:  XBMC &amp; FireTV  Companion</string>
+     <string>adbFire:  Kodi &amp; FireTV  Companion</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -413,7 +413,7 @@
      <rect>
       <x>50</x>
       <y>240</y>
-      <width>285</width>
+      <width>286</width>
       <height>242</height>
      </rect>
     </property>
@@ -436,7 +436,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Backup XBMC (or fork)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Backup XBMC</string>
+          <string>Backup Kodi</string>
          </property>
         </widget>
        </item>
@@ -507,7 +507,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore XBMC's data files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>Restore XBMC</string>
+          <string>Restore Kodi</string>
          </property>
         </widget>
        </item>
@@ -577,6 +577,7 @@
     <addaction name="actionRecovery"/>
     <addaction name="actionCredits"/>
     <addaction name="actionPreferences"/>
+    <addaction name="actionView_Log"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -602,6 +603,9 @@
     <addaction name="actionUninstall_SSH"/>
     <addaction name="actionFirmware_install"/>
     <addaction name="actionInstall_Recovery"/>
+    <addaction name="actionSwap_data"/>
+    <addaction name="actionUnlock_Bootloader"/>
+    <addaction name="actionLock_Bootloader"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuRoot"/>
@@ -695,6 +699,29 @@
   <action name="actionUninstall_SSH">
    <property name="text">
     <string>Uninstall SSH</string>
+   </property>
+  </action>
+  <action name="actionView_Log">
+   <property name="text">
+    <string>View Log</string>
+   </property>
+  </action>
+  <action name="actionSwap_data">
+   <property name="text">
+    <string>Swap /data</string>
+   </property>
+   <property name="toolTip">
+    <string>Swap /data to external</string>
+   </property>
+  </action>
+  <action name="actionUnlock_Bootloader">
+   <property name="text">
+    <string>Unlock Bootloader</string>
+   </property>
+  </action>
+  <action name="actionLock_Bootloader">
+   <property name="text">
+    <string>Lock Bootloader</string>
    </property>
   </action>
  </widget>

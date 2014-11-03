@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>USB Drives/Samba</title></head><body>
+<u><b>"USB Drives/Samba" </b> </u>
+This mounts/unmounts all connected USB drives or sticks. If checked, the "persistence" checkbox mounts your devices at boot.
+<p>
+Mounting USB mass storage devices requires installation of busybox. <p>
+Mounted drives (and /sdcard) are exported to the network via Samba, a
+form of the SMB/CIFS networking protocol. 
+<p>
+The Samba server you should
+see on your network is called adbFire. The storage is exported as sdcard
+and usb. Usb is a folder containing all your /dev/block/sd* devices. They
+ar mounted as drive1,drive2,drive3, etc in the order in which they are 
+processed.
+<p>
+It's an unfortunate reality that assigning mount points by device name
+(/dev/sda1, /dev/sdb1) is unreliable. Now we have the ability to mount
+a drive to a specific location by its label or UUID, the unique id that
+is assigned when a device is formatted. 
+<p>
+This release of adbFire has a script, /system/xbin/mntdrives2.sh, that you
+must edit to assign UUIDs or labels  to specific mount points (e.g. /storage/usb/movies),
+but future releases will have functions that automate this process, making it
+point-and-click. If you're interested, read the script and post any questions you may have.  
+<p>
+<p>
+If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
+<a href="menu.html">main menu</a>
+</body</html>

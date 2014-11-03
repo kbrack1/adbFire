@@ -54,7 +54,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When the AFTV boots, XBMC automatically starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Boot AFTV to XBMC</string>
+        <string>Boot AFTV to Kodi</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -67,7 +67,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Classic TV is launched, XBMC starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Link XBMC to ikonoTV</string>
+        <string>Link Kodi to ikonoTV</string>
        </property>
        <property name="checked">
         <bool>false</bool>

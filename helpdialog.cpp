@@ -9,7 +9,7 @@ helpDialog::helpDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->textBrowser->setSource(*new QUrl("qrc:/assets/adbfhelp.html"));
+    ui->textBrowser->setSource(*new QUrl("qrc:/assets/menu.html"));
 
     ui->textBrowser->setWindowTitle("adbFire Help");
 
