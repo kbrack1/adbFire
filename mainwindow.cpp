@@ -5,6 +5,7 @@
 #include "uninstalldialog.h"
 #include "llamadialog.h"
 #include "usbfiledialog.h"
+#include "uuiddialog.h"
 #include "creditsdialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
@@ -41,7 +42,7 @@
 
 // #include <QDebug>
 
-
+// busybox mount -t cifs //192.168.1.3/avi /sdcard/samba -o username=guest
 
 #ifdef Q_OS_LINUX
  int os=0;
@@ -51,7 +52,7 @@
 int os=2;
 #endif
 
-const QString version = "1.14";
+const QString version = "1.15";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -62,6 +63,8 @@ bool dbexists = false;
 bool updatecheck = true;
 bool versioncheck = true;
 bool sshcheck = false;
+bool killadbBool = true;
+bool resetadbBool = true;
 
 QString port = ":5555";
 QString filename = "";
@@ -459,10 +462,14 @@ void updateTables()
     QString str1;
     QString str2;
     QString str3;
+    QString str4;
+    QString str5;
 
     str1.setNum(usbcheck);
     str2.setNum(ftvupdate);
     str3.setNum(checkversion);
+
+
 
     QSqlQuery query;
 
@@ -539,6 +546,29 @@ void updateTables()
          logfile("SqLite error:" + query.lastError().text());
          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
         }
+
+      sqlstatement = "UPDATE device SET resetadb='"+str4+"' WHERE Id=1";
+       query.exec(sqlstatement);
+
+       if (query.lastError().isValid())
+        {
+          logfile(sqlstatement);
+          logfile("SqLite error:" + query.lastError().text());
+          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+         }
+
+
+
+       sqlstatement = "UPDATE device SET killadb='"+str5+"' WHERE Id=1";
+        query.exec(sqlstatement);
+
+        if (query.lastError().isValid())
+         {
+           logfile(sqlstatement);
+           logfile("SqLite error:" + query.lastError().text());
+           logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+          }
+
 
 
 }
@@ -652,8 +682,6 @@ void readTables()
 
 
 
-
-
             sqlstatement="SELECT versioncheck FROM device";
             query.exec(sqlstatement);
             while (query.next()) {
@@ -666,6 +694,8 @@ void readTables()
                logfile("SqLite error:" + query.lastError().text());
                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
               }
+
+
 
 
 
@@ -686,6 +716,9 @@ void readTables()
          versioncheck=false;
      else
          versioncheck=true;
+
+
+
 }
 
 
@@ -837,7 +870,9 @@ bool isConnectedToNetwork()
          QString command=RunProcess(cstring);
        }
 
-    kill_server();
+   if (resetadbBool)
+         kill_server();
+
     start_server();
     logfile("starting server");
     if (serverRunning)
@@ -877,11 +912,6 @@ bool isConnectedToNetwork()
 
 
 
-
-
-
-
-
 }
 
 
@@ -898,7 +928,10 @@ MainWindow::~MainWindow()
     else
         ftvupdate = 0;
 
-    kill_server();
+     if(killadbBool)
+         kill_server();
+
+
     open_pref_database();
     logfile("open database for update");
     updateTables();
@@ -1992,6 +2025,8 @@ rtimer.start();
 ////////////////////////////////////////////////
 void MainWindow::on_consoleButton_clicked()
 {
+
+   // /Applications/Utilities/Terminal.app/Contents/MacOS/Terminal /Users/jeff/Desktop
 
     if (!isConnected)
           { QMessageBox::critical(
@@ -5659,6 +5694,26 @@ void MainWindow::on_actionSwap_data_triggered()
 void MainWindow::on_actionUnlock_Bootloader_triggered()
 {
 
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+   if (!is_su())
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+
     QString cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/aftv-unlock unlock";
     QString command=RunProcess(cstring);
 
@@ -5683,6 +5738,26 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
 void MainWindow::on_actionLock_Bootloader_triggered()
 {
 
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+   if (!is_su())
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+
     QString cstring = adb + " -s " + daddr+port + " shell su -c /system/xbin/aftv-unlock lock";
     QString command=RunProcess(cstring);
 
@@ -5703,3 +5778,194 @@ void MainWindow::on_actionLock_Bootloader_triggered()
 
 }
 
+
+/////////////////////////////////////////////////////////
+void MainWindow::on_actionBuild_mount_script_triggered()
+{
+
+    QString cstring;
+    QString command;
+    QString uuid;
+    QString dtype;
+    QString fileName;
+    // bool worked = false;
+
+    if (!isConnected)
+       { QMessageBox::critical(
+             this,
+             tr("adbFire"),
+             tr("Device not connected"));
+          return;
+    }
+
+
+   if (!is_su())
+      { QMessageBox::critical(
+            this,
+            "",
+            "Root required!");
+         return;
+   }
+
+
+ logfile("build mount script");
+
+    logfile("swap routine started");
+
+
+          logfile("looking for drives");
+
+          cstring = adb + " shell su -c blkid /dev/block/sd*";
+          command=RunProcess(cstring);
+
+          if (command.isEmpty())
+             { QMessageBox::critical(this,"","No drives found");
+
+              logfile(cstring);
+              logfile("no drives found");
+              return;
+              }
+
+
+          logfile(cstring);
+          logfile(command);
+
+          QFile file21(adbdir+"temp.txt");
+
+            if(!file21.open(QFile::WriteOnly |
+                          QFile::Text))
+            {
+                QMessageBox::critical(this,"","Error creating drive file!");
+
+                logfile(cstring);
+                logfile(command);
+                logfile("error creating "+adbdir+ "drives temp.txt");
+                return;
+            }
+
+
+            QTextStream out1(&file21);
+            out1  << command << endl;
+
+            file21.flush();
+            file21.close();
+
+         bool doloop = true;
+         int i = 0;
+
+          uuidDialog sddialog;
+          sddialog.setModal(true);
+          sddialog.setData1("Build UUID Mount Script");
+
+          do
+          {
+
+          if(sddialog.exec() == QDialog::Accepted)
+          fileName = sddialog.uuidName();
+          else return;
+
+
+          if (fileName.isEmpty())
+             {
+              QMessageBox::critical(this,"","No drive selected");
+              logfile("no drive selected");
+              doloop = false;
+              return;
+              }
+
+
+          QStringList driveElements = fileName.split(" ");
+
+          int r = driveElements.size();
+
+          if (r == 4)
+            {
+              uuid = driveElements[2];
+              dtype = driveElements[3];
+             }
+
+          if (r == 3)
+           {
+              uuid = driveElements[1];
+              dtype = driveElements[2];
+            }
+
+
+
+
+          if (r < 3 || r > 4)
+           { QMessageBox::critical(this,"","Unknown problem with this drive\nPlease check format");
+             return; }
+
+
+          QString mountpoint = QInputDialog::getText(this, "Mount point",
+                                                   "/storage/usb/", QLineEdit::Normal
+                                                   );
+            i = i + +1;
+
+            }
+            while (doloop);
+
+        //  QMessageBox::StandardButton reply2;
+         //   reply2 = QMessageBox::question(this, "", "Drive "+uuid+" selected. Enter ",
+          //                                QMessageBox::Ok|QMessageBox::Cancel);
+       //     if (reply2 == QMessageBox::No)
+         //       return;
+
+
+          //  QElapsedTimer rtimer;
+          //  int nMilliseconds;
+       //     rtimer.start();
+
+
+       //  mount_system("ro");
+
+
+
+
+       //   nMilliseconds = rtimer.elapsed();
+      //    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+
+       //   return;
+
+
+
+}
+
+
+
+
+void MainWindow::on_actionConsole_triggered()
+{
+
+
+    // set PATH=%PATH%;C:\xampp\php
+
+    logfile("detaching console process");
+
+     QString cstring = "";
+
+
+     if (os == 1)
+
+        {
+        cstring = "cmd /k cd " + adbdir;
+        QProcess::startDetached(cstring);
+        }
+
+
+
+       if (os == 2)
+         {
+         QString cstring = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal " + adbdir;
+         QProcess::startDetached(cstring);
+         }
+
+       if (os == 0)
+        {
+           cstring = "x-terminal-emulator--working-directory="+adbdir;
+           QProcess::startDetached(cstring);
+         }
+}

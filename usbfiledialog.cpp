@@ -52,14 +52,18 @@ usbfileDialog::usbfileDialog(QWidget *parent) :
      }
 
 
-   // if (ost1 == 2 )
-  else
-
-
+  if (ost1 == 2 )
     {
        tmpdir1 = QCoreApplication::applicationDirPath();
        tmpdir1 = tmpdir1+"/adbfiles/";
-      adb21 = tmpdir1+"adb";
+      adb21 = tmpdir1+"adb.osx";
+     }
+
+  if (ost1 == 0 )
+    {
+       tmpdir1 = QCoreApplication::applicationDirPath();
+       tmpdir1 = tmpdir1+"/adbfiles/";
+      adb21 = tmpdir1+"adb.linux";
      }
 
 

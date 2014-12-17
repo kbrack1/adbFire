@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>330</width>
-    <height>384</height>
+    <height>408</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>320</y>
+     <y>350</y>
      <width>168</width>
      <height>32</height>
     </rect>
@@ -56,12 +56,12 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>53</y>
-     <width>268</width>
-     <height>239</height>
+     <y>54</y>
+     <width>280</width>
+     <height>274</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="versionLabel">
       <property name="text">
@@ -88,7 +88,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
@@ -106,7 +106,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <widget class="QPushButton" name="pfolderButton">
         <property name="toolTip">
@@ -127,47 +127,43 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QCheckBox" name="ftvupdatesBox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>FireTV updates on</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="sshbox">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>SSH server at boot</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="versioncheck">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Check for adbFire updates at startup</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QCheckBox" name="ftvupdatesBox">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>FireTV updates on</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="sshbox">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>SSH server at boot</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="versioncheck">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Check for adbFire updates at startup</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">

@@ -19,6 +19,7 @@ SOURCES += main.cpp\
     uninstalldialog.cpp \
     preferencesdialog.cpp \
     usbfiledialog.cpp \
+    uuiddialog.cpp \
     llamadialog.cpp \
     creditsdialog.cpp \
     adblogdialog.cpp
@@ -32,9 +33,10 @@ HEADERS  += mainwindow.h \
     uninstalldialog.h \
     preferencesdialog.h \
     usbfiledialog.h \
+    uuiddialog.h \
     llamadialog.h \
     creditsdialog.h \
-    adblogdialog.h \
+    adblogdialog.h  
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -42,6 +44,7 @@ FORMS    += mainwindow.ui \
     uninstalldialog.ui \
     preferencesdialog.ui \
     usbfiledialog.ui \
+    uuiddialog.ui \
     llamadialog.ui \
     creditsdialog.ui \
     adblogdialog.ui

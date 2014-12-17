@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>usbfileDialog</class>
- <widget class="QDialog" name="usbfileDialog">
+ <class>uuidDialog</class>
+ <widget class="QDialog" name="uuidDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -19,7 +19,7 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QListWidget" name="usblistWidget">
+  <widget class="QListWidget" name="uuidlistWidget">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -32,7 +32,7 @@
   <widget class="QLabel" name="title">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>90</x>
      <y>20</y>
      <width>201</width>
      <height>22</height>
@@ -46,31 +46,15 @@
     </font>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Change Me&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="buildButton">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>240</y>
-     <width>74</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Build</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;xxxxxxxxxx&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>200</y>
-     <width>164</width>
+     <x>50</x>
+     <y>210</y>
+     <width>240</width>
      <height>32</height>
     </rect>
    </property>
@@ -89,6 +73,16 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QPushButton" name="buildButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string>Build</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -97,7 +91,7 @@
   <connection>
    <sender>pushButton</sender>
    <signal>clicked()</signal>
-   <receiver>usbfileDialog</receiver>
+   <receiver>uuidDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -111,9 +105,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>usblistWidget</sender>
+   <sender>uuidlistWidget</sender>
    <signal>itemDoubleClicked(QListWidgetItem*)</signal>
-   <receiver>usbfileDialog</receiver>
+   <receiver>uuidDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -129,7 +123,7 @@
   <connection>
    <sender>pushButton_2</sender>
    <signal>clicked()</signal>
-   <receiver>usbfileDialog</receiver>
+   <receiver>uuidDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -108,6 +108,10 @@ private slots:
 
     void on_actionLock_Bootloader_triggered();
 
+    void on_actionBuild_mount_script_triggered();
+
+    void on_actionConsole_triggered();
+
 private:
     Ui::MainWindow *ui;
 

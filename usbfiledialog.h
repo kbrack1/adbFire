@@ -27,7 +27,7 @@ public:
 public:
     QString buffer;
 
-private:
+public:
     Ui::usbfileDialog *ui;
 
 

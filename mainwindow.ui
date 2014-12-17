@@ -576,6 +576,7 @@
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
     <addaction name="actionCredits"/>
+    <addaction name="actionConsole"/>
     <addaction name="actionPreferences"/>
     <addaction name="actionView_Log"/>
     <addaction name="separator"/>
@@ -603,6 +604,7 @@
     <addaction name="actionUninstall_SSH"/>
     <addaction name="actionFirmware_install"/>
     <addaction name="actionInstall_Recovery"/>
+    <addaction name="actionBuild_mount_script"/>
     <addaction name="actionSwap_data"/>
     <addaction name="actionUnlock_Bootloader"/>
     <addaction name="actionLock_Bootloader"/>
@@ -722,6 +724,19 @@
   <action name="actionLock_Bootloader">
    <property name="text">
     <string>Lock Bootloader</string>
+   </property>
+  </action>
+  <action name="actionBuild_mount_script">
+   <property name="text">
+    <string>Build mount script</string>
+   </property>
+  </action>
+  <action name="actionConsole">
+   <property name="text">
+    <string>Console</string>
+   </property>
+   <property name="toolTip">
+    <string>Open console on PC</string>
    </property>
   </action>
  </widget>
