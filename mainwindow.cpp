@@ -5783,6 +5783,11 @@ void MainWindow::on_actionLock_Bootloader_triggered()
 void MainWindow::on_actionBuild_mount_script_triggered()
 {
 
+
+    QMessageBox::information(this,"","Program stub");
+    return;
+
+
     QString cstring;
     QString command;
     QString uuid;
