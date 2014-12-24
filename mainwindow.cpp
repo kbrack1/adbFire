@@ -436,7 +436,7 @@ void createTables()
        }
 
 
-    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.xbmc','password', 1 )";
+    sqlstatement="insert into device values(1, '','"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.kodi','password', 1 )";
     query.exec(sqlstatement);
 
     if (query.lastError().isValid())
@@ -710,7 +710,7 @@ void readTables()
       pulldir = hdir;
 
      if (xbmcpackage.isEmpty())
-         xbmcpackage = "org.xbmc.xbmc";
+         xbmcpackage = "org.xbmc.kodi";
 
      if (checkversion==0)
          versioncheck=false;
@@ -1688,7 +1688,7 @@ xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/sounds/";
 break;
 
 case 4:
-xpath = "/sdcard/Android/data/org.xbmc.xbmc/files/"+hidden+"/system/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/system/";
 break;
 
 case 5:
