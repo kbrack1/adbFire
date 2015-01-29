@@ -11,6 +11,7 @@
 
 QString pdir = "";
 QString version2;
+int rval1 = 0;
 
 ////////////////////////////////////////////////
  QString strip2 (QString str)
@@ -55,7 +56,17 @@ bool isConnectedToNetwork2()
 
 
 
+int preferencesDialog::buffermode() {
+   return ui->buffermode->currentIndex();
+}
 
+QString preferencesDialog::bufferfactor() {
+   return ui->bufferfactor->text();
+}
+
+QString preferencesDialog::buffersize() {
+   return ui->buffersize->text();
+}
 
 QString preferencesDialog::xbmcpackageName() {
    return ui->packagename->text();
@@ -83,11 +94,26 @@ bool preferencesDialog::versioncheck() {
 }
 
 
+void preferencesDialog::setbuffersize(const QString &buffersize)
+{
+    ui->buffersize->setText(buffersize);
+}
+
+void preferencesDialog::setbuffermode(const int &buffermode)
+{
+
+    ui->buffermode->setCurrentIndex(buffermode);
+}
+
+void preferencesDialog::setbufferfactor(const QString &bufferfactor)
+{
+    ui->bufferfactor->setText(bufferfactor);
+}
+
 void preferencesDialog::setPackagename(const QString &packagename)
 {
     ui->packagename->setText(packagename);
 }
-
 
 void preferencesDialog::setSSHpassword(const QString &sshpassword)
 {
@@ -118,10 +144,23 @@ void preferencesDialog::setversioncheck(const bool &versioncheck)
 
 
 
+
 void preferencesDialog::setversionLabel(const QString &versiontext)
 {
     ui->versionLabel->setText("adbFire version: "+ versiontext);
     version2 = versiontext;
+}
+
+void preferencesDialog::setdaddr(const QString &daddr)
+{
+    ui->daddr->setText(daddr);
+
+}
+
+
+
+int preferencesDialog::returnval1() {
+   return rval1;
 }
 
 
@@ -214,4 +253,21 @@ void preferencesDialog::onRequestCompleted() {
 
        delete reply;
 
+}
+
+void preferencesDialog::on_writexml_clicked()
+{
+   rval1 = 2;
+}
+
+void preferencesDialog::on_resetxml_clicked()
+{
+     ui->buffersize->setText("20971520");
+     ui->buffermode->setCurrentIndex(2);
+     ui->bufferfactor->setText("1");
+}
+
+void preferencesDialog::on_pushButton_clicked()
+{
+    rval1 = 1;
 }

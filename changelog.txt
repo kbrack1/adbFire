@@ -1,3 +1,12 @@
+adbFire 1.15 changelog
+=======================
+
+Kodi is now chosen by default.  
+
+Console option for adb command-line 
+
+Various minor bugs fixed, forms adjusted, etc.
+
 adbFire 1.14 changelog
 =======================
 

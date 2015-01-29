@@ -25,27 +25,30 @@ public:
       void setsshBoot(const bool &sshcheck);
       void setversioncheck(const bool &versioncheck);
       void setversionLabel(const QString &versiontext);
+      void setdaddr(const QString &daddr);
+
+
+      void setbuffermode(const int &buffermode);
+      void setbuffersize(const QString &buffersize);
+      void setbufferfactor(const QString &bufferfactor);
+
+
 
     ~preferencesDialog();
 
 public:
    QString xbmcpackageName();
-
-public:
    QString sshpassword();
-
-public:
+   int buffermode();
+   QString buffersize();
+   QString bufferfactor();
    QString pulldir();
 
-public:
    bool updatecheck();
-
-public:
    bool sshcheck();
-
-public:
    bool versioncheck();
 
+int returnval1();
 
 private slots:
    void on_pfolderButton_clicked();
@@ -56,6 +59,12 @@ private slots:
 
    void onRequestCompleted();
 
+
+   void on_writexml_clicked();
+
+   void on_resetxml_clicked();
+
+   void on_pushButton_clicked();
 
 private:
     Ui::preferencesDialog *ui;

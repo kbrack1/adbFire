@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>411</width>
-    <height>527</height>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,8 +36,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>470</y>
+     <x>150</x>
+     <y>440</y>
      <width>93</width>
      <height>28</height>
     </rect>
@@ -46,42 +46,16 @@ p, li { white-space: pre-wrap; }
     <string>Close</string>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>127</x>
-     <y>342</y>
-     <width>191</width>
-     <height>114</height>
+     <x>40</x>
+     <y>350</y>
+     <width>138</width>
+     <height>66</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>&lt;a href=&quot;http://wiki.xbmc.org/index.php?title=Amazon_Fire_TV&quot;&gt;XBMC Fire TV Wiki&lt;/a&gt;</string>
-      </property>
-      <property name="openExternalLinks">
-       <bool>true</bool>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_6">
-      <property name="text">
-       <string>&lt;a href=&quot;http://forum.xbmc.org/showthread.php?tid=198873&quot;&gt;adbFire @ XBMC Forum&lt;/a&gt;</string>
-      </property>
-      <property name="openExternalLinks">
-       <bool>true</bool>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
-    </item>
     <item>
      <widget class="QLabel" name="label_7">
       <property name="text">
@@ -112,6 +86,57 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_10">
       <property name="text">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.chiark.greenend.org.uk/~sgtatham/putty/docs.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;PuTTY Online Help&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>350</y>
+     <width>150</width>
+     <height>66</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>&lt;a href=&quot;http://forum.xbmc.org/showthread.php?tid=198873&quot;&gt;adbFire @ XBMC Forum&lt;/a&gt;</string>
+      </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_11">
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.jocala.com/usbdriver/index.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Install WinUSB Drivers&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="openExternalLinks">
+       <bool>true</bool>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>&lt;a href=&quot;http://wiki.xbmc.org/index.php?title=Amazon_Fire_TV&quot;&gt;XBMC Fire TV Wiki&lt;/a&gt;</string>
       </property>
       <property name="openExternalLinks">
        <bool>true</bool>

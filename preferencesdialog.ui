@@ -6,32 +6,35 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>330</width>
-    <height>408</height>
+    <width>601</width>
+    <height>416</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Preferences</string>
   </property>
+  <property name="layoutDirection">
+   <enum>Qt::LeftToRight</enum>
+  </property>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>170</x>
      <y>20</y>
-     <width>191</width>
+     <width>211</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;b&gt;&lt;u&gt;adbFire Preferences&lt;/b&gt;&lt;/u&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;adbFire Device Preferences&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>350</y>
-     <width>168</width>
+     <x>149</x>
+     <y>358</y>
+     <width>302</width>
      <height>32</height>
     </rect>
    </property>
@@ -39,7 +42,7 @@
     <item>
      <widget class="QPushButton" name="pushButton">
       <property name="text">
-       <string>OK</string>
+       <string>Save</string>
       </property>
      </widget>
     </item>
@@ -52,80 +55,231 @@
     </item>
    </layout>
   </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>100</y>
+     <width>231</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Kodi Cache Settings</string>
+   </property>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>104</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Mode</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="buffermode">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Kodi cache mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="currentText">
+        <string/>
+       </property>
+       <item>
+        <property name="text">
+         <string/>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>161</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Size</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="buffersize">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Kodi cache size in bytes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhNone</set>
+       </property>
+       <property name="inputMask">
+        <string>999999999</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>72</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Read factor</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="bufferfactor">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>90</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>299</width>
+      <height>16777215</height>
+     </size>
+    </property>
+    <property name="inputMask">
+     <string>9999</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>186</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QPushButton" name="writexml">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create advancedsettings.xml file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Write XML</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetxml">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="daddr">
+   <property name="geometry">
+    <rect>
+     <x>41</x>
+     <y>61</y>
+     <width>181</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Device:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="versionLabel">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>89</y>
+     <width>133</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>adbFire version: 9999</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>139</x>
+     <y>322</y>
+     <width>144</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>for adbFire update now</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="getUpdate">
+   <property name="geometry">
+    <rect>
+     <x>49</x>
+     <y>318</y>
+     <width>82</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Check</string>
+   </property>
+  </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>54</y>
-     <width>280</width>
-     <height>274</height>
+     <x>49</x>
+     <y>248</y>
+     <width>252</width>
+     <height>62</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QLabel" name="versionLabel">
-      <property name="text">
-       <string>adbFire version: 9999</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>XBMC package name</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="packagename">
-        <property name="toolTip">
-         <string>Package name for XBMC or XBMC fork</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>SSH Password</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="sshpassword">
-        <property name="toolTip">
-         <string>Package name for XBMC or XBMC fork</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QPushButton" name="pfolderButton">
-        <property name="toolTip">
-         <string>Choose folder for pulled files</string>
-        </property>
-        <property name="text">
-         <string>Pull Folder</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="pulldir">
-        <property name="toolTip">
-         <string>Pulled files are put in this folder</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <widget class="QCheckBox" name="ftvupdatesBox">
       <property name="toolTip">
@@ -165,19 +319,70 @@
       </property>
      </widget>
     </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>31</x>
+     <y>130</y>
+     <width>260</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QPushButton" name="getUpdate">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Check</string>
+         <string>Kodi package name</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QLineEdit" name="packagename">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Package name for Kodi or Kodi fork&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>for adbFire update now</string>
+         <string>SSH Password</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="sshpassword">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SSH password (Root only)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QPushButton" name="pfolderButton">
+        <property name="toolTip">
+         <string>Choose folder for pulled files</string>
+        </property>
+        <property name="text">
+         <string>Pull Folder</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="pulldir">
+        <property name="toolTip">
+         <string>Pulled files are put in this folder</string>
         </property>
        </widget>
       </item>
@@ -186,6 +391,23 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>packagename</tabstop>
+  <tabstop>sshpassword</tabstop>
+  <tabstop>pulldir</tabstop>
+  <tabstop>ftvupdatesBox</tabstop>
+  <tabstop>versioncheck</tabstop>
+  <tabstop>getUpdate</tabstop>
+  <tabstop>buffermode</tabstop>
+  <tabstop>buffersize</tabstop>
+  <tabstop>bufferfactor</tabstop>
+  <tabstop>pfolderButton</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>writexml</tabstop>
+  <tabstop>resetxml</tabstop>
+  <tabstop>sshbox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
@@ -217,6 +439,22 @@
     <hint type="destinationlabel">
      <x>229</x>
      <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>writexml</sender>
+   <signal>clicked()</signal>
+   <receiver>preferencesDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>402</x>
+     <y>235</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>300</x>
+     <y>221</y>
     </hint>
    </hints>
   </connection>

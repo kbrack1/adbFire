@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>cifsDialog</class>
+ <widget class="QDialog" name="cifsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>254</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Network Shares</string>
+  </property>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>229</x>
+     <y>20</y>
+     <width>36</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Share</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>69</x>
+     <y>20</y>
+     <width>67</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>IP Address</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>339</x>
+     <y>20</y>
+     <width>76</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mount Point</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>47</y>
+     <width>479</width>
+     <height>144</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="select1">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to select this share&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ipaddress1"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="share1"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="mount1"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="nfs1">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check if share is NFS. Unchecked defaults to CIFS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>NFS</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QCheckBox" name="select2">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to select this share&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ipaddress2"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="share2"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="mount2"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="nfs2">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check if share is NFS. Unchecked defaults to CIFS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>NFS</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QCheckBox" name="select3">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to select this share&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ipaddress3"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="share3"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="mount3"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="nfs3">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check if share is NFS. Unchecked defaults to CIFS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>NFS</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QCheckBox" name="select4">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to select this share&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="ipaddress4"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="share4"/>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="mount4"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="nfs4">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check if share is NFS. Unchecked defaults to CIFS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>NFS</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>210</y>
+     <width>424</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="mountButton">
+      <property name="text">
+       <string>Mount</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="umountButton">
+      <property name="text">
+       <string>Unmount</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="saveButton">
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="scriptButton">
+      <property name="text">
+       <string>Script</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancelButton">
+      <property name="text">
+       <string>Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>select1</tabstop>
+  <tabstop>ipaddress1</tabstop>
+  <tabstop>share1</tabstop>
+  <tabstop>mount1</tabstop>
+  <tabstop>nfs1</tabstop>
+  <tabstop>select2</tabstop>
+  <tabstop>ipaddress2</tabstop>
+  <tabstop>share2</tabstop>
+  <tabstop>mount2</tabstop>
+  <tabstop>nfs2</tabstop>
+  <tabstop>select3</tabstop>
+  <tabstop>ipaddress3</tabstop>
+  <tabstop>share3</tabstop>
+  <tabstop>mount3</tabstop>
+  <tabstop>nfs3</tabstop>
+  <tabstop>select4</tabstop>
+  <tabstop>ipaddress4</tabstop>
+  <tabstop>share4</tabstop>
+  <tabstop>mount4</tabstop>
+  <tabstop>nfs4</tabstop>
+  <tabstop>mountButton</tabstop>
+  <tabstop>umountButton</tabstop>
+  <tabstop>saveButton</tabstop>
+  <tabstop>scriptButton</tabstop>
+  <tabstop>cancelButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>cancelButton</sender>
+   <signal>clicked()</signal>
+   <receiver>cifsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>443</x>
+     <y>225</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>129</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>saveButton</sender>
+   <signal>clicked()</signal>
+   <receiver>cifsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>282</x>
+     <y>225</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>279</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scriptButton</sender>
+   <signal>clicked()</signal>
+   <receiver>cifsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>361</x>
+     <y>225</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>279</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>umountButton</sender>
+   <signal>clicked()</signal>
+   <receiver>cifsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>193</x>
+     <y>225</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>279</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mountButton</sender>
+   <signal>clicked()</signal>
+   <receiver>cifsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>100</x>
+     <y>225</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>279</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

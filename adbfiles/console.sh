@@ -1,2 +1,2 @@
 #!/bin/sh
-ssh root@firetv
+/Users/jeff/buildfirestat/adbFire.app/Contents/MacOS/adbfiles/adb shell

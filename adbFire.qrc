@@ -11,6 +11,7 @@
  <file>assets/adbshell.html</file>
  <file>assets/atvsetup.html</file>
  <file>assets/backup.html</file>
+ <file>assets/cache.html</file>
  <file>assets/filero.html</file>
  <file>assets/filerw.html</file>
  <file>assets/help.html</file>
@@ -36,6 +37,7 @@
  <file>assets/unbusy.html</file>
  <file>assets/uninapk.html</file>
  <file>assets/unssh.html</file>
+ <file>assets/usbmode.html</file>
  <file>assets/usbdrive.html</file>
  <file>assets/vlog.html</file>
 <file>assets/lock.html</file>

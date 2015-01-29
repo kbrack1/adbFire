@@ -41,6 +41,8 @@ public:
 
 
 
+private slots:
+
 };
 
 #endif // USBFILEDIALOG_H

@@ -1,0 +1,4 @@
+#!/system/bin/sh
+/system/xbin/mntdrives.sh samba
+
+

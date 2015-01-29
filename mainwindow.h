@@ -15,6 +15,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+class MyClass;
 
 private slots:
 
@@ -27,6 +28,8 @@ private slots:
     void on_akill_Button_clicked();
 
     void TimerEvent();
+
+    void readInc(int);
 
     void on_sideload_Button_clicked();
 
@@ -111,6 +114,11 @@ private slots:
     void on_actionBuild_mount_script_triggered();
 
     void on_actionConsole_triggered();
+
+    void on_actionMount_CIFS_triggered();
+
+
+    void on_usbmode_toggled(bool checked);
 
 private:
     Ui::MainWindow *ui;
