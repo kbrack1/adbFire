@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     llamadialog.cpp \
     creditsdialog.cpp \
     adblogdialog.cpp \
-    cifsdialog.cpp
+    cifsdialog.cpp \
+    videodialog.cpp \
+    kodidialog.cpp
 
 
 RESOURCES = adbFire.qrc
@@ -38,7 +40,9 @@ HEADERS  += mainwindow.h \
     llamadialog.h \
     creditsdialog.h \
     adblogdialog.h \  
-    cifsdialog.h
+    cifsdialog.h \
+    videodialog.h \
+    kodidialog.h
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -50,7 +54,9 @@ FORMS    += mainwindow.ui \
     llamadialog.ui \
     creditsdialog.ui \
     adblogdialog.ui \
-    cifsdialog.ui
+    cifsdialog.ui \
+    videodialog.ui \
+    kodidialog.ui
 
 RC_FILE = adbFire.rc
 

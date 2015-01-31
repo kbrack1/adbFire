@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>601</width>
-    <height>416</height>
+    <height>445</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
    <property name="geometry">
     <rect>
      <x>149</x>
-     <y>358</y>
+     <y>378</y>
      <width>302</width>
      <height>32</height>
     </rect>
@@ -58,8 +58,8 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>100</y>
+     <x>310</x>
+     <y>70</y>
      <width>231</width>
      <height>171</height>
     </rect>
@@ -218,24 +218,11 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QLabel" name="daddr">
-   <property name="geometry">
-    <rect>
-     <x>41</x>
-     <y>61</y>
-     <width>181</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Device:</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="versionLabel">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>89</y>
+     <x>30</x>
+     <y>60</y>
      <width>133</width>
      <height>16</height>
     </rect>
@@ -248,7 +235,7 @@
    <property name="geometry">
     <rect>
      <x>139</x>
-     <y>322</y>
+     <y>342</y>
      <width>144</width>
      <height>16</height>
     </rect>
@@ -261,7 +248,7 @@
    <property name="geometry">
     <rect>
      <x>49</x>
-     <y>318</y>
+     <y>338</y>
      <width>82</width>
      <height>32</height>
     </rect>
@@ -274,7 +261,7 @@
    <property name="geometry">
     <rect>
      <x>49</x>
-     <y>248</y>
+     <y>268</y>
      <width>252</width>
      <height>62</height>
     </rect>
@@ -321,18 +308,46 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>31</x>
-     <y>130</y>
+     <x>30</x>
+     <y>90</y>
      <width>260</width>
-     <height>101</height>
+     <height>167</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="devlab">
+        <property name="text">
+         <string>Device:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="daddr"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="devlab_2">
+        <property name="text">
+         <string>Description</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="description"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
@@ -350,7 +365,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
       <item>
        <widget class="QLabel" name="label_4">
         <property name="text">
@@ -368,7 +383,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
       <item>
        <widget class="QPushButton" name="pfolderButton">
         <property name="toolTip">
@@ -390,23 +405,38 @@
     </item>
    </layout>
   </widget>
+  <widget class="QLabel" name="recnum">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>490</y>
+     <width>59</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
+  <tabstop>daddr</tabstop>
+  <tabstop>description</tabstop>
   <tabstop>packagename</tabstop>
   <tabstop>sshpassword</tabstop>
   <tabstop>pulldir</tabstop>
   <tabstop>ftvupdatesBox</tabstop>
+  <tabstop>sshbox</tabstop>
   <tabstop>versioncheck</tabstop>
   <tabstop>getUpdate</tabstop>
   <tabstop>buffermode</tabstop>
   <tabstop>buffersize</tabstop>
   <tabstop>bufferfactor</tabstop>
-  <tabstop>pfolderButton</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
   <tabstop>writexml</tabstop>
   <tabstop>resetxml</tabstop>
-  <tabstop>sshbox</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pfolderButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

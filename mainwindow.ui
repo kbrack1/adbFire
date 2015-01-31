@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>561</height>
+    <width>656</width>
+    <height>566</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -96,7 +96,7 @@
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Device IP address or name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="editable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="connButton">
@@ -135,7 +135,7 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>430</x>
       <y>210</y>
       <width>161</width>
       <height>171</height>
@@ -285,8 +285,8 @@
    <widget class="QGroupBox" name="usbgroupBox">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>50</y>
+      <x>440</x>
+      <y>60</y>
       <width>131</width>
       <height>141</height>
      </rect>
@@ -346,7 +346,7 @@
    <widget class="QPushButton" name="donate">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>440</x>
       <y>430</y>
       <width>150</width>
       <height>50</height>
@@ -368,7 +368,7 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>430</x>
       <y>400</y>
       <width>181</width>
       <height>16</height>
@@ -561,8 +561,8 @@
    <widget class="QCheckBox" name="usbmode">
     <property name="geometry">
      <rect>
-      <x>280</x>
-      <y>80</y>
+      <x>300</x>
+      <y>90</y>
       <width>89</width>
       <height>20</height>
      </rect>
@@ -580,7 +580,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>574</width>
+     <width>656</width>
      <height>22</height>
     </rect>
    </property>
@@ -594,6 +594,7 @@
     <addaction name="actionConsole"/>
     <addaction name="actionPreferences"/>
     <addaction name="actionView_Log"/>
+    <addaction name="actionDownload_Kodi"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -608,6 +609,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionHelp"/>
+    <addaction name="actionVideo_Help"/>
    </widget>
    <widget class="QMenu" name="menuRoot">
     <property name="title">
@@ -764,6 +766,19 @@
   <action name="actionMount_CIFS">
    <property name="text">
     <string>Mount Network Share</string>
+   </property>
+  </action>
+  <action name="actionVideo_Help">
+   <property name="text">
+    <string>Video Help</string>
+   </property>
+   <property name="toolTip">
+    <string>adbFire Video Help</string>
+   </property>
+  </action>
+  <action name="actionDownload_Kodi">
+   <property name="text">
+    <string>Download Kodi</string>
    </property>
   </action>
  </widget>

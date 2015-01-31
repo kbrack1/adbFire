@@ -26,13 +26,12 @@ public:
       void setversioncheck(const bool &versioncheck);
       void setversionLabel(const QString &versiontext);
       void setdaddr(const QString &daddr);
-
+      void setdescription(const QString &description);
 
       void setbuffermode(const int &buffermode);
       void setbuffersize(const QString &buffersize);
       void setbufferfactor(const QString &bufferfactor);
-
-
+      void setrecnum(const QString &recnum);
 
     ~preferencesDialog();
 
@@ -43,7 +42,8 @@ public:
    QString buffersize();
    QString bufferfactor();
    QString pulldir();
-
+   QString daddr();
+   QString description();
    bool updatecheck();
    bool sshcheck();
    bool versioncheck();

@@ -120,6 +120,10 @@ private slots:
 
     void on_usbmode_toggled(bool checked);
 
+    void on_actionVideo_Help_triggered();
+
+    void on_actionDownload_Kodi_triggered();
+
 private:
     Ui::MainWindow *ui;
 

@@ -80,6 +80,14 @@ QString preferencesDialog::pulldir() {
    return ui->pulldir->text();
 }
 
+QString preferencesDialog::daddr() {
+   return ui->daddr->text();
+}
+
+QString preferencesDialog::description() {
+   return ui->description->text();
+}
+
 bool preferencesDialog::updatecheck() {
    return ui->ftvupdatesBox->isChecked();
 }
@@ -143,8 +151,6 @@ void preferencesDialog::setversioncheck(const bool &versioncheck)
 }
 
 
-
-
 void preferencesDialog::setversionLabel(const QString &versiontext)
 {
     ui->versionLabel->setText("adbFire version: "+ versiontext);
@@ -157,6 +163,18 @@ void preferencesDialog::setdaddr(const QString &daddr)
 
 }
 
+void preferencesDialog::setdescription(const QString &description)
+{
+    ui->description->setText(description);
+
+}
+
+
+void preferencesDialog::setrecnum(const QString &recnum)
+{
+    ui->recnum->setText(recnum);
+
+}
 
 
 int preferencesDialog::returnval1() {
