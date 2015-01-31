@@ -6910,7 +6910,7 @@ void MainWindow::on_actionConsole_triggered()
 
      QString pathdir = QCoreApplication::applicationDirPath() +"/adbfiles";
 
-       if (os == 2)
+       if (os == 2 || os == 0)
          {
 
            QString commstr = adbdir+"cpath";
