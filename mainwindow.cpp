@@ -6629,9 +6629,18 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
    }
 
 
+   QString cstring = adb + " shell ls /system/xbin/aftv-unlock unlock";
+   QString command=RunProcess(cstring);
 
-    QString cstring = adb + " shell su -c /system/xbin/aftv-unlock unlock";
-    QString command=RunProcess(cstring);
+    if (command.contains("No such file or directory"))
+    {
+     QMessageBox::information(this,"","aftv-unlock not found!");
+     return;
+     }
+
+
+        cstring = adb + " shell su -c /system/xbin/aftv-unlock unlock";
+        command=RunProcess(cstring);
 
          if (command.contains("All done"))
             {
@@ -6672,10 +6681,18 @@ void MainWindow::on_actionLock_Bootloader_triggered()
          return;
    }
 
+   QString cstring = adb + " shell ls /system/xbin/aftv-unlock unlock";
+   QString command=RunProcess(cstring);
+
+    if (command.contains("No such file or directory"))
+    {
+     QMessageBox::information(this,"","aftv-unlock not found!");
+     return;
+     }
 
 
-    QString cstring = adb + " shell su -c /system/xbin/aftv-unlock lock";
-    QString command=RunProcess(cstring);
+     cstring = adb + " shell su -c /system/xbin/aftv-unlock lock";
+     command=RunProcess(cstring);
 
          if (command.contains("All done"))
             {
@@ -7472,4 +7489,9 @@ void MainWindow::on_actionDownload_Kodi_triggered()
     kodiDialog kodidialog;
     kodidialog.setModal(true);
     kodidialog.exec();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    on_actionPreferences_triggered();
 }

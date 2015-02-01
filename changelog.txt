@@ -1,5 +1,47 @@
+adbFire 1.16 changelog
+=======================
+Multiple device database added. Manage up to 10
+Fire TV devices, each with it's own individual
+settings (Kodi cache, pull directory, description,etc)
+
+Mount CIFS/NFS shares ad hoc or at boot.
+
+USB Mode for the Fire TV Stick. Manage Kodi
+via USB.
+
+Windows console now has adb automatically added
+to the system path. Linux/OS X users have a command
+to accomplish the same.
+
+Video Help menu added. This links to YouTube
+videos showing various adbFire functions in action.
+Currently:
+
+Using USB Mode
+Installing WinUSB Drivers
+Using Multiple Devices with adbFire
+Mounting CIFS/NFS Shares with adbFire
+Installing adbFire and Kodi
+
+Kodi cache settings added. Choose any cache values
+for Kodi you need, not limited to a few presets.
+
+Menu function "Install System Tools" replaces
+former function "Install Busybox". This encompasses
+the installation of Busybox, Samba and system and
+init scripts required by adbFire.
+
+Linux bug for console fixed
+Ikono TV icons changed
+Link to Kodi download added
+Bug in packagename path fixed
+Various help files added
+Minor bugs fixed as found.
+
+
 adbFire 1.15 changelog
 =======================
+
 
 Kodi is now chosen by default.  
 
