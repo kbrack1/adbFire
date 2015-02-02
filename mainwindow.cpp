@@ -57,7 +57,7 @@ int os=2;
 //  int n = num.toInt();
 
 
-const QString version = "1.16";
+const QString version = "1.17";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -6967,8 +6967,10 @@ void MainWindow::on_actionConsole_triggered()
 
        if (os == 0)
         {
-           cstring = "x-terminal-emulator --working-directory="+adbdir;
+           // cstring = "x-terminal-emulator --working-directory="+adbdir+"/adbfiles";
+            cstring = "gnome-terminal --working-directory="+adbdir;
            QProcess::startDetached(cstring);
+
          }
 
 

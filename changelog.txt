@@ -1,3 +1,16 @@
+adbFire 1.17 changelog
+=======================
+Menu option "Preferences" changed to "Device Setup"
+New button "Setup" added, directly to right of IP combobox
+
+Both options above take you to the screen where device
+data is entered: ip address, description, cache settings,etc
+
+aftv-unlock detection. Warns if program isn't installed.
+
+Linux x-terminal-emulator changed to gnome-terminal.
+
+
 adbFire 1.16 changelog
 =======================
 Multiple device database added. Manage up to 10
