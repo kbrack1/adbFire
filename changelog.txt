@@ -10,6 +10,7 @@ aftv-unlock detection. Warns if program isn't installed.
 
 Linux x-terminal-emulator changed to gnome-terminal.
 
+Backup Fire TV, Restore to Fire TV Stick added to Video Help
 
 adbFire 1.16 changelog
 =======================
