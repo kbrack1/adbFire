@@ -66,6 +66,12 @@ private slots:
 
    void on_pushButton_clicked();
 
+   void on_preset1_clicked();
+
+   void on_preset2_clicked();
+
+   void on_preset3_clicked();
+
 private:
     Ui::preferencesDialog *ui;
 

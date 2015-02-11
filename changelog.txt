@@ -1,5 +1,29 @@
+adbFire 1.18 changelog
+=======================
+Bug in aftv-unlock detection fixed.
+
+Check for enduser-added spaces in app filename.
+
+Fixed bug where some variables were not properly
+initialized when  switching between devices via
+the combobox.
+
+Fixed bug in root detection function.
+
+NTFS write speeds fixed. 
+
+Mount HFS+ (Mac) USB drives
+
+Three presets added to Kodi Cache selection in
+Device Setup
+
+Help Selection: "Preferences Dialog" changed to "Device Setup"
+
+
+
 adbFire 1.17 changelog
 =======================
+
 Menu option "Preferences" changed to "Device Setup"
 New button "Setup" added, directly to right of IP combobox
 

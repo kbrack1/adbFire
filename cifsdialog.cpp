@@ -230,3 +230,8 @@ void cifsDialog::on_scriptButton_clicked()
 {
   rval=4;
 }
+
+void cifsDialog::on_cancelButton_clicked()
+{
+    rval=99;
+}

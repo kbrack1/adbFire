@@ -283,9 +283,48 @@ void preferencesDialog::on_resetxml_clicked()
      ui->buffersize->setText("20971520");
      ui->buffermode->setCurrentIndex(2);
      ui->bufferfactor->setText("1");
+
+     ui->preset1->setAutoExclusive(false);
+     ui->preset2->setAutoExclusive(false);
+     ui->preset3->setAutoExclusive(false);
+
+     ui->preset1->setChecked(false);
+     ui->preset2->setChecked(false);
+     ui->preset3->setChecked(false);
+
+     ui->preset1->setAutoExclusive(true);
+     ui->preset2->setAutoExclusive(true);
+     ui->preset3->setAutoExclusive(true);
+
 }
 
 void preferencesDialog::on_pushButton_clicked()
 {
     rval1 = 1;
+}
+
+void preferencesDialog::on_preset1_clicked()
+{
+
+    setbuffermode(1);
+    setbuffersize("0");
+    setbufferfactor("10");
+
+}
+
+void preferencesDialog::on_preset2_clicked()
+{
+    setbuffermode(2);
+    setbuffersize("104857600");
+    setbufferfactor("1");
+}
+
+void preferencesDialog::on_preset3_clicked()
+{
+    setbuffermode(2);
+    setbuffersize("52428800");
+    setbufferfactor("1");
+
+
+
 }

@@ -57,7 +57,7 @@ int os=2;
 //  int n = num.toInt();
 
 
-const QString version = "1.17";
+const QString version = "1.18";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -253,19 +253,21 @@ QString RunProcess(QString cstring)
 bool is_su()
 {
 
-bool isroot;
 QString cstring = adb + " shell ls /system/xbin/su";
 QString command=RunProcess(cstring);
 
-if (command.contains("/system/xbin/su"))
-   isroot = true;
+if (command.contains("No such file or directory"))
+  {
+    logfile("not rooted");
+    logfile(command);
+    return false;
+   }
     else
-    isroot = false;
-
-logfile("is_su");
-logfile(command);
-
-return isroot;
+  {
+      logfile("rooted");
+      logfile(command);
+      return true;
+   }
 
 
 }
@@ -1518,11 +1520,15 @@ bool isConnectedToNetwork()
 {
 
 
+
+
+
      if (os == 1)
         {
          adbdir = "./";
           // adbdir = QDir::currentPath();
          adb = adbdir+"adb.exe";
+         adb = '"'+adb+'"';
         }
 
    if (os == 2)
@@ -1535,8 +1541,8 @@ bool isConnectedToNetwork()
            if (QFile::exists(adbdir+"adb"))
            {
                adb = adbdir+"adb";
+               adb = '"'+adb+'"';
                QProcess::execute ("chmod 0755 "+ adb);
-
            }
 
            else
@@ -1544,8 +1550,8 @@ bool isConnectedToNetwork()
            {
            QFile::copy(adbdir+"adb.osx", adbdir+"adb");
            adb = adbdir+"adb";
+           adb = '"'+adb+'"';
            QProcess::execute ("chmod 0755 "+ adb);
-
            }
 
 
@@ -1562,7 +1568,9 @@ bool isConnectedToNetwork()
            if (QFile::exists(adbdir+"adb"))
            {
                adb = adbdir+"adb";
+               adb = '"'+adb+'"';
                QProcess::execute ("chmod 0755 "+ adb);
+
 
            }
 
@@ -1571,6 +1579,7 @@ bool isConnectedToNetwork()
            {
            QFile::copy(adbdir+"adb.linux", adbdir+"adb");
            adb = adbdir+"adb";
+           adb = '"'+adb+'"';
            QProcess::execute ("chmod 0755 "+ adb);
            }
 
@@ -1629,10 +1638,14 @@ bool isConnectedToNetwork()
    daddr = ui->deviceBox->currentText();
 
 
+   db.open();
+    readTables(ui->deviceBox->currentIndex());
+    db.close();
+
  //  readTables(ui->deviceBox->currentIndex()+1);
 
    connect(ui->deviceBox, SIGNAL(currentIndexChanged(int)),
-       SLOT(readInc(int)));
+       SLOT(readInc()));
 
 
     if (!(os == 1))
@@ -1656,10 +1669,6 @@ bool isConnectedToNetwork()
       ui->usbBox->setDisabled(true);
     }
 
-    // open_pref_database();
-   db.open();
-    readTables(ui->deviceBox->currentIndex());
-    db.close();
 
 
     if (checkversion==1)
@@ -1771,12 +1780,17 @@ void MainWindow::TimerEvent()
 
 
 /////////////////////////////////////////////////////
-void MainWindow::readInc(int idx)
+void MainWindow::readInc()
 {
     daddr = ui->deviceBox->currentText();
     // readTables( idx + 1 );
     on_disButton_clicked();
-//    on_connButton_clicked();
+
+    db.open();
+     readTables(ui->deviceBox->currentIndex());
+     db.close();
+
+    //    on_connButton_clicked();
 
 }
 
@@ -2907,9 +2921,9 @@ logfile("opening preferences dialog");
     QString recnum  = QString::number(ui->deviceBox->currentIndex());
 
     // open_pref_database();
-   db.open();
-    readTables(ui->deviceBox->currentIndex());
-    db.close();
+   // db.open();
+   //  readTables(ui->deviceBox->currentIndex());
+   // db.close();
 
     oldpass = sshpassword;
     olddaddr = daddr;
@@ -2965,7 +2979,7 @@ logfile("opening preferences dialog");
 
 
 
-    bool currentupdate = updatecheck;
+    // bool currentupdate = updatecheck;
 
     preferencesDialog dialog;
     dialog.setPackagename(xbmcpackage);
@@ -3030,7 +3044,10 @@ logfile("opening preferences dialog");
                     ui->update_status->setText(amazon_update2);
                     ui->deviceBox->setItemText(ui->deviceBox->currentIndex(),daddr);
                 }
-        }  // end x1
+
+
+
+    }  // end x1
 
 
     if (x == 2)
@@ -3490,7 +3507,6 @@ void MainWindow::on_actionInstall_busybox_triggered()
     }
 
 
- //
 
    if (!is_su())
       { QMessageBox::critical(
@@ -5255,11 +5271,15 @@ rtimer.start();
 void MainWindow::on_llamaButton_clicked()
 {
 
+   logfile("llama options function entered");
+
+
     if (!isConnected)
        { QMessageBox::critical(
              this,
              "adbFire",
              devstr2);
+         logfile("not connected -- bail");
           return;
     }
 
@@ -5271,7 +5291,8 @@ void MainWindow::on_llamaButton_clicked()
             this,
             "",
             "Kodi not installed");
-         return;
+             logfile(xbmcpackage+" not found -- bail");
+       return;
    }
 
 
@@ -5881,24 +5902,11 @@ void MainWindow::on_actionInstall_SSH_triggered()
     }
 
 
-    QString cstring;
-    QString command;
 
 
 
 
-
-   bool isroot;
-   cstring = adb + " shell ls /system/xbin/su";
-   command=RunProcess(cstring);
-
-   if (command.contains("No such file or directory"))
-      isroot = false;
-       else
-       isroot = true;
-
-
-   if (!isroot)
+   if (!is_su())
       { QMessageBox::critical(
             this,
             "",
@@ -5907,7 +5915,8 @@ void MainWindow::on_actionInstall_SSH_triggered()
    }
 
 
-
+   QString cstring;
+   QString command;
 
 
    cstring = adb + " shell ls /system/xbin/busybox";
@@ -5915,7 +5924,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
 
      if (command.contains("No such file or directory"))
-      { QMessageBox::critical( this,"","Busybox required for SSH. Install from the Root Menu.");
+      { QMessageBox::critical( this,"","System Tools required for SSH. Install from the Root Menu.");
 
          logfile(cstring);
          logfile(command);
@@ -6629,7 +6638,7 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
    }
 
 
-   QString cstring = adb + " shell ls /system/xbin/aftv-unlock unlock";
+   QString cstring = adb + " shell ls /system/xbin/aftv-unlock";
    QString command=RunProcess(cstring);
 
     if (command.contains("No such file or directory"))
@@ -6681,7 +6690,7 @@ void MainWindow::on_actionLock_Bootloader_triggered()
          return;
    }
 
-   QString cstring = adb + " shell ls /system/xbin/aftv-unlock unlock";
+   QString cstring = adb + " shell ls /system/xbin/aftv-unlock";
    QString command=RunProcess(cstring);
 
     if (command.contains("No such file or directory"))
@@ -7046,10 +7055,8 @@ void MainWindow::on_actionMount_CIFS_triggered()
     dialog.setModal(true);
 
 
-    if(dialog.exec() == QDialog::Accepted)
-    {
-
-
+   if(dialog.exec() == QDialog::Accepted)
+      {
         int x = dialog.returnval();
 
         ipaddress1=dialog.ipaddress1();
@@ -7446,12 +7453,12 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
   }
 
-  // QMessageBox::information(this,"","USB Mode On");
+
 }
 
 
-
-void MainWindow::on_usbmode_toggled(bool checked)
+/////////////////////////////////////
+void MainWindow::on_usbmode_toggled()
 {
 
     QString msg;

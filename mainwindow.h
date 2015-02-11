@@ -29,7 +29,7 @@ private slots:
 
     void TimerEvent();
 
-    void readInc(int);
+    void readInc();
 
     void on_sideload_Button_clicked();
 
@@ -118,7 +118,7 @@ private slots:
     void on_actionMount_CIFS_triggered();
 
 
-    void on_usbmode_toggled(bool checked);
+    void on_usbmode_toggled();
 
     void on_actionVideo_Help_triggered();
 
