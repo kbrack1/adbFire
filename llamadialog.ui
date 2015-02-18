@@ -31,7 +31,7 @@
     <rect>
      <x>30</x>
      <y>90</y>
-     <width>221</width>
+     <width>251</width>
      <height>131</height>
     </rect>
    </property>
@@ -43,7 +43,7 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>178</width>
+      <width>209</width>
       <height>77</height>
      </rect>
     </property>
@@ -54,7 +54,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When the AFTV boots, XBMC automatically starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Boot AFTV to Kodi</string>
+        <string>Boot AFTV to Media Center</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -67,7 +67,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Classic TV is launched, XBMC starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Link Kodi to ikonoTV</string>
+        <string>Link Media Center to ikonoTV</string>
        </property>
        <property name="checked">
         <bool>false</bool>

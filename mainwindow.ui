@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
+    <width>559</width>
     <height>561</height>
    </rect>
   </property>
@@ -215,67 +215,6 @@
         </property>
         <property name="text">
          <string>Stop</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="usbgroupBox">
-    <property name="geometry">
-     <rect>
-      <x>350</x>
-      <y>60</y>
-      <width>131</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>USB Drives/Samba</string>
-    </property>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>104</width>
-       <height>92</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_6">
-      <item>
-       <widget class="QPushButton" name="mntButton">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mount /dev/sd* devices at /storage/usb/&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Mount</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="umntButton">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unmount  /storage/usb/sd*&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Unmount</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="usbBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make mount of /dev/block/sda1 persistent&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Persistent</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -518,12 +457,12 @@
      <rect>
       <x>200</x>
       <y>40</y>
-      <width>93</width>
+      <width>121</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>Setup</string>
+     <string>Setup Device</string>
     </property>
    </widget>
    <widget class="QComboBox" name="deviceBox">
@@ -574,14 +513,88 @@
      </item>
     </layout>
    </widget>
+   <widget class="QGroupBox" name="mountbox">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>40</y>
+      <width>141</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Mount Drives/Samba</string>
+    </property>
+    <widget class="QLabel" name="sambaLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>140</y>
+       <width>105</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Samba server on&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>102</width>
+       <height>89</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QPushButton" name="mntButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mount /dev/sd* devices at /storage/usb/&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Mount</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="umntButton">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unmount  /storage/usb/sd*&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Unmount</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="usbBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make mount of /dev/block/sda1 persistent&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Persistent</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>558</width>
-     <height>26</height>
+     <width>559</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

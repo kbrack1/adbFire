@@ -27,7 +27,7 @@ public:
       void setversionLabel(const QString &versiontext);
       void setdaddr(const QString &daddr);
       void setdescription(const QString &description);
-
+      void setfilepath(const QString &filepath);
       void setbuffermode(const int &buffermode);
       void setbuffersize(const QString &buffersize);
       void setbufferfactor(const QString &bufferfactor);
@@ -44,6 +44,7 @@ public:
    QString pulldir();
    QString daddr();
    QString description();
+   QString filepath();
    bool updatecheck();
    bool sshcheck();
    bool versioncheck();

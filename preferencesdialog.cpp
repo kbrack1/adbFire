@@ -88,6 +88,9 @@ QString preferencesDialog::description() {
    return ui->description->text();
 }
 
+QString preferencesDialog::filepath() {
+   return ui->filepath->text();
+}
 bool preferencesDialog::updatecheck() {
    return ui->ftvupdatesBox->isChecked();
 }
@@ -169,10 +172,20 @@ void preferencesDialog::setdescription(const QString &description)
 
 }
 
+void preferencesDialog::setfilepath(const QString &filepath)
+{
+    ui->filepath->setText(filepath);
 
+}
 void preferencesDialog::setrecnum(const QString &recnum)
 {
     ui->recnum->setText(recnum);
+
+    if (recnum=="0")
+    ui->versioncheck->setVisible(true);
+     else
+    ui->versioncheck->setVisible(false);
+
 
 }
 
@@ -187,7 +200,6 @@ preferencesDialog::preferencesDialog(QWidget *parent) :
     ui(new Ui::preferencesDialog)
 {
     ui->setupUi(this);
-
 
 
 }

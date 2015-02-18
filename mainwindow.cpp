@@ -56,8 +56,7 @@ int os=2;
 // QString num="123";
 //  int n = num.toInt();
 
-
-const QString version = "1.18";
+const QString version = "1.19";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -91,6 +90,7 @@ QString buffersize = "";
 QString bufferfactor = "";
 QString dbstring = "";
 QString description = "";
+QString filepath = "";
 
 QString ipaddress1;
 QString share1;
@@ -460,7 +460,7 @@ void createTables()
 
     logfile("creating adbfire.db");
 
-    QString sqlstatement = "create table device(id int primary key, name varchar(20) ,description varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , sshpassword varchar(10) , versioncheck int, buffermode int, buffersize varchar(10), bufferfactor varchar(10))";
+    QString sqlstatement = "create table device(id int primary key, name varchar(20) ,description varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , sshpassword varchar(10) , versioncheck int, buffermode int, buffersize varchar(10), bufferfactor varchar(10), filepath varchar(20))";
 
     QSqlQuery query;
     query.exec(sqlstatement);
@@ -481,8 +481,11 @@ void createTables()
        s  = QString::number(n);
        QString r  = "IP address "+ QString::number(n+1);
 
-       QString d = "Description";
-       sqlstatement="insert into device values('"+s+"','"+r+"', '"+d+"'  ,'"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.kodi','password', 1 ,1,'20971520','1')";
+       QString d  = "Description "+ QString::number(n+1);
+
+       QString z = "/files/.kodi";
+
+       sqlstatement="insert into device values('"+s+"','"+r+"', '"+d+"'  ,'"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.kodi','password', 1 ,1,'20971520','1','"+z+"')";
 
         query.exec(sqlstatement);
 
@@ -547,7 +550,7 @@ void updateTables(int i)
     QString str2;
     QString str3;
     QString str4;
-
+    QString tempstring;
 
     str1.setNum(usbcheck);
     str2.setNum(ftvupdate);
@@ -559,7 +562,10 @@ void updateTables(int i)
 
     QSqlQuery query;
 
-    QString sqlstatement = "UPDATE device SET name='"+daddr+"'  WHERE Id="+ idstring;
+    tempstring = daddr;
+    tempstring.replace(QString("'"), QString("''"));
+
+    QString sqlstatement = "UPDATE device SET name='"+tempstring+"'  WHERE Id="+ idstring;
      query.exec(sqlstatement);
 
      if (query.lastError().isValid())
@@ -570,7 +576,11 @@ void updateTables(int i)
        }
 
 
-    sqlstatement = "UPDATE device SET sldir='"+sldir+"'  WHERE Id="+ idstring;
+     tempstring = sldir;
+     tempstring.replace(QString("'"), QString("''"));
+
+
+     sqlstatement = "UPDATE device SET sldir='"+tempstring+"'  WHERE Id="+ idstring;
      query.exec(sqlstatement);
 
 
@@ -581,28 +591,11 @@ void updateTables(int i)
         logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
        }
 
-    sqlstatement = "UPDATE device SET pushdir='"+pushdir+"'  WHERE Id="+ idstring;
-     query.exec(sqlstatement);
 
-     if (query.lastError().isValid())
-      {
-        logfile(sqlstatement);
-        logfile("SqLite error:" + query.lastError().text());
-        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
-       }
+     tempstring = pushdir;
+     tempstring.replace(QString("'"), QString("''"));
 
-    sqlstatement = "UPDATE device SET pulldir='"+pulldir+"'  WHERE Id="+ idstring;
-     query.exec(sqlstatement);
-
-
-     if (query.lastError().isValid())
-      {
-        logfile(sqlstatement);
-        logfile("SqLite error:" + query.lastError().text());
-        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
-       }
-
-    sqlstatement = "UPDATE device SET xbmcpackage='"+xbmcpackage+"'  WHERE Id="+ idstring;
+     sqlstatement = "UPDATE device SET pushdir='"+tempstring+"'  WHERE Id="+ idstring;
      query.exec(sqlstatement);
 
      if (query.lastError().isValid())
@@ -613,7 +606,40 @@ void updateTables(int i)
        }
 
 
-     sqlstatement = "UPDATE device SET sshpassword='"+sshpassword+"'  WHERE Id="+ idstring;
+     tempstring = pulldir;
+     tempstring.replace(QString("'"), QString("''"));
+
+     sqlstatement = "UPDATE device SET pulldir='"+tempstring+"'  WHERE Id="+ idstring;
+     query.exec(sqlstatement);
+
+
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+
+     tempstring = xbmcpackage;
+     tempstring.replace(QString("'"), QString("''"));
+
+     sqlstatement = "UPDATE device SET xbmcpackage='"+tempstring+"'  WHERE Id="+ idstring;
+     query.exec(sqlstatement);
+
+     if (query.lastError().isValid())
+      {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+
+     tempstring = sshpassword;
+     tempstring.replace(QString("'"), QString("''"));
+
+
+      sqlstatement = "UPDATE device SET sshpassword='"+tempstring+"'  WHERE Id="+ idstring;
       query.exec(sqlstatement);
 
       if (query.lastError().isValid())
@@ -623,7 +649,11 @@ void updateTables(int i)
          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
         }
 
-     sqlstatement = "UPDATE device SET versioncheck='"+str3+"'  WHERE Id="+ idstring;
+
+      tempstring = str3;
+      tempstring.replace(QString("'"), QString("''"));
+
+      sqlstatement = "UPDATE device SET versioncheck='"+tempstring+"'  WHERE Id="+ idstring;
       query.exec(sqlstatement);
 
       if (query.lastError().isValid())
@@ -634,7 +664,11 @@ void updateTables(int i)
         }
 
 
-      sqlstatement = "UPDATE device SET buffermode='"+str4+"'  WHERE Id="+ idstring;
+      tempstring = str4;
+      tempstring.replace(QString("'"), QString("''"));
+
+
+       sqlstatement = "UPDATE device SET buffermode='"+tempstring+"'  WHERE Id="+ idstring;
        query.exec(sqlstatement);
 
        if (query.lastError().isValid())
@@ -644,7 +678,11 @@ void updateTables(int i)
           logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
          }
 
-       sqlstatement = "UPDATE device SET buffersize='"+buffersize+"'  WHERE Id="+ idstring;
+
+       tempstring = buffersize;
+       tempstring.replace(QString("'"), QString("''"));
+
+       sqlstatement = "UPDATE device SET buffersize='"+tempstring+"'  WHERE Id="+ idstring;
         query.exec(sqlstatement);
 
         if (query.lastError().isValid())
@@ -654,7 +692,11 @@ void updateTables(int i)
            logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
           }
 
-        sqlstatement = "UPDATE device SET bufferfactor='"+bufferfactor+"'  WHERE Id="+ idstring;
+
+        tempstring = bufferfactor;
+        tempstring.replace(QString("'"), QString("''"));
+
+         sqlstatement = "UPDATE device SET bufferfactor='"+tempstring+"'  WHERE Id="+ idstring;
          query.exec(sqlstatement);
 
          if (query.lastError().isValid())
@@ -664,7 +706,11 @@ void updateTables(int i)
             logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
            }
 
-         sqlstatement = "UPDATE device SET description='"+description+"'  WHERE Id="+ idstring;
+
+         tempstring = description;
+         tempstring.replace(QString("'"), QString("''"));
+
+          sqlstatement = "UPDATE device SET description='"+tempstring+"'  WHERE Id="+ idstring;
           query.exec(sqlstatement);
 
           if (query.lastError().isValid())
@@ -674,7 +720,18 @@ void updateTables(int i)
              logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
             }
 
+          tempstring = filepath;
+          tempstring.replace(QString("'"), QString("''"));
 
+           sqlstatement = "UPDATE device SET filepath='"+tempstring+"'  WHERE Id="+ idstring;
+           query.exec(sqlstatement);
+
+           if (query.lastError().isValid())
+            {
+              logfile(sqlstatement);
+              logfile("SqLite error:" + query.lastError().text());
+              logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+             }
 
 }
 
@@ -685,9 +742,6 @@ void updateShares()
 {
 
 
- // QMessageBox::critical(0, "",daddr,QMessageBox::Cancel);
-
-
     logfile("updating shares table adbfire.db");
 
 
@@ -696,10 +750,16 @@ void updateShares()
 
 
     QSqlQuery query;
-    QString idstring = "1";
+    QString idstring;
+    QString tempstring;
 
 
-    QString sqlstatement = "UPDATE netshare SET ipaddress='"+ipaddress1+"'  WHERE Id="+ idstring;
+
+    idstring = "1";
+    tempstring = ipaddress1;
+    tempstring.replace(QString("'"), QString("''"));
+
+     QString sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
      query.exec(sqlstatement);
 
      if (query.lastError().isValid())
@@ -710,7 +770,11 @@ void updateShares()
        }
 
 
-      sqlstatement = "UPDATE netshare SET share='"+share1+"'  WHERE Id="+ idstring;
+
+     tempstring = share1;
+     tempstring.replace(QString("'"), QString("''"));
+
+     sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
       query.exec(sqlstatement);
 
       if (query.lastError().isValid())
@@ -720,7 +784,11 @@ void updateShares()
          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
         }
 
-      sqlstatement = "UPDATE netshare SET mount='"+mount1+"'  WHERE Id="+ idstring;
+
+      tempstring = mount1;
+      tempstring.replace(QString("'"), QString("''"));
+
+       sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
        query.exec(sqlstatement);
 
        if (query.lastError().isValid())
@@ -731,7 +799,11 @@ void updateShares()
          }
 
 
-       sqlstatement = "UPDATE netshare SET nfs='"+nfs1+"'  WHERE Id="+ idstring;
+
+       tempstring = nfs1;
+       tempstring.replace(QString("'"), QString("''"));
+
+        sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
         query.exec(sqlstatement);
 
         if (query.lastError().isValid())
@@ -744,8 +816,10 @@ void updateShares()
 
         idstring = "2";
 
+        tempstring = ipaddress2;
+        tempstring.replace(QString("'"), QString("''"));
 
-        sqlstatement = "UPDATE netshare SET ipaddress='"+ipaddress2+"'  WHERE Id="+ idstring;
+         sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
          query.exec(sqlstatement);
 
          if (query.lastError().isValid())
@@ -756,7 +830,11 @@ void updateShares()
            }
 
 
-          sqlstatement = "UPDATE netshare SET share='"+share2+"'  WHERE Id="+ idstring;
+
+         tempstring = share2;
+         tempstring.replace(QString("'"), QString("''"));
+
+         sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
           query.exec(sqlstatement);
 
           if (query.lastError().isValid())
@@ -766,7 +844,11 @@ void updateShares()
              logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
             }
 
-          sqlstatement = "UPDATE netshare SET mount='"+mount2+"'  WHERE Id="+ idstring;
+
+          tempstring = mount2;
+          tempstring.replace(QString("'"), QString("''"));
+
+           sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
            query.exec(sqlstatement);
 
            if (query.lastError().isValid())
@@ -777,7 +859,11 @@ void updateShares()
              }
 
 
-           sqlstatement = "UPDATE netshare SET nfs='"+nfs2+"'  WHERE Id="+ idstring;
+
+           tempstring = nfs2;
+           tempstring.replace(QString("'"), QString("''"));
+
+            sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
             query.exec(sqlstatement);
 
             if (query.lastError().isValid())
@@ -788,10 +874,13 @@ void updateShares()
               }
 
 
+
             idstring = "3";
 
+            tempstring = ipaddress3;
+            tempstring.replace(QString("'"), QString("''"));
 
-             sqlstatement = "UPDATE netshare SET ipaddress='"+ipaddress3+"'  WHERE Id="+ idstring;
+             sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
              query.exec(sqlstatement);
 
              if (query.lastError().isValid())
@@ -802,7 +891,11 @@ void updateShares()
                }
 
 
-              sqlstatement = "UPDATE netshare SET share='"+share3+"'  WHERE Id="+ idstring;
+
+             tempstring = share3;
+             tempstring.replace(QString("'"), QString("''"));
+
+             sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
               query.exec(sqlstatement);
 
               if (query.lastError().isValid())
@@ -812,7 +905,11 @@ void updateShares()
                  logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
                 }
 
-              sqlstatement = "UPDATE netshare SET mount='"+mount3+"'  WHERE Id="+ idstring;
+
+              tempstring = mount3;
+              tempstring.replace(QString("'"), QString("''"));
+
+               sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
                query.exec(sqlstatement);
 
                if (query.lastError().isValid())
@@ -823,7 +920,11 @@ void updateShares()
                  }
 
 
-               sqlstatement = "UPDATE netshare SET nfs='"+nfs3+"'  WHERE Id="+ idstring;
+
+               tempstring = nfs3;
+               tempstring.replace(QString("'"), QString("''"));
+
+                sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
                 query.exec(sqlstatement);
 
                 if (query.lastError().isValid())
@@ -835,10 +936,15 @@ void updateShares()
 
 
 
+
                 idstring = "4";
 
 
-                 sqlstatement = "UPDATE netshare SET ipaddress='"+ipaddress4+"'  WHERE Id="+ idstring;
+
+                tempstring = ipaddress4;
+                tempstring.replace(QString("'"), QString("''"));
+
+                 sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
                  query.exec(sqlstatement);
 
                  if (query.lastError().isValid())
@@ -849,7 +955,11 @@ void updateShares()
                    }
 
 
-                  sqlstatement = "UPDATE netshare SET share='"+share4+"'  WHERE Id="+ idstring;
+
+                 tempstring = share4;
+                 tempstring.replace(QString("'"), QString("''"));
+
+                 sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
                   query.exec(sqlstatement);
 
                   if (query.lastError().isValid())
@@ -859,7 +969,11 @@ void updateShares()
                      logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
                     }
 
-                  sqlstatement = "UPDATE netshare SET mount='"+mount4+"'  WHERE Id="+ idstring;
+
+                  tempstring = mount4;
+                  tempstring.replace(QString("'"), QString("''"));
+
+                   sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
                    query.exec(sqlstatement);
 
                    if (query.lastError().isValid())
@@ -870,7 +984,11 @@ void updateShares()
                      }
 
 
-                   sqlstatement = "UPDATE netshare SET nfs='"+nfs4+"'  WHERE Id="+ idstring;
+
+                   tempstring = nfs4;
+                   tempstring.replace(QString("'"), QString("''"));
+
+                    sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
                     query.exec(sqlstatement);
 
                     if (query.lastError().isValid())
@@ -880,8 +998,8 @@ void updateShares()
                        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
                       }
 
-}
 
+}
 
 
 
@@ -891,7 +1009,7 @@ QString loadDevices(int i)
 {
 
   QString sqlstatement;
-  QString device_address;
+  QString description;
 
     logfile("reading database");
 
@@ -900,10 +1018,10 @@ QString loadDevices(int i)
 
      QString idstring = QString::number(i);
 
-     sqlstatement= "SELECT name FROM device WHERE Id="+ idstring;
+     sqlstatement= "SELECT description FROM device WHERE Id="+ idstring;
      query.exec(sqlstatement);
          while (query.next()) {
-            device_address = query.value(0).toString();
+            description = query.value(0).toString();
          }
 
 
@@ -917,7 +1035,7 @@ QString loadDevices(int i)
            }
 
 
-     return device_address;
+     return description;
 
 }
 
@@ -1132,6 +1250,22 @@ void readTables(int i)
                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
               }
 
+
+            sqlstatement="SELECT filepath FROM device  WHERE id=" + id;
+            query.exec(sqlstatement);
+            while (query.next()) {
+                  filepath = query.value(0).toString();
+            }
+
+            logfile(sqlstatement);
+            logfile(filepath);
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
 
 
 
@@ -1594,6 +1728,7 @@ bool isConnectedToNetwork()
 
      ui->setupUi(this);
 
+    // ui->mountbox->setVisible(false);
 
      ui->statusBar->addPermanentWidget(ui->update_status);
      ui->statusBar->addPermanentWidget(ui->server_running);
@@ -1613,12 +1748,39 @@ bool isConnectedToNetwork()
      ui->server_running->setText(adbstr2);
      ui->device_connected->setText(devstr2);
      ui->update_status->setText("");
-
+     ui->sambaLabel->setVisible(false);
 
   rotate_logfile();
 
 
-  logfile("adbFire logfile");
+  logfile("adbFire v"+version);
+
+  QDateTime dateTime = QDateTime::currentDateTime();
+  QString dtstr = dateTime.toString("MMddyyhhmmss");
+  logfile(dtstr);
+
+  if (os == 1)
+          {
+          logfile("Windows");
+          }
+
+     if (os == 2)
+
+          {
+        logfile("OS X");
+          }
+
+
+
+     if (os == 0)
+
+          {
+        logfile("Linux");
+
+          }
+
+ logfile("------------");
+
 
   hdir = QDir::homePath();
   open_pref_database();
@@ -1635,12 +1797,14 @@ bool isConnectedToNetwork()
 
 
    ui->deviceBox->setCurrentIndex(0);
-   daddr = ui->deviceBox->currentText();
+   // daddr = ui->deviceBox->currentText();
 
 
    db.open();
     readTables(ui->deviceBox->currentIndex());
     db.close();
+
+
 
  //  readTables(ui->deviceBox->currentIndex()+1);
 
@@ -1667,12 +1831,17 @@ bool isConnectedToNetwork()
       ui->device_connected->setText(devstr2);
       ui->update_status->setText("");
       ui->usbBox->setDisabled(true);
+      ui->sambaLabel->setVisible(false);
     }
 
-
+    firstrun=true;
+    logfile("initial open");
+    logfile(daddr);
+    on_connButton_clicked();
 
     if (checkversion==1)
          get_data();
+
 
 
 
@@ -1782,7 +1951,7 @@ void MainWindow::TimerEvent()
 /////////////////////////////////////////////////////
 void MainWindow::readInc()
 {
-    daddr = ui->deviceBox->currentText();
+    description = ui->deviceBox->currentText();
     // readTables( idx + 1 );
     on_disButton_clicked();
 
@@ -1790,7 +1959,8 @@ void MainWindow::readInc()
      readTables(ui->deviceBox->currentIndex());
      db.close();
 
-    //    on_connButton_clicked();
+     logfile(daddr);
+     on_connButton_clicked();
 
 }
 
@@ -2003,11 +2173,18 @@ void MainWindow::on_connButton_clicked()
     start_server();
 
     port = ":5555";
+    QString sambastring;
+    QString sambacheck;
 
-    daddr = ui->deviceBox->currentText();
+    // daddr = ui->deviceBox->currentText();
+
     QString cstring = adb + " connect " +daddr+port;
-
     QString command=RunProcess(cstring);
+
+    logfile("connection attempt");
+    logfile(cstring);
+    logfile(command);
+
 
     if (command.contains("connected to"))
            isConnected=true;
@@ -2047,7 +2224,36 @@ void MainWindow::on_connButton_clicked()
          ui->device_connected->setText(devstr1);
          ui->server_running->setText(adbstr1);
          serverRunning = true;
-         ui->usbBox->setDisabled(false);
+
+         if (is_su())
+          {
+
+             ui->usbBox->setDisabled(false);
+
+             sambastring = adb + " shell su -c ps | grep smbd";
+             sambacheck=RunProcess(sambastring);
+
+             logfile(sambastring);
+             logfile(sambacheck);
+
+
+              if (!sambacheck.isEmpty())
+               {
+                  logfile("samba running");
+                  ui->sambaLabel->setVisible(true);
+                }
+
+             else
+
+                {
+                   logfile("samba off!");
+                   ui->sambaLabel->setVisible(false);
+                }
+            }
+
+
+
+
 
 
      }
@@ -2055,11 +2261,13 @@ void MainWindow::on_connButton_clicked()
         { ui->device_connected->setText(devstr2);
          ui->usbBox->setDisabled(true);
 
-         if (!firstrun)
+        /* if (!firstrun)
          QMessageBox::critical(
                       this,
                       tr("adbFire"),
                       tr("Device not connected"));
+        */
+
      }
 
         firstrun=false;
@@ -2106,8 +2314,10 @@ void MainWindow::on_disButton_clicked()
 
         ui->usbBox->setDisabled(true);
         daddr = ui->deviceBox->currentText();
+        ui->sambaLabel->setVisible(false);
         QString cstring = adb + " disconnect "+daddr+port ;
         QString command=RunProcess(cstring);
+
 
         isConnected=false;
          ui->device_connected->setText("  Device not connected.");
@@ -2239,7 +2449,7 @@ void MainWindow::on_backupButton_clicked()
 
 QString hdir = QDir::homePath();
  QString command = "";
- QString xpath = "/sdcard/Android/data/"+xbmcpackage;
+ QString xpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
 
  QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Destination"),
                                               hdir,
@@ -2252,7 +2462,7 @@ QString hdir = QDir::homePath();
 
 
  QMessageBox::StandardButton reply;
-   reply = QMessageBox::question(this, "Backup", "backup xbmc to "+dir,
+   reply = QMessageBox::question(this, "Backup", "backup Kodi to "+dir,
                                  QMessageBox::Yes|QMessageBox::No);
    if (reply == QMessageBox::Yes) {
 
@@ -2451,57 +2661,37 @@ void MainWindow::on_fpushButton_clicked()
     rtimer.start();
 
 
-    if (xbmcpackage.isEmpty())
-       xbmcpackage="org.xbmc.kodi";
-
-      cstring = adb + " shell ls /sdcard/Android/data/"+xbmcpackage+"/files/.xbmc";
-      command=RunProcess(cstring);
-     if (command.contains("No such file or directory"))
-      {
-         hidden=".kodi";
-       }
-
-      cstring = adb + " shell ls /sdcard/Android/data/"+xbmcpackage+"/files/.kodi";
-      command=RunProcess(cstring);
-      if (command.contains("No such file or directory"))
-       {
-          hidden=".xbmc";
-        }
-
-
- if (xbmcpackage.isEmpty())
-    xbmcpackage="org.xbmc.kodi";
 
 
  QString cname = ui->comboBox->currentText();
 
 switch(ui->comboBox->currentIndex() ){
 case 0:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/addons/";
 break;
 
 case 1:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/keymaps";
 break;
 
 case 2:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/media/";
 break;
 
 case 3:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/sounds/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/sounds/";
 break;
 
 case 4:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/system/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/system/";
 break;
 
 case 5:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/";
 break;
 
 case 6:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/temp/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/temp/";
 break;
 
 case 7:
@@ -2509,7 +2699,7 @@ xpath = "/sdcard/";
 break;
 
 default:
-xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
+xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/addons/";
 break;
 }
 
@@ -2521,8 +2711,8 @@ if (xpath != "/sdcard/")
      { QMessageBox::critical(
            this,
            "",
-           "Kodi not installed");
-       logfile("xbmc not installed. cant push to it.");
+           xbmcpackage+" not installed");
+       logfile(xbmcpackage+" not installed. cant push to it.");
         return;
      }
 
@@ -2641,12 +2831,11 @@ void MainWindow::on_restoreButton_clicked()
 
 
  QString xpath = "/sdcard/Android/data/";
-
  QString cstring;
  QString command;
 
 
- cstring = adb + " shell su -c ps | grep "+xbmcpackage;
+ cstring = adb + " shell ps | grep "+xbmcpackage;
  command=RunProcess(cstring);
 
 
@@ -2661,6 +2850,19 @@ void MainWindow::on_restoreButton_clicked()
                                               hdir,
                                               QFileDialog::ShowDirsOnly
                                               | QFileDialog::DontResolveSymlinks);
+
+
+
+
+
+
+// if (!QDir(dir+filepath).exists())
+// {
+//     QMessageBox::critical(this,"","Backup "+dir+"\n"+ "does not contain a proper structure. Can't restore.");
+//     return;
+// }
+
+
 
  if (!dir.isEmpty() )
  {
@@ -2679,11 +2881,11 @@ void MainWindow::on_restoreButton_clicked()
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
        timer->start(tsvalue);
 
-       cstring = adb + " shell rm -r "+xpath +xbmcpackage;
+       cstring = adb + " shell rm -r "+xpath +xbmcpackage + filepath + "/*";
 
        command=RunProcess(cstring);
 
-       cstring = adb + " push "+'"'+dir+'"'+ " "+xpath+xbmcpackage;
+       cstring = adb + " push "+'"'+dir+'"'+ " "+xpath+xbmcpackage+filepath;
 
         command=RunProcess(cstring);
 
@@ -2738,19 +2940,13 @@ void MainWindow::on_pushRemote_clicked()
       { QMessageBox::critical(
             this,
             "",
-            "Kodi not installed");
+            xbmcpackage+" not installed");
          return;
    }
 
 
-   QString hidden;
 
-   if (xbmcpackage.contains(".kodi"))
-      hidden=".kodi";
-    else
-        hidden=".xbmc";
-
-QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps/";
+QString  xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/keymaps/";
 
 QElapsedTimer rtimer;
 int nMilliseconds;
@@ -2845,6 +3041,7 @@ void MainWindow::on_consoleButton_clicked()
 
 
     logfile("detaching console process");
+    logfile(daddr);
 
     QString cstring = "";
 
@@ -2920,6 +3117,7 @@ logfile("opening preferences dialog");
 
     QString recnum  = QString::number(ui->deviceBox->currentIndex());
 
+
     // open_pref_database();
    // db.open();
    //  readTables(ui->deviceBox->currentIndex());
@@ -2977,7 +3175,7 @@ logfile("opening preferences dialog");
         }
 
 
-
+   // QMessageBox::critical(this,"",filepath);
 
     // bool currentupdate = updatecheck;
 
@@ -2994,6 +3192,7 @@ logfile("opening preferences dialog");
     dialog.setbuffersize(buffersize);
     dialog.setbufferfactor(bufferfactor);
     dialog.setdescription(description);
+    dialog.setfilepath(filepath);
     dialog.setrecnum(recnum);  //hidden on form
     dialog.setModal(true);
 
@@ -3018,6 +3217,7 @@ logfile("opening preferences dialog");
     buffersize = dialog.buffersize();
     bufferfactor = dialog.bufferfactor();
     description = dialog.description();
+    filepath = dialog.filepath();
     daddr = dialog.daddr();
 
      // QMessageBox::critical(this,"",daddr);
@@ -3042,7 +3242,7 @@ logfile("opening preferences dialog");
                     isConnected=false;
                     ui->device_connected->setText(devstr2);
                     ui->update_status->setText(amazon_update2);
-                    ui->deviceBox->setItemText(ui->deviceBox->currentIndex(),daddr);
+                    ui->deviceBox->setItemText(ui->deviceBox->currentIndex(),description);
                 }
 
 
@@ -4091,55 +4291,35 @@ void MainWindow::on_fdellButton_clicked()
      QString cname = ui->comboBox->currentText();
 
 
-     QString hidden;
-
-     if (xbmcpackage.isEmpty())
-        xbmcpackage="org.xbmc.kodi";
-
-     cstring = adb + " shell ls /sdcard/Android/data/"+xbmcpackage+"/files/.xbmc";
-     command=RunProcess(cstring);
-    if (command.contains("No such file or directory"))
-     {
-        hidden=".kodi";
-      }
-
-     cstring = adb + " shell ls /sdcard/Android/data/"+xbmcpackage+"/files/.kodi";
-     command=RunProcess(cstring);
-     if (command.contains("No such file or directory"))
-      {
-         hidden=".xbmc";
-       }
-
-
 
 
      switch(ui->comboBox->currentIndex() ){
      case 0:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/addons/";
      break;
 
      case 1:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/keymaps/";
      break;
 
      case 2:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/media/";
      break;
 
      case 3:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/sounds/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/sounds/";
      break;
 
      case 4:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/system/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/system/";
      break;
 
      case 5:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/";
      break;
 
      case 6:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/temp/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/temp/";
      break;
 
      case 7:
@@ -4147,7 +4327,7 @@ void MainWindow::on_fdellButton_clicked()
      break;
 
      default:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/addons/";
      break;
      }
 
@@ -4672,6 +4852,9 @@ void MainWindow::on_mntButton_clicked()
 
 
 QString cstring;
+QString command;
+QString sambacheck;
+QString sambastring;
 
    ui->progressBar->setHidden(false);
    ui->progressBar->setValue(0);
@@ -4681,7 +4864,7 @@ QString cstring;
    timer->start(tsvalue);
 
    cstring = adb + " shell ls /system/xbin/mount";
-   QString command=RunProcess(cstring);
+   command=RunProcess(cstring);
 
 
      if (command.contains("No such file or directory"))
@@ -4689,7 +4872,7 @@ QString cstring;
 
          logfile(cstring);
          logfile(command);
-         logfile("Busybox required for USB drive. Install it from the menu.");
+         logfile("System Tools required for USB drive. Install from the menu.");
          return;
      }
 
@@ -4712,11 +4895,35 @@ QString cstring;
            logfile(command);
 
 
-           cstring = adb + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc start";
-           command=RunProcess(cstring);
+           sambastring = adb + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc start";
+           sambacheck=RunProcess(sambastring);
 
-           logfile(cstring);
-           logfile(command);
+           logfile(sambastring);
+           logfile(sambacheck);
+
+
+
+
+                   sambastring = adb + " shell su -c ps | grep smbd";
+                   sambacheck=RunProcess(sambastring);
+
+                   logfile(sambastring);
+                   logfile(sambacheck);
+
+
+                   if (!sambacheck.isEmpty())
+                    {
+                       logfile("samba running");
+                       ui->sambaLabel->setVisible(true);
+                    }
+
+                    else
+
+                   {
+                      logfile("samba off!");
+                      ui->sambaLabel->setVisible(false);
+                   }
+
 
 
            return;
@@ -4789,7 +4996,7 @@ void MainWindow::on_umntButton_clicked()
 
 
      if (command.contains("No such file or directory"))
-      { QMessageBox::critical( this,"","Busybox required for USB drive. Install it from the menu.");
+      { QMessageBox::critical( this,"","System Tools required for USB drive. Install from the menu.");
 
          logfile(cstring);
          logfile(command);
@@ -4816,6 +5023,9 @@ void MainWindow::on_umntButton_clicked()
        logfile("stopping samba");
        cstring = adb + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc stop";
        command=RunProcess(cstring);
+
+       logfile("samba off!");
+       ui->sambaLabel->setVisible(false);
 
        logfile(cstring);
        logfile(command);
@@ -4988,27 +5198,15 @@ void MainWindow::on_fpullButton_clicked()
      QString fileName;
      QString cstring;
      QString command;
-     QString hidden;
 
-     if (xbmcpackage.isEmpty())
-        xbmcpackage="org.xbmc.kodi";
 
-     if (xbmcpackage.isEmpty())
-        xbmcpackage="org.xbmc.kodi";
-
-       cstring = adb + " shell ls /sdcard/Android/data/"+xbmcpackage+"/files/.xbmc";
-       command=RunProcess(cstring);
-      if (command.contains("No such file or directory"))
-       {
-          hidden=".kodi";
-        }
-
-       cstring = adb + " shell ls /sdcard/Android/data/"+xbmcpackage+"/files/.kodi";
+       cstring = adb + " shell ls /sdcard/Android/data/"+xbmcpackage+filepath;
        command=RunProcess(cstring);
        if (command.contains("No such file or directory"))
         {
-           hidden=".xbmc";
-         }
+           QMessageBox::critical(this,"",xbmcpackage+filepath+" not found");
+           return;
+       }
 
 
 
@@ -5016,31 +5214,31 @@ void MainWindow::on_fpullButton_clicked()
 
      switch(ui->comboBox->currentIndex() ){
      case 0:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/addons/";
      break;
 
      case 1:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/keymaps/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/keymaps/";
      break;
 
      case 2:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/media/";
      break;
 
      case 3:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/sounds/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/sounds/";
      break;
 
      case 4:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/system/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/system/";
      break;
 
      case 5:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/";
      break;
 
      case 6:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/temp/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/temp/";
      break;
 
      case 7:
@@ -5049,7 +5247,7 @@ void MainWindow::on_fpullButton_clicked()
 
 
      default:
-     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/addons/";
+     xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/addons/";
      break;
      }
 
@@ -5176,20 +5374,13 @@ void MainWindow::on_pushSplash_clicked()
       { QMessageBox::critical(
             this,
             "",
-            "Kodi not installed");
+            xbmcpackage+" not installed");
          return;
    }
 
 
-   QString hidden;
 
-   if (xbmcpackage.contains(".kodi"))
-      hidden=".kodi";
-    else
-        hidden=".xbmc";
-
-
-QString  xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/media/";
+QString  xpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/media/";
 
 QElapsedTimer rtimer;
 int nMilliseconds;
@@ -5298,10 +5489,12 @@ void MainWindow::on_llamaButton_clicked()
 
    QString llamadir;
 
-   if (xbmcpackage.contains(".kodi"))
-      llamadir="kodillama";
-    else
-      llamadir="xbmcllama";
+
+
+    if (xbmcpackage == "org.xbmc.kodi")
+          llamadir="kodillama";
+       else
+          llamadir="xbmcllama";
 
 
 
@@ -5384,6 +5577,9 @@ void MainWindow::on_llamaButton_clicked()
 
        if (llamaRadio4)
            llamaEvent = 4;
+
+
+
 
        if (ctvRadio1)
            ctvIcon = 1;
@@ -5468,7 +5664,16 @@ void MainWindow::on_llamaButton_clicked()
 
          if (llamaEvent == 1)
          {
-          cstring = adb + " push "+adbdir+llamadir+"/llama_boot /sdcard/Llama/";
+
+
+
+             cstring = adb + " push "+adbdir+llamadir+"/llama_boot /sdcard/Llama/";
+        cstring = adb + " push "+adbdir+llamadir+"/llama_boot /sdcard/Llama/";
+        cstring = adb + " push "+adbdir+llamadir+"/llama_boot /sdcard/Llama/";
+
+
+
+
           command=RunProcess(cstring);
           logfile(cstring);
           logfile(command);
@@ -5499,8 +5704,14 @@ void MainWindow::on_llamaButton_clicked()
 
      }
 
+//  /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms/B00IPRAZB4
+//  preview_84a70e233a1a6d1ac0d93d2e9f1f2de0e7c2d64d289f1e6f17434fe4c3752717.png
+//  thumbnail_43127692f3ed9671e079492a40a450bbd51543bd84d74bba24baf55fe7e06afa.png
 
-   if (classicTV && ctvIcon < 4)
+
+
+
+  if (classicTV && ctvIcon < 4)
 
    {
 
@@ -6066,22 +6277,8 @@ void MainWindow::on_actionUninstall_SSH_triggered()
          return;
    }
 
-
-   logfile("ssh uninstallation query");
-
-   QMessageBox::StandardButton reply;
-      reply = QMessageBox::question(this, "", "Uninstall SSH?",
-                                   QMessageBox::Yes|QMessageBox::No);
-      if (reply == QMessageBox::No)
-        {logfile("ssh uninstall cancelled");
-          return;}
-
-
-   mount_system("rw");
-
    QString cstring;
    QString command;
-
 
    cstring = adb + " shell /system/xbin/sshstatus";
    command=RunProcess(cstring);
@@ -6099,6 +6296,23 @@ void MainWindow::on_actionUninstall_SSH_triggered()
        return;
       }
 
+
+   logfile("ssh uninstallation query");
+
+   QMessageBox::StandardButton reply;
+      reply = QMessageBox::question(this, "", "Uninstall SSH?",
+                                   QMessageBox::Yes|QMessageBox::No);
+      if (reply == QMessageBox::No)
+        {logfile("ssh uninstall cancelled");
+          return;}
+
+
+   mount_system("rw");
+
+
+
+
+
    if (command.contains("running"))
       {
 
@@ -6114,27 +6328,12 @@ void MainWindow::on_actionUninstall_SSH_triggered()
 
        logfile("uninstall ssh");
 
-       cstring = adb + " shell su -c /data/jocala/rmssh";
+       cstring = adb + " shell su -c /data/jocala/ssh/rmssh";
        command=RunProcess(cstring);
-
-       logfile("rm /system/xbin/ssh");
-       logfile(cstring);
-       logfile(command);
 
        cstring = adb + " shell su -c rm -r /data/jocala/";
        command=RunProcess(cstring);
 
-       logfile("rm /system/xbin/ssh");
-       logfile(cstring);
-       logfile(command);
-
-
-       cstring = adb + " shell su -c rm -r /system/etc/init.d/02sshd";
-       command=RunProcess(cstring);
-
-       logfile("rm /system/etc/init.d/02sshd");
-       logfile(cstring);
-       logfile(command);
 
 
        cstring = adb + " shell sshstatus";
@@ -6853,7 +7052,7 @@ void MainWindow::on_actionBuild_mount_script_triggered()
 
 
           QString mount = QInputDialog::getText(this, "Mount point",
-                                                   "/storage/usb/", QLineEdit::Normal
+                                                   uuid+" /storage/usb/", QLineEdit::Normal
                                                    );
             i = i + +1;
 
