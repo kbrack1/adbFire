@@ -2,14 +2,30 @@
 <html><head><title>The Device Setup Dialog</title></head><body>
 <b><u>The Preferences Dialog</b></u>
 <p>
-<b><u>Package name</b></u>, default: org.xbmc.xbmc. This varies depending on what variant of XBMC/Kodi you're running.<p>
+
+<b><u>Description</b></u><br>
+Enter a descriptive title for your device.
+<p>
+<b><u>Device IP</b></u><br>
+Enter the device IP address. A device name is also allowable
+if you have set it up with your router.
+<p>
+<b><u>Package name</b></u>, default: org.xbmc.kodi. <br>
+This varies depending on what variant of XBMC/Kodi you're running.<p>
 If you are running a fork of XBMC/Kodi, enter its package name here, e.g. for SPMC enter "com.semperpax.spmc".
 <p>
-The default is "org.xbmc.kodi". adbFire works equally well with Gotham, SPMC, BeyondXBMC, elmerohueso's XBMC Launcher and Kodi nightlies have been tested with adbFire.<p>
-In theory any fork should work if its file directory structure adheres to Kodi/XBMC conventions (/sdcard/Android/data/packagename/path/.path/) directory structure. YMMV.<p>
+If you are running Kodi leave this setting unchanged.
 <p>
-<b><u>File Path</b></u>, default: /files/.kodi/<br>For XBMC it's "/files/.xbmc/". This path may vary depending on what variant of XBMC/Kodi you're running,
- e.g. for SPMC enter "/files/.spmc/".
+
+<b><u>File Path</b></u>, default: files/.kodi <br>
+This may also vary depending on what variant of XBMC/Kodi you're running.<p>
+The File Path for XBMC is files/.xbmc -- the File Path for SPMC is files/.spmc
+<p>
+The period "." that you see at the beginning of "files" is very important. Don't leave it off!
+<p>
+The File Path is not set up on your Fire Device until Kodi has completed its initial run. adbFire uses the File Path in conjunction with the Package Name to locate the Media Center on your device. If either are entered incorrectly, none of the "Kodi" functions will work.
+<p>
+If you are running Kodi leave this setting unchanged.
 <p>
 <b><u>Pull Folder</b></u>, default: User's home directory.<br>
 Choose the folder where pulled Kodi files and screenshot pngs are placed.

@@ -256,6 +256,9 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Kodi Cache read factor&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="inputMask">
        <string>9999</string>
       </property>
@@ -345,7 +348,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="description"/>
+         <widget class="QLineEdit" name="description">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter a general description for your device. &lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -359,7 +366,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="daddr"/>
+         <widget class="QLineEdit" name="daddr">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the IP address for your device. You may also enter a device name if you have one set up with your router.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -368,14 +379,14 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>Kodi package name</string>
+           <string>Package name</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QLineEdit" name="packagename">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Package name for Kodi or Kodi fork&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Package name for your Media Center  software&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
@@ -393,7 +404,7 @@
         <item>
          <widget class="QLineEdit" name="filepath">
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SSH password (Root only)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the file path for your Media Center.  This is combined with Package Name, e.g.  org.xbmc.kodi/files/.kodi&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
          </widget>
         </item>
