@@ -39,8 +39,12 @@ public:
 public:
    bool ctvradio3();
 
+
 public:
-   bool ctvradio4();
+   bool ctvButton();
+   bool kodiButton();
+   bool xbmcButton();
+   bool spmcButton();
 
 private:
     Ui::llamaDialog *ui;

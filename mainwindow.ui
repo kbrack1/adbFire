@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>559</width>
+    <width>580</width>
     <height>561</height>
    </rect>
   </property>
@@ -528,34 +528,21 @@
    <widget class="QGroupBox" name="mountbox">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>40</y>
+      <x>350</x>
+      <y>60</y>
       <width>141</width>
-      <height>161</height>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
      <string>Mount Drives/Samba</string>
     </property>
-    <widget class="QLabel" name="sambaLabel">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>140</y>
-       <width>105</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Samba server on&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>102</width>
+       <width>117</width>
        <height>89</height>
       </rect>
      </property>
@@ -581,18 +568,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="usbBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make mount of /dev/block/sda1 persistent&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
+       <widget class="QLabel" name="sambaLabel">
         <property name="text">
-         <string>Persistent</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Samba server on&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -605,7 +583,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>559</width>
+     <width>580</width>
      <height>22</height>
     </rect>
    </property>
@@ -642,14 +620,15 @@
     </property>
     <addaction name="actionInstall_busybox"/>
     <addaction name="actionUninstall_Busybox"/>
+    <addaction name="actionInstall_Samba"/>
+    <addaction name="actionUninstall_Samba"/>
     <addaction name="actionInstall_SSH"/>
     <addaction name="actionUninstall_SSH"/>
     <addaction name="actionFirmware_install"/>
     <addaction name="actionInstall_Recovery"/>
-    <addaction name="actionBuild_mount_script"/>
+    <addaction name="actionInstall_Stock_Recovery"/>
     <addaction name="actionSwap_data"/>
     <addaction name="actionUnlock_Bootloader"/>
-    <addaction name="actionLock_Bootloader"/>
     <addaction name="actionMount_CIFS"/>
    </widget>
    <addaction name="menuFile"/>
@@ -736,7 +715,7 @@
   </action>
   <action name="actionInstall_Recovery">
    <property name="text">
-    <string>Install Recovery</string>
+    <string>Install Clockwork Mod</string>
    </property>
    <property name="toolTip">
     <string>Install CWM recovery</string>
@@ -770,16 +749,6 @@
     <string>Unlock Bootloader</string>
    </property>
   </action>
-  <action name="actionLock_Bootloader">
-   <property name="text">
-    <string>Lock Bootloader</string>
-   </property>
-  </action>
-  <action name="actionBuild_mount_script">
-   <property name="text">
-    <string>Build mount script</string>
-   </property>
-  </action>
   <action name="actionConsole">
    <property name="text">
     <string>Console</string>
@@ -804,6 +773,21 @@
   <action name="actionDownload_Kodi">
    <property name="text">
     <string>Download Kodi</string>
+   </property>
+  </action>
+  <action name="actionInstall_Stock_Recovery">
+   <property name="text">
+    <string>Install Stock Recovery</string>
+   </property>
+  </action>
+  <action name="actionInstall_Samba">
+   <property name="text">
+    <string>Install Samba</string>
+   </property>
+  </action>
+  <action name="actionUninstall_Samba">
+   <property name="text">
+    <string>Uninstall Samba</string>
    </property>
   </action>
  </widget>

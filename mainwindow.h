@@ -79,8 +79,6 @@ private slots:
 
     void on_roButton_clicked();
 
-    void on_usbBox_clicked(bool checked);
-
     void on_pushSplash_clicked();
 
     void on_llamaButton_clicked();
@@ -109,9 +107,7 @@ private slots:
 
     void on_actionUnlock_Bootloader_triggered();
 
-    void on_actionLock_Bootloader_triggered();
-
-    void on_actionBuild_mount_script_triggered();
+    // void on_actionBuild_mount_script_triggered();
 
     void on_actionConsole_triggered();
 
@@ -125,6 +121,14 @@ private slots:
     void on_actionDownload_Kodi_triggered();
 
     void on_pushButton_clicked();
+
+    void on_actionInstall_Stock_Recovery_triggered();
+
+    void on_actionInstall_Samba_triggered();
+
+    void on_actionUninstall_Samba_triggered();
+
+
 
 private:
     Ui::MainWindow *ui;

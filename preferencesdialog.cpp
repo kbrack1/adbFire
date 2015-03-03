@@ -99,6 +99,10 @@ bool preferencesDialog::sshcheck() {
    return ui->sshbox->isChecked();
 }
 
+bool preferencesDialog::mountcheck() {
+   return ui->mountbox->isChecked();
+}
+
 
 bool preferencesDialog::versioncheck() {
    return ui->versioncheck->isChecked();
@@ -147,6 +151,10 @@ void preferencesDialog::setsshBoot(const bool &sshcheck)
     ui->sshbox->setChecked(sshcheck);
 }
 
+void preferencesDialog::setmountBoot(const bool &mountcheck)
+{
+    ui->mountbox->setChecked(mountcheck);
+}
 
 void preferencesDialog::setversioncheck(const bool &versioncheck)
 {
@@ -182,10 +190,13 @@ void preferencesDialog::setrecnum(const QString &recnum)
     ui->recnum->setText(recnum);
 
     if (recnum=="0")
-    ui->versioncheck->setVisible(true);
+       { ui->versioncheck->setVisible(true);
+        ui->getUpdate->setVisible(true);
+        }
      else
-    ui->versioncheck->setVisible(false);
-
+        { ui->versioncheck->setVisible(false);
+         ui->getUpdate->setVisible(false);
+        }
 
 }
 
@@ -279,7 +290,7 @@ void preferencesDialog::onRequestCompleted() {
        }
 
        else
-           QMessageBox::information(0, "","No update available",QMessageBox::Cancel);
+           QMessageBox::information(0, "","No adbFire update available",QMessageBox::Cancel);
 
        delete reply;
 
@@ -339,4 +350,28 @@ void preferencesDialog::on_preset3_clicked()
 
 
 
+}
+
+void preferencesDialog::on_kodiButton_clicked()
+{
+    ui->packagename->setText("org.xbmc.kodi");
+    ui->filepath->setText("/files/.kodi");
+}
+
+void preferencesDialog::on_xbmcButton_clicked()
+{
+    ui->packagename->setText("org.xbmc.xbmc");
+    ui->filepath->setText("/files/.xbmc");
+}
+
+void preferencesDialog::on_spmcButton_clicked()
+{
+    ui->packagename->setText("com.semperpax.spmc");
+    ui->filepath->setText("/files/.spmc");
+}
+
+void preferencesDialog::on_otherButton_clicked()
+{
+    ui->packagename->setText("");
+    ui->filepath->setText("");
 }

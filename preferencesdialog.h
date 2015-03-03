@@ -23,6 +23,7 @@ public:
       void setPulldir(const QString &pulldir);
       void setftvUpdate(const bool &updatecheck);  
       void setsshBoot(const bool &sshcheck);
+      void setmountBoot(const bool &mountcheck);
       void setversioncheck(const bool &versioncheck);
       void setversionLabel(const QString &versiontext);
       void setdaddr(const QString &daddr);
@@ -47,6 +48,7 @@ public:
    QString filepath();
    bool updatecheck();
    bool sshcheck();
+   bool mountcheck();
    bool versioncheck();
 
 int returnval1();
@@ -72,6 +74,14 @@ private slots:
    void on_preset2_clicked();
 
    void on_preset3_clicked();
+
+   void on_kodiButton_clicked();
+
+   void on_xbmcButton_clicked();
+
+   void on_spmcButton_clicked();
+
+   void on_otherButton_clicked();
 
 private:
     Ui::preferencesDialog *ui;

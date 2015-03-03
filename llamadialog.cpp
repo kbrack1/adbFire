@@ -39,10 +39,21 @@ bool llamaDialog::ctvradio3() {
 }
 
 
-bool llamaDialog::ctvradio4() {
-   return ui->ctvradio4->isChecked();
+bool llamaDialog::ctvButton() {
+   return ui->ctvButton->isChecked();
 }
 
+bool llamaDialog::kodiButton() {
+   return ui->kodiButton->isChecked();
+}
+
+bool llamaDialog::xbmcButton() {
+   return ui->xbmcButton->isChecked();
+}
+
+bool llamaDialog::spmcButton() {
+   return ui->spmcButton->isChecked();
+}
 
 
 llamaDialog::llamaDialog(QWidget *parent) :

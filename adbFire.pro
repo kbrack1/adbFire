@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     adblogdialog.cpp \
     cifsdialog.cpp \
     videodialog.cpp \
-    kodidialog.cpp
+    kodidialog.cpp \
+    unlockdialog.cpp
 
 
 RESOURCES = adbFire.qrc
@@ -42,7 +43,8 @@ HEADERS  += mainwindow.h \
     adblogdialog.h \  
     cifsdialog.h \
     videodialog.h \
-    kodidialog.h
+    kodidialog.h \
+    unlockdialog.h
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -56,7 +58,8 @@ FORMS    += mainwindow.ui \
     adblogdialog.ui \
     cifsdialog.ui \
     videodialog.ui \
-    kodidialog.ui
+    kodidialog.ui \
+    unlockdialog.ui
 
 RC_FILE = adbFire.rc
 

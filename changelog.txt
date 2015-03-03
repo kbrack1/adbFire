@@ -1,12 +1,99 @@
+adbFire 1.21 changelog
+
+Llama Options now include SPMC, Koyring's
+fork of Kodi. Start SPMC at boot, place
+the SPMC icon in the FTV's Recent area.
+
+Llama Options now gives you the
+choice of Ikono TV or Classic TV
+as your switching program. 
+
+Device Setup "Updates" button message changed from
+"No update available" to "No adbFire update available"
+
+Various typos in html help fixed.
+
+Mount USB drives at boot checkbox moved to Device Setup.
+
+System Tools installation now checks for backups of drive
+mount & /data swap scripts and offers to restore them.
+
+Samba now completely removed when System Tools are
+uninstalled. 
+
+Samba installation now seperate from System Tools
+installation. System tools is a prerequisite.
+
+Installation of stock recovery and clockwork mod 
+are now seperate functions.
+
+rbox full unlock added.
+
+Kodi/XBMC/SPMC filepaths and packagenames pre-programmed
+in Device Setup dialog.
+
+Device Setup: SSH at boot, Mount at boot and Amazon updates
+These root functions require that the checkbox be
+checked/unchecked by the user. Nothing automatic occurs.
+
+
+adbFire 1.20 changelog
+
+Timestamp/Version number/OS header added to log file
+
+Main window combobox now contains device description, not IP.
+
+Samba server off/on indicator added
+
+File Path field added to device database. This is to 
+accomodate Kodi forks that diverge from /file/.kodi/ 
+or /file/.xbmc/ file path, e.g. SPMC. 
+
+Device Setup Help re-written to reflect new layout.
+
+Root requirement to check Kodi running state removed.
+
+The adbFire Backup format is now similar to the format of the
+Kodi Backup Addon.
+
+Backups made by the Kodi Backup Addon can be restored by adbFire.
+ 
+Main window "Setup" button now reads "Device Setup"
+
+Busybox v1.24 smaller, more applets and HFS+ Label/UUID support
+
+New SSH. Recompiled for more speed, less size and no 2gb file
+size limit with sftp/scp.
+
+adbFire now attempts connection with first device at startup.
+
+adbFire now attempts connection when device is selected 
+from combobox.
+
+When uninstalling System Tools, backups are made of the
+mntdrives.sh script and if it exists mntdata.sh
+
+Llama Options for XBMC/Kodi on boot simplified.
+
+Llama updated to 1.2014.11.20.2003
+
+"Backup Kodi" button now reads "Backup"
+
+"Restore Kodi" button now reads "Restore"
+
+LLama Options "Boot AFTV to Kodi" replaces "Kodi" with "Media Center"
+
+Llama Options "Link Kodi to ikonoTV" replaces "Kodi" with "Media Center"
+
+
 adbFire 1.18 changelog
 =======================
 Bug in aftv-unlock detection fixed.
 
 Check for enduser-added spaces in app filename.
 
-Fixed bug where some variables were not properly
-initialized when  switching between devices via
-the combobox.
+Fixed initialization bug when switching between
+devices via the combobox.
 
 Fixed bug in root detection function.
 

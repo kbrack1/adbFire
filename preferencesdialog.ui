@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>610</width>
-    <height>379</height>
+    <width>576</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,8 +58,8 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>319</x>
-     <y>58</y>
+     <x>310</x>
+     <y>60</y>
      <width>161</width>
      <height>16</height>
     </rect>
@@ -71,8 +71,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>319</x>
-     <y>88</y>
+     <x>310</x>
+     <y>90</y>
      <width>104</width>
      <height>26</height>
     </rect>
@@ -125,8 +125,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>319</x>
-     <y>208</y>
+     <x>310</x>
+     <y>210</y>
      <width>186</width>
      <height>32</height>
     </rect>
@@ -154,8 +154,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>319</x>
-     <y>178</y>
+     <x>310</x>
+     <y>180</y>
      <width>174</width>
      <height>20</height>
     </rect>
@@ -202,8 +202,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>120</y>
+     <x>311</x>
+     <y>122</y>
      <width>161</width>
      <height>23</height>
     </rect>
@@ -234,8 +234,8 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>319</x>
-     <y>148</y>
+     <x>310</x>
+     <y>150</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -268,63 +268,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QCheckBox" name="sshbox">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>271</y>
-     <width>142</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start SSH server at boot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="text">
-    <string>SSH server at boot</string>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="ftvupdatesBox">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>250</y>
-     <width>138</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="text">
-    <string>FireTV updates on</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="versioncheck">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>292</y>
-     <width>252</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check for adbFire updates when program starts&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="text">
-    <string>Check for adbFire updates at startup</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -464,16 +407,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="getUpdate">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check for adbFire Updates&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Updates</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QPushButton" name="pushButton_2">
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close rhis dialog&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -487,6 +420,135 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>360</y>
+     <width>350</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_11">
+    <item>
+     <widget class="QCheckBox" name="versioncheck">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check for adbFire updates when program starts&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Check for adbFire updates at start</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="getUpdate">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check for adbFire Updates&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Check Now</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>270</y>
+     <width>153</width>
+     <height>62</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <widget class="QCheckBox" name="ftvupdatesBox">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;disables/enables&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;com.amazon.dcp&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>FireTV updates on</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="sshbox">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start SSH server at boot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>SSH server at boot</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="mountbox">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start SSH server at boot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Mount drives at boot</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>260</y>
+     <width>66</width>
+     <height>77</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <item>
+     <widget class="QRadioButton" name="kodiButton">
+      <property name="text">
+       <string>Kodi</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="xbmcButton">
+      <property name="text">
+       <string>XBMC</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="spmcButton">
+      <property name="text">
+       <string>SPMC</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="otherButton">
+      <property name="text">
+       <string>Other</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>description</tabstop>
@@ -496,9 +558,6 @@
   <tabstop>sshpassword</tabstop>
   <tabstop>pfolderButton</tabstop>
   <tabstop>pulldir</tabstop>
-  <tabstop>ftvupdatesBox</tabstop>
-  <tabstop>sshbox</tabstop>
-  <tabstop>versioncheck</tabstop>
   <tabstop>buffermode</tabstop>
   <tabstop>buffersize</tabstop>
   <tabstop>bufferfactor</tabstop>
@@ -507,7 +566,12 @@
   <tabstop>preset3</tabstop>
   <tabstop>writexml</tabstop>
   <tabstop>resetxml</tabstop>
-  <tabstop>getUpdate</tabstop>
+  <tabstop>ftvupdatesBox</tabstop>
+  <tabstop>sshbox</tabstop>
+  <tabstop>mountbox</tabstop>
+  <tabstop>versioncheck</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
  </tabstops>
  <resources/>
  <connections>

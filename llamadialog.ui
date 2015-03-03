@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>372</width>
-    <height>422</height>
+    <width>406</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,21 +16,21 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>120</x>
      <y>30</y>
-     <width>141</width>
-     <height>16</height>
+     <width>181</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Llama Options</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;Llama Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>90</y>
+     <y>160</y>
      <width>251</width>
      <height>131</height>
     </rect>
@@ -43,7 +43,7 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>209</width>
+      <width>211</width>
       <height>77</height>
      </rect>
     </property>
@@ -51,10 +51,10 @@
      <item>
       <widget class="QRadioButton" name="llamaradio1">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When the AFTV boots, XBMC automatically starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When the AFTV boots, your media center software automatically starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Boot AFTV to Media Center</string>
+        <string>Boot to Media Center</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -64,10 +64,10 @@
      <item>
       <widget class="QRadioButton" name="llamaradio2">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Classic TV is launched, XBMC starts.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When Ikono TV/Classic is launched, Llama will start your media center software.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Link Media Center to ikonoTV</string>
+        <string>Link Media Center to Program</string>
        </property>
        <property name="checked">
         <bool>false</bool>
@@ -77,7 +77,7 @@
      <item>
       <widget class="QRadioButton" name="llamaradio3">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Both actions above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Your media center software starts at boot. Also, when Ikono TV/Classic is launched, Llama will start your media center software.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Both</string>
@@ -90,7 +90,7 @@
      <item>
       <widget class="QRadioButton" name="llamaradio4">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Both actions above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Take no action&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>No action</string>
@@ -103,79 +103,50 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QCheckBox" name="llamacheckBox">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>60</y>
-     <width>121</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install Llama or update Llama Events&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="text">
-    <string>Install Llama</string>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>230</y>
-     <width>311</width>
-     <height>131</height>
+     <x>40</x>
+     <y>300</y>
+     <width>221</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="title">
-    <string>ikono TV Icon</string>
+    <string>Icon choice</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>40</y>
-      <width>275</width>
-      <height>77</height>
+      <y>30</y>
+      <width>167</width>
+      <height>58</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QRadioButton" name="ctvradio1">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Replace Classic TV icon with XBMC icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The icon for your Program Choice will be replaced by the icon of your media center.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Replace ikonoTV icon with XBMC icon</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
+        <string>Replace Program icon </string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QRadioButton" name="ctvradio2">
        <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore default Classic TV icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore the default icon for the Program Choice above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Replace ikonoTV icon with Kodi icon</string>
+        <string>Restore Program icon</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QRadioButton" name="ctvradio3">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore default Classic TV icon&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>Restore default ikonoTV icon</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="ctvradio4">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do nothing &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -190,11 +161,146 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>80</y>
+     <width>131</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Program Choice</string>
+   </property>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>91</width>
+      <height>39</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QRadioButton" name="ikonoButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ikono TV is a priigram used as as a surrogate for your media center on the Fire TV's home page Recent section. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Ikono TV</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="ctvButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ClassicTV is a priigram used as as a surrogate for your media center on the Fire TV's home page Recent section. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Classic TV</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>80</y>
+     <width>141</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Llama</string>
+   </property>
+   <widget class="QCheckBox" name="llamacheckBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install Llama&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>Install Llama</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>160</y>
+     <width>91</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Media Center</string>
+   </property>
+   <widget class="QWidget" name="layoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>66</width>
+      <height>77</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QRadioButton" name="kodiButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the icon for the Kodi Media Center&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Kodi</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="xbmcButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the icon for the XBMC Media Center&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>XBMC</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="spmcButton">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the icon for the SPMC Media Center&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>SPMC</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>370</y>
+     <y>420</y>
      <width>164</width>
      <height>32</height>
     </rect>
@@ -202,6 +308,9 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QPushButton" name="okButton">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Perform the selected tasks&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>OK</string>
       </property>
@@ -209,6 +318,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="quitButton">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cancel and close dialog&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>Cancel</string>
       </property>
