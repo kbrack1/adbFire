@@ -16,10 +16,10 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>30</y>
-     <width>181</width>
-     <height>31</height>
+     <x>90</x>
+     <y>20</y>
+     <width>201</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="text">
@@ -44,7 +44,7 @@
       <x>20</x>
       <y>30</y>
       <width>211</width>
-      <height>77</height>
+      <height>103</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -115,13 +115,13 @@
    <property name="title">
     <string>Icon choice</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>30</y>
       <width>167</width>
-      <height>58</height>
+      <height>76</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -179,7 +179,7 @@
       <x>10</x>
       <y>30</y>
       <width>91</width>
-      <height>39</height>
+      <height>49</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -296,12 +296,12 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>100</x>
      <y>420</y>
-     <width>164</width>
+     <width>195</width>
      <height>32</height>
     </rect>
    </property>
