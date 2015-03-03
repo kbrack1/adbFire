@@ -1,2 +1,0 @@
-#!/system/bin/sh
-/system/xbin/busybox mount -o nolock,ro,hard,intr,vers=3 -t nfs 192.168.1.200:/media /sdcard/test

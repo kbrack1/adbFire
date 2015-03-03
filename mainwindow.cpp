@@ -57,7 +57,7 @@ int os=2;
 // QString num="123";
 //  int n = num.toInt();
 
-const QString version = "1.21";
+const QString version = "1.22";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -6993,14 +6993,18 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
        if (!agree)
            return;
 
+
+       isConnected=false;
+        ui->device_connected->setText("  Device not connected.");
+        ui->update_status->setText("");
+
+
         cstring = adb + " shell su -c /system/xbin/aftv-full-unlock";
         command=RunProcess(cstring);
 
-        isConnected=false;
-         ui->device_connected->setText("  Device not connected.");
-         ui->update_status->setText("");
-         logfile(cstring);
-         logfile(command);
+      logfile(cstring);
+      logfile(command);
+
 
     }
 
@@ -7016,6 +7020,36 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
 }
 
 /*
+
+
+ QElapsedTimer rtimer;
+ int nMilliseconds;
+
+QProcess reboot_device;
+rtimer.start();
+reboot_device.setProcessChannelMode(QProcess::MergedChannels);
+
+ cstring = adb + " shell su -c /system/xbin/aftv-full-unlock";
+
+reboot_device.start(cstring);
+reboot_device.waitForStarted();
+while(reboot_device.state() != QProcess::NotRunning)
+  {
+    qApp->processEvents();
+     nMilliseconds = rtimer.elapsed();
+   if (nMilliseconds >= 5000)
+       break;
+}
+
+       isConnected=false;
+        ui->device_connected->setText("  Device not connected.");
+        ui->update_status->setText("");
+        logfile(cstring);
+        logfile(command);
+
+
+
+
 
 /////////////////////////////////////////////////////////
 void MainWindow::on_actionBuild_mount_script_triggered()

@@ -1,4 +1,4 @@
-adbFire 1.21 changelog
+adbFire 1.22 changelog
 
 Llama Options now include SPMC, Koyring's
 fork of Kodi. Start SPMC at boot, place
