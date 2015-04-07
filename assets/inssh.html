@@ -3,9 +3,16 @@
 <b><u>Install SSH</b></u><br>
 This option installs the Dropbear SSH server on your device. This allows you to open a secure shell on your Fire TV, somewhat like adb shell. Among many other things, it allows you to copy files to your device as root using the scp command and act as a backup entryway into your system in the case of a problem with adb. <p>
 The sftp option is also present, which allows an ftp-like connection to the Fire TV<p>
-SSH can be made persistant by checking the "SSH at boot" option in adbFire's preferences dialog. If you choose not to start SSH at boot it can be started and stopped via the command line:<p> Press "ADB Shell" then enter the command "sshstart password" where 'password' is the password you want SSH to use. <p>Stopping SSH is done via the command "sshstop", and you can find SSH's status with the command: "sshstatus".
+SSH can be made persistant by checking the "SSH at boot" option in adbFire's preferences dialog. If you choose not to start SSH at boot it can be started via SFTP/SSH buttons or via the command line:<p> Pressing either SSH or SFTP will open a connection to Fire TV. <p>
+From the Fire TV ADB Shell you have three commands to control the SSH server:
+<ul>
+<li>sshstart: start the ssh server</li>
+<li>sshstop: stop the ssh server</li>
+<li>sshstatus: give the server status</li>
+</ul>
 <p>For Windows users the puTTY ssh/sftp clients are pre-installed, OS X and Linux users have default ssh/sftp clients.
 <p>
+For more information click <a href="ssh.html">here</a>
 <p>
 <b>Root is REQUIRED</b>
 <p>

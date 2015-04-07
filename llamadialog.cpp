@@ -55,6 +55,10 @@ bool llamaDialog::spmcButton() {
    return ui->spmcButton->isChecked();
 }
 
+bool llamaDialog::tvmcButton() {
+   return ui->tvmcButton->isChecked();
+}
+
 
 llamaDialog::llamaDialog(QWidget *parent) :
     QDialog(parent),

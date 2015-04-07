@@ -45,7 +45,7 @@ public:
    bool kodiButton();
    bool xbmcButton();
    bool spmcButton();
-
+   bool tvmcButton();
 private:
     Ui::llamaDialog *ui;
 };

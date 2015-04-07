@@ -2,6 +2,13 @@
 <html><head><title>SSH</title></head><body>
 The <b>"SSH"</b> button opens an ssh client connection to the Fire TV. For Windows it's PuTTY SSH, which is pre-installed. For OS X and Linux adbFire starts the native ssh client.<p>
 <p>
+The <b>"SFTP"</b> button opens an sftp client connection to the Fire TV. For Windows it's PuTTY SFTP, which is pre-installed. For OS X and Linux adbFire starts the native sftp client.<p>
+<p>
+On the Fire TV asbFire installs the lightweight Dropbear ssh server. The server is set up to use public key authentication. This eliminates the need for passwords.<p>
+While an in-depth discussion of this topic is beyond the scope of this document, at it's most basic, public key authentication involves a public key existing on the Fire TV and a private key existing on any device that needs to login to the Fire TV. <p>
+For Windows users the private key is adbfire.ppk and it is kept in the same folder as all other adbFire files.<p>
+For Linux/Mac users the private key is id_adbfire, and it's kept in the .ssh directory that is in your home folder. When you install adbFire SSH  the .ssh folder is created for you if one doesn't exist.<p>
+Also in  the .ssh folder is a file named "config". This file tells your client device what keys to use with what host. If you already have a .ssh/config file, the adbFire data will be appended to it, otherwise a new one is created.
 <p>
 If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
 <a href="menu.html">main menu</a>

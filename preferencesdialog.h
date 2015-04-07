@@ -19,7 +19,6 @@ public:
     explicit preferencesDialog(QWidget *parent = 0 );
 
       void setPackagename(const QString &packagename);
-      void setSSHpassword(const QString &sshpassword);
       void setPulldir(const QString &pulldir);
       void setftvUpdate(const bool &updatecheck);  
       void setsshBoot(const bool &sshcheck);
@@ -38,7 +37,6 @@ public:
 
 public:
    QString xbmcpackageName();
-   QString sshpassword();
    int buffermode();
    QString buffersize();
    QString bufferfactor();
@@ -82,6 +80,8 @@ private slots:
    void on_spmcButton_clicked();
 
    void on_otherButton_clicked();
+
+   void on_tvmcButton_clicked();
 
 private:
     Ui::preferencesDialog *ui;

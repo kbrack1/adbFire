@@ -27,7 +27,7 @@ installation. System tools is a prerequisite.
 Installation of stock recovery and clockwork mod 
 are now seperate functions.
 
-rbox full unlock added.
+rbox full unlock added. Currently, the unlock cannot be reversed.
 
 Kodi/XBMC/SPMC filepaths and packagenames pre-programmed
 in Device Setup dialog.

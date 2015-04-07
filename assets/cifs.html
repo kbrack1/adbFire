@@ -17,6 +17,7 @@ Mount - Mount any share with the selection checkbox checked<p>
 Unmount - Unmount any share with the selection checkbox checked<p>
 Save - Save all shares<p>
 Script - Write an init.d script to mount checked shares at boot<p>
+UnScript - Delete the init.d script that mounts checked shares at boot<p>
 Cancel - Exit the dialog with no action taken.<p>
 
 <u>Shares and mount points are entered like so:</u><br>
@@ -24,6 +25,8 @@ Cancel - Exit the dialog with no action taken.<p>
 192.168.1.2 (your share IP)<br>
 /path/to/your/share<br>
 /path/to/mountpoint<br>
+<p>
+Android 4.2 and above breaks Dalvik-apps that mount file systems to be shared with other apps. Unfortunately, this means that CIFS/NFS mounts created by adbFire can only be used by root.
 <p>
 This is a <b><u>ROOT</u></b> function. This will not work on unrooted devices.
 <p>

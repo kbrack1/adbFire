@@ -231,6 +231,13 @@ void cifsDialog::on_scriptButton_clicked()
   rval=4;
 }
 
+
+void cifsDialog::on_unscriptButton_clicked()
+{
+    rval=5;
+}
+
+
 void cifsDialog::on_cancelButton_clicked()
 {
     rval=99;

@@ -12,7 +12,7 @@
         <file>assets/atvsetup.html</file>
         <file>assets/backup.html</file>
         <file>assets/cache.html</file>
-	<file>assets/console.html</file>
+        <file>assets/console.html</file>
         <file>assets/filero.html</file>
         <file>assets/filerw.html</file>
         <file>assets/help.html</file>
@@ -33,7 +33,6 @@
         <file>assets/restore.html</file>
         <file>assets/root.html</file>
         <file>assets/screen.html</file>
-        <file>assets/sftp.html</file>
         <file>assets/splash.html</file>
         <file>assets/ssh.html</file>
         <file>assets/swap.html</file>

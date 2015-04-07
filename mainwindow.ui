@@ -790,6 +790,16 @@
     <string>Uninstall Samba</string>
    </property>
   </action>
+  <action name="actionInstallBootmenu">
+   <property name="text">
+    <string>install Boot Menu</string>
+   </property>
+  </action>
+  <action name="actionUninstall_Boot_Menu">
+   <property name="text">
+    <string>Uninstall Boot Menu</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

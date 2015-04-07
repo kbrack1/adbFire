@@ -130,6 +130,10 @@ private slots:
 
 
 
+    void on_actionInstallBootmenu_triggered();
+
+    void on_actionUninstall_Boot_Menu_triggered();
+
 private:
     Ui::MainWindow *ui;
 

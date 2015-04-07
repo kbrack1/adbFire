@@ -13,6 +13,14 @@ QString pdir = "";
 QString version2;
 int rval1 = 0;
 
+QString packagepreset1 = "org.xbmc.kodi";
+QString packagepreset2 = "org.xbmc.xbmc";
+QString packagepreset3 = "com.semperpax.spmc";
+QString packagepreset4 = "ag.tvmc.tvmc";
+
+QString xpackage;
+
+
 ////////////////////////////////////////////////
  QString strip2 (QString str)
 {
@@ -72,9 +80,7 @@ QString preferencesDialog::xbmcpackageName() {
    return ui->packagename->text();
 }
 
-QString preferencesDialog::sshpassword() {
-   return ui->sshpassword->text();
-}
+
 
 QString preferencesDialog::pulldir() {
    return ui->pulldir->text();
@@ -127,13 +133,39 @@ void preferencesDialog::setbufferfactor(const QString &bufferfactor)
 
 void preferencesDialog::setPackagename(const QString &packagename)
 {
+
+    bool isset=false;
+
     ui->packagename->setText(packagename);
+
+
+
+    if (packagename == packagepreset1)
+    {  ui->kodiButton->setChecked(true);
+        isset=true;
+    }
+
+    if (packagename == packagepreset2)
+    { ui->xbmcButton->setChecked(true);
+        isset=true;
+    }
+
+     if (packagename == packagepreset3)
+        { ui->spmcButton->setChecked(true);
+         isset=true;
+        }
+
+     if (packagename == packagepreset4)
+       {  ui->tvmcButton->setChecked(true);
+         isset=true;
+        }
+
+     if (!isset)
+       ui->otherButton->setChecked(true);
+
 }
 
-void preferencesDialog::setSSHpassword(const QString &sshpassword)
-{
-    ui->sshpassword->setText(sshpassword);
-}
+
 
 void preferencesDialog::setPulldir(const QString &pulldir)
 {
@@ -205,7 +237,7 @@ int preferencesDialog::returnval1() {
    return rval1;
 }
 
-
+/////////////////////////////////////
 preferencesDialog::preferencesDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::preferencesDialog)
@@ -374,4 +406,10 @@ void preferencesDialog::on_otherButton_clicked()
 {
     ui->packagename->setText("");
     ui->filepath->setText("");
+}
+
+void preferencesDialog::on_tvmcButton_clicked()
+{
+    ui->packagename->setText("ag.tvmc.tvmc");
+    ui->filepath->setText("/files/.spmc");
 }

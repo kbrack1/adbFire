@@ -80,6 +80,8 @@ private slots:
 
    void on_cancelButton_clicked();
 
+   void on_unscriptButton_clicked();
+
 private:
     Ui::cifsDialog *ui;
 };
