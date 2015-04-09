@@ -1736,6 +1736,138 @@ bool isConnectedToNetwork()
 }
 
 
+/////////////////////////////////////////////////
+void writeConfig()
+
+{
+
+   QString l1;
+   QString l2;
+   QString l3;
+   QString l4;
+
+   QString cstring;
+   QString command;
+
+
+
+ QString sshDir = QDir::homePath() + "/.ssh";
+
+
+ if ( !QDir(sshDir).exists() )
+  {
+     QDir().mkdir(sshDir);
+     cstring = "chmod 0700 "+sshDir;
+     command=RunProcess(cstring);
+     logfile(cstring);
+     logfile(command);
+ }
+
+
+ l1 = "Host "+daddr;
+ l2 = "HostName "+daddr;
+ l3 = "IdentityFile ~/.ssh/id_adbfire";
+ l4 = "User root";
+
+ if (!fileExists(sshDir+"/config"))
+   {
+
+    QString cfgfile = sshDir+"/config";
+    QFile file(cfgfile);
+
+      if(!file.open(QFile::WriteOnly |  QFile::Text))
+       {
+        QMessageBox::critical(0, "","Can't open config file!\n",QMessageBox::Cancel);
+        logfile("error creating config!");
+        return;
+       }
+
+QTextStream out(&file);
+
+   out  << l1 << endl;
+   out  << l2 << endl;
+   out  << l3 << endl;
+   out  << l4 << endl;
+   out  << endl;
+
+    file.flush();
+    file.close();
+
+}
+
+ else
+
+  {
+
+     QString cfgfile = sshDir+"/config";
+     QFile file(cfgfile);
+
+
+      QFile xfile(cfgfile);
+        if (!xfile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+          QMessageBox::critical(0, "","Can't open config file!\n",QMessageBox::Cancel);
+          return;
+        }
+
+        QStringList stringList;
+        QTextStream textStream(&xfile);
+
+        while (!textStream.atEnd())
+            stringList << textStream.readLine();
+
+        file.close();
+
+
+
+if (!stringList.contains(l1))
+{
+
+      if(!file.open(QFile::WriteOnly | QFile::Text | QFile::Append))
+         {
+           QMessageBox::critical(0, "","Can't open config file!\n",QMessageBox::Cancel);
+           return;
+         }
+
+
+ QTextStream out(&file);
+
+ out  << l1 << endl;
+ out  << l2 << endl;
+ out  << l3 << endl;
+ out  << l4 << endl;
+ out  << endl;
+
+
+  file.flush();
+  file.close();
+
+ }
+
+ }
+
+
+ if (!fileExists(sshDir+"/id_adbfire"))
+   {
+      cstring = "cp "+adbdir+"id_adbfire  "+sshDir;
+      command=RunProcess(cstring);
+      logfile(cstring);
+       logfile(command);
+    }
+
+
+ cstring = "chmod 0600 "+sshDir+"/id_adbfire";
+ command=RunProcess(cstring);
+ logfile(cstring);
+ logfile(command);
+
+ cstring = "chmod 0600 "+sshDir+"/config";
+ command=RunProcess(cstring);
+ logfile(cstring);
+ logfile(command);
+
+
+} ////////
 
 
 //////////////////////////////////////////////
@@ -6529,9 +6661,6 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
 
 
-
-
-
    QString cstring;
    QString command;
 
@@ -6616,94 +6745,6 @@ logfile(cstring);
 logfile(command);
 
 
-if (os != 1)
-          {
-
-           QString sshDir = QDir::homePath() + "/.ssh";
-
-
-           if ( !QDir(sshDir).exists() )
-           {
-                 QDir().mkdir(sshDir);
-                   cstring = "chmod 0700 "+sshDir;
-                  command=RunProcess(cstring);
-                  logfile(cstring);
-                  logfile(command);
-           }
-
-
-               if (!fileExists(sshDir+"/config"))
-                  {
-                    cstring = "cp "+adbdir+"sshconfig  "+sshDir+"/config";
-                    command=RunProcess(cstring);
-                    logfile(cstring);
-                    logfile(command);
-
-                    cstring = "chmod 0600 "+sshDir+"/config";
-                    command=RunProcess(cstring);
-                    logfile(cstring);
-                    logfile(command);
-
-                    cstring = "cp "+adbdir+"id_adbfire "+sshDir;
-                    command=RunProcess(cstring);;
-                    logfile(cstring);
-                    logfile(command);
-
-                    cstring = "chmod 0600 "+sshDir+"/id_adbfire";
-                    command=RunProcess(cstring);
-                    logfile(cstring);
-                    logfile(command);
-
-
-                }
-
-                else
-
-                {
-
-                   QString line;
-
-                   QFile sshConfigFile(sshDir+"/config");
-
-                   QFile adbConfigFile(adbdir+"sshconfig");
-
-                      if(!sshConfigFile.open(QFile::WriteOnly | QFile::Text | QFile::Append))
-                         {
-                          QMessageBox::critical(0, "","Can't create config file!\n",QMessageBox::Cancel);
-                          return;
-                         }
-
-                   if (adbConfigFile.open(QIODevice::ReadOnly))
-                   {
-                      QTextStream in(&adbConfigFile);
-                      while (!in.atEnd())
-                      {
-                         line = in.readLine();
-                          QTextStream out(&sshConfigFile);
-                               out  << line << endl;
-
-                      }
-                      sshConfigFile.close();
-                      adbConfigFile.close();
-                   }
-
-                   cstring = "chmod 0600 "+sshDir+"/config";
-                   command=RunProcess(cstring);
-                   logfile(cstring);
-                   logfile(command);
-
-                   cstring = "cp "+adbdir+"id_adbfire  "+sshDir;
-                   command=RunProcess(cstring);
-                   logfile(cstring);
-                   logfile(command);
-
-                   cstring = "chmod 0600 "+sshDir+"/id_adbfire";
-                   command=RunProcess(cstring);
-                   logfile(cstring);
-                   logfile(command);
-
-                }
-         }
 
 cstring = adb + " shell ls /data/jocala/ssh/sshstart";
 command=RunProcess(cstring);
@@ -6864,6 +6905,11 @@ void MainWindow::on_puttyButton_clicked()
     QString cstring = "";
     QString command = "";
 
+
+    if (os != 1)
+       writeConfig();
+
+
     cstring = adb + " shell su -c /system/xbin/sshstart";
     command=RunProcess(cstring);
 
@@ -6966,6 +7012,9 @@ void MainWindow::on_sftpButton_clicked()
           return;
     }
 
+
+    if (os != 1)
+       writeConfig();
 
 
     QString cstring = adb + " shell su -c /system/xbin/sshstart";

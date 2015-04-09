@@ -1,3 +1,51 @@
+adbFire 1.23 changelog
+
+Busybox added for non-root users.
+
+Bug writing Linux scripts from Windows
+systems fixed.
+
+init.d scripts reordered to allow for a
+initial sleep script to pause init.d
+run-levels processing when needed.
+
+Tooltips added to share mounting dialog.
+
+Delete boot mount script button added to
+share mounting dialog.
+
+All ssh control commands are bash scripts,
+editable by user. There are three:
+
+sshstart
+sshstop
+sshstatus
+
+Dropbear ssh is now password-free. Required
+key files for Windows PuTTY and Mac/Linux openssh are
+supplied. Both Fire TV and PC-side installation
+are automated.
+
+SSH server starts on demand. Start at boot option
+available.
+
+SSH/SFTP html help files updated.
+
+Bug where file pull breaks when target folder
+has embedded spaces is fixed.
+
+Bug allowing empty 04mntshares script fixed.
+
+Bug pulling screenshots into directories with
+embedded spaces fixed.
+
+Existence check for pull directory added.
+
+TVMC added to media center presets in setup dialog.
+
+TVMC added to Llama options.
+
+
 adbFire 1.22 changelog
 
 Llama Options now include SPMC, Koyring's
