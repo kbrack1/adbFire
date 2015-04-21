@@ -1,3 +1,18 @@
+adbFire 1.24 changelog
+
+Kodi/Fork data move to/from extUsb
+
+Kodi/Fork Thumbnails move to/from extUsb
+
+Backup/Restore works with moved data/Thumbnails
+
+Push/Pull/Delete works with moved data/Thumbnails
+
+HTML help added for Kodi data move options
+
+extUsb added to Push/Pull/Delete dropdown choices
+
+
 adbFire 1.23 changelog
 
 Busybox added for non-root users.
