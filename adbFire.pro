@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     kodidialog.cpp \
     unlockdialog.cpp \
     bootmenudialog.cpp \
-    unbootdialog.cpp
+    unbootdialog.cpp \
+    datadialog.cpp
 
 
 RESOURCES = adbFire.qrc
@@ -48,7 +49,8 @@ HEADERS  += mainwindow.h \
     kodidialog.h \
     unlockdialog.h \
     bootmenudialog.h \
-    unbootdialog.h
+    unbootdialog.h \
+    datadialog.h
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -65,7 +67,8 @@ FORMS    += mainwindow.ui \
     kodidialog.ui \
     unlockdialog.ui \
     bootmenudialog.ui \
-    unbootdialog.ui
+    unbootdialog.ui \
+    datadialog.ui
 
 RC_FILE = adbFire.rc
 

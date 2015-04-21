@@ -44,5 +44,6 @@
         <file>assets/vlog.html</file>
         <file>assets/lock.html</file>
         <file>assets/unlock.html</file>
+        <file>assets/mvdata.html</file>
     </qresource>
 </RCC>

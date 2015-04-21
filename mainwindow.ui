@@ -141,6 +141,11 @@
           <string>sdcard</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>extUsb</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
@@ -595,6 +600,7 @@
     <addaction name="actionDownload_Kodi"/>
     <addaction name="actionConsole"/>
     <addaction name="actionCredits"/>
+    <addaction name="actionMove_Restore_Data"/>
     <addaction name="actionView_Log"/>
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
@@ -668,7 +674,7 @@
     <string>Device Setup</string>
    </property>
    <property name="toolTip">
-    <string>Preferences</string>
+    <string>Set up device</string>
    </property>
   </action>
   <action name="actionReboot">
@@ -798,6 +804,27 @@
   <action name="actionUninstall_Boot_Menu">
    <property name="text">
     <string>Uninstall Boot Menu</string>
+   </property>
+  </action>
+  <action name="actionKodi_data_external">
+   <property name="text">
+    <string>MC Data to extUsb</string>
+   </property>
+   <property name="toolTip">
+    <string>Move media center data to extUsb</string>
+   </property>
+  </action>
+  <action name="actionKodi_data_internal">
+   <property name="text">
+    <string>MC Data to internal</string>
+   </property>
+   <property name="toolTip">
+    <string>Move media center data from extUsb</string>
+   </property>
+  </action>
+  <action name="actionMove_Restore_Data">
+   <property name="text">
+    <string>Media Center Data</string>
    </property>
   </action>
  </widget>

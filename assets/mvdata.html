@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Media Center Data</title></head><body>
+The <b>"Media Center Data"</b> allows moving your entire Kodi data folder or just Thumbnails to the Fire TV's external storage (extUsb). Please note that Kodi <u>MUST</u> have been run for the first time before using this dialog. 
+<p>
+<u>The dialog presents four radio buttons:</u><br>
+Move data to extUsb<br>
+Move data from extUsb<br>
+Move thumbnails to extUsb<br>
+Move thumbnails from extUsb<br>
+<p>
+Click the radio button of your choice and press "OK".
+<p>
+The Move data choices move Kodi's entire data folder (.kodi) to the external device mounted at /storage/extUsb, or back to the normal area of the sdcard partition.<p>
+<p>
+At start, Kodi (or its forks) look for a text file "/sdcard/xbmc_env.properties" that tell it where its data files are located. adbFire creates this file when it moves the data directory to extUsb and delete the file when you move the directory back to its normal location.
+<p>
+Moving data is not allowed if Kodi is running.
+<p>
+Either of these options can save a significant amount of space on the Fire TV's rather paltry internal /sdcard partition. Thumbnails alone can take up several gig.Relocation of the entire data partition is only available to Kodi and forks, not Gotham-based software.<p>
+If you feel that moving the entire Kodi data directory causes lag or if you are running a Gotham-based XBMC/fork you have the option to just move thumbnails. As mentioned above, this can save a significant amount of space. Like moving the Kodi data directory, there are two choices, move thumbnails to extUsb or from extUsb back to the default userdata directory.
+<p>
+When thumbnails are moved to extUsb a special advancedsettings.xml file is created that tells Kodi/XBMC/forks where the thumbnails are located. If you already have an advancedsettings.xml file it is backed up. adbFire does not merge the two files.
+<p>
+If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
+<a href="menu.html">main menu</a>
+</body</html>

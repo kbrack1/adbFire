@@ -134,6 +134,17 @@ private slots:
 
     void on_actionUninstall_Boot_Menu_triggered();
 
+    void data_external();
+
+    void data_internal();
+
+    void external_thumb();
+
+    void internal_thumb();
+
+
+    void on_actionMove_Restore_Data_triggered();
+
 private:
     Ui::MainWindow *ui;
 

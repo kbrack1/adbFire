@@ -1,8 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>Backup Kodi</title></head><body>
-The <b>"Backup Kodi"</b> button backs up the org.xbmc.kodi folder on the device. Please note that Kodi <u>MUST</u> have been run for the first time before using this function. Empty directories are not backed up.
+The <b>"Backup Kodi"</b> button backs up the contents of the .kodi folder on the device. Please note that Kodi <u>MUST</u> have been run for the first time before using this function. Empty directories are not backed up.
 If you are running something other than <a href=kodi.html>Kodi</a> you will need to change the package name amd File Path
 in the <a href=preferences.html>Device Setup</a> dialog to whatever package name and File Path your software uses.
+<p>
+If you have <a href="mvdata.html">moved data or thumbnails</a> to extUsb, the backup still proceeds normally. However in the case of thumbnails, they are saved in the default userdata folder of the backup and the advancedsettings.xml file is renamed advancedsettings,backup. <p>
+Currently, when restoring backup sets nothing is moved to extUsb. If desired you will need to  <a href="mvdata.html">redo</a> the move via adbFire. A future release is planned that will perform data/thumbnail moves as part of the restore.
 <p>
 If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
 <a href="menu.html">main menu</a>
