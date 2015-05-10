@@ -1,4 +1,0 @@
-List of devices attached 
-7094160945130C30	device
-
-
