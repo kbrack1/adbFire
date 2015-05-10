@@ -14,6 +14,7 @@
 #include "datadialog.h"
 #include "unlockdialog.h"
 #include "bootmenudialog.h"
+#include "mediacenterdialog.h"
 #include <QMessageBox>
 #include <QTableWidget>
 #include <QResource>
@@ -61,7 +62,7 @@ int os=2;
 // QString num="123";
 //  int n = num.toInt();
 
-const QString version = "1.24";
+const QString version = "1.25";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -129,6 +130,7 @@ QString adbstr2 = "ADB not running. ";
 QString devstr1 = "  Device connected";
 QString devstr2 = "  Device not connected.";
 QString devstr3 = "  USB Mode";
+QString devstr4 = "  Console Mode";
 
 QString amazon_update1 = "Amazon updates on.      ";
 QString amazon_update0 = "Amazon updates off.     ";
@@ -293,6 +295,7 @@ if (command.contains("No such file or directory"))
 }
 
 
+
 /////////////////////////////
 bool is_busybox()
 {
@@ -335,12 +338,14 @@ if (command.contains("No such file or directory"))
 
  QString cstring = adb + " kill-server";
  QString command=RunProcess(cstring);
+ logfile(cstring);
+ logfile("server stopped");
  serverRunning = false;
  
 }
 
 
- //////////////////////////////////////
+//////////////////////////////////////
 void start_server()
 {
 
@@ -362,6 +367,85 @@ void start_server()
          logfile(command);
          serverRunning = false;
          }
+}
+
+//////////////////////////////////////
+QString list_devices()
+{
+
+ int i;
+ QString isdevice;
+ QString usbid;
+ QString cstring = adb + " devices";
+ QString command=RunProcess(cstring);
+
+
+
+     if (command.contains("device"))
+        {
+           //logfile("device(s) found");
+           //logfile(command);
+
+           QFile file21(adbdir+"temp.txt");
+
+             if(!file21.open(QFile::WriteOnly))
+               {
+                  QMessageBox::critical(0, "","Error creating daddr file!\n",QMessageBox::Cancel);
+                   logfile(cstring);
+                   logfile(command);
+                   logfile("error creating "+adbdir+ "device file");
+                   return "error";
+               }
+
+
+             QTextStream out1(&file21);
+             out1  << command << endl;
+
+             file21.flush();
+             file21.close();
+
+
+
+             QString tmpstr2 = adbdir+"temp.txt";
+             QString fline2;
+
+                QFile file32(tmpstr2);
+                  if (!file32.open(QIODevice::ReadOnly | QIODevice::Text))
+                    {QMessageBox::critical(0,"","Error reading file!");
+                       return "error"; }
+
+                  QTextStream in1(&file32);
+                   while (!in1.atEnd())
+                    {
+
+                     fline2 = in1.readLine();
+
+                       if (!fline2.isEmpty()  &&  (!fline2.contains("List of devices")))
+                        {
+
+
+                           i =  fline2.indexOf("\t");
+
+                           usbid =fline2.mid(0,i);
+                           isdevice = fline2.mid(i+1);
+
+                           logfile(usbid);
+                           logfile(isdevice);
+
+                       }
+
+                   }
+
+                     file32.close();
+
+               //QFile::remove(tmpstr2);
+
+     }
+
+
+         return isdevice;
+
+
 }
 
 
@@ -2673,7 +2757,6 @@ void MainWindow::on_backupButton_clicked()
 
 
  QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
-
  QString cstring = adb + " shell ls "+mcpath;
 
  QString command=RunProcess(cstring);
@@ -2687,8 +2770,8 @@ void MainWindow::on_backupButton_clicked()
 
 
 
- cstring = adb + " shell ls "+mcpath;
 
+ cstring = adb + " shell ls "+mcpath;
  command=RunProcess(cstring);
 
  if (command.contains("No such file or directory"))
@@ -2746,23 +2829,35 @@ void MainWindow::on_backupButton_clicked()
 
           if (!QDir(thfile).exists())
           {
-              QString cstring = adb + " pull /storage/extUsb/mcfiles/"+" "+'"'+udir+'"';
-              QString command=RunProcess(cstring);
 
-               if (!QDir(thfile).exists())
+              QString thpath = "/storage/extUsb/"+filepath;
+              thpath.replace(QString("file"), QString("mcfile"));
 
-               {
 
-                   QMessageBox::critical(
-                               this,
-                              "",
-                               "Problem pulling Thumbnails\nfrom /storage/extUsb/mcfiles");
+                 cstring = adb + " shell ls "+thpath+"/Thumbnails";
+                 command=RunProcess(cstring);
 
-                   logfile(cstring);
-                   logfile(command);
-               }
+                 if (command.contains("No such file or directory"))
+                  {                
+                   logfile("Thumbnails not found");
+                 }
 
-           QFile::rename(dir+"/userdata/advancedsettings.xml", dir+"/userdata/advancedsettings.backup");
+               else
+                 {
+                    QString cstring = adb + " pull "+thpath+"/ "+'"'+udir+'"';
+                    QString command=RunProcess(cstring);
+                    QFile::rename(dir+"/userdata/advancedsettings.xml", dir+"/userdata/advancedsettings.backup");
+
+                    if (!QDir(thfile).exists())
+
+                    {
+                        QMessageBox::critical(0,"","Problem pulling Thumbnails\nfrom /storage/extUsb/mcfiles");
+                        logfile(cstring);
+                        logfile(command);
+                    }
+
+
+                 }
 
           }
 
@@ -3653,18 +3748,41 @@ logfile("opening preferences dialog");
               QString str1;
               str1.setNum(buffermode-1);
 
-                     QString xpath = "";
-                     QString hidden;
+              QString xpath = "";
+              QString hidden;
+              QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
+
+              QString filename1 = "advancedsettings.xml";
+              QString filename2 = adbdir+filename1;
 
 
-                     if (xbmcpackage.contains(".kodi"))
-                        hidden=".kodi";
-                      else
-                          hidden=".xbmc";
 
-                     xpath = "/sdcard/Android/data/"+xbmcpackage+"/files/"+hidden+"/userdata/";
-                     QString filename1 = "advancedsettings.xml";
-                     QString filename2 = adbdir+filename1;
+             cstring = adb + " shell ls "+mcpath;
+             command=RunProcess(cstring);
+
+                     if (command.contains("No such file or directory"))
+                      {
+
+                        mcpath = "/storage/extUsb/"+filepath;
+                        mcpath.replace(QString("file"), QString("mcfile"));
+                     }
+
+
+
+                     cstring = adb + " shell ls "+mcpath;
+
+                     command=RunProcess(cstring);
+
+                     if (command.contains("No such file or directory"))
+                      {
+                         QMessageBox::critical(
+                                     this,
+                                    "",
+                                     "Destination path missing");
+                                     return;
+                     }
+
+                 xpath = mcpath+"/userdata/";
 
                      cstring = adb + " shell ls "+xpath+filename1;
                      command=RunProcess(cstring);
@@ -3734,7 +3852,9 @@ logfile("opening preferences dialog");
                         QMessageBox::critical(this,"","Error pushing xml from PC to device!");
                         return;
                       }
-
+                    else {
+                       QMessageBox::information(this,"","advancedsettings.xml written");
+                   }
 
 
 
@@ -4046,6 +4166,26 @@ logfile("opening preferences dialog");
 
 
 } // end preferences
+
+
+
+//////////////////////////////////////////////////
+void MainWindow::getpackage()
+{
+
+logfile("opening getpackage dialog");
+
+    mediacenterDialog dialog;
+
+    if(dialog.exec() == QDialog::Accepted)
+    {
+      xbmcpackage = dialog.xbmcpackageName();
+      filepath = dialog.filepath();
+    }
+
+} // end getpackage
+
+
 
 
 
@@ -8438,33 +8578,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
 }
 
 
-/////////////////////////////////////
-void MainWindow::on_usbmode_toggled()
-{
-
-    QString msg;
-
-    if (ui->usbmode->isChecked() )
-      {
-        daddr = ui->deviceBox->currentText();
-        QString cstring = adb + " disconnect "+daddr+port ;
-        QString command=RunProcess(cstring);
-
-        isConnected=true;
-        ui->device_connected->setText(devstr3);
-        ui->update_status->setText(amazon_update2);
-      }
-    else
-       { isConnected=false;
-         ui->device_connected->setText(devstr2);
-         ui->update_status->setText(amazon_update2);
-       }
-
-
-
-
-}
-
+////////////////////////////////////////////////
 void MainWindow::on_actionVideo_Help_triggered()
 {
     logfile("opening video help");
@@ -9157,13 +9271,15 @@ void MainWindow::external_thumb()
           return;
     }
 
+    int i =  filepath.indexOf(".");
+    QString hidden = filepath.mid(i);
 
 
     QString l1 = "<advancedsettings>";
     QString l2 = "  <pathsubstitution>";
     QString l3 = "    <substitute>";
     QString l4 = "       <from>special://profile/Thumbnails/</from>";
-    QString l5 = "        <to>/storage/extUsb/mcfiles/Thumbnails/</to>";
+    QString l5 = "        <to>/storage/extUsb/mcfiles/"+hidden+"/Thumbnails/</to>";
     QString l6 = "     </substitute>";
     QString l7 = "   </pathsubstitution>";
     QString l8 = "</advancedsettings>";
@@ -9173,8 +9289,9 @@ void MainWindow::external_thumb()
     QString cstring;
     QString command;
 
-    QString xpath = "";
+    QString mvpath;
     QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
+
 
     cstring = adb + " shell ls "+mcpath;
 
@@ -9192,27 +9309,44 @@ void MainWindow::external_thumb()
 
 
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles";
+    cstring = adb +" shell ls /storage/extUsb/mcfiles/Thumbnails";
     command=RunProcess(cstring);
 
-    if (!command.contains("No such file or directory"))
+    if (command.contains("No such file or directory"))
       {
+       mvpath = "/storage/extUsb/mcfiles/"+hidden;
+       }
 
-            QMessageBox::critical(
+       else
+       {
+        mvpath = "/storage/extUsb/mcfiles";
+       }
+
+
+
+        cstring = adb +" shell ls "+mvpath+"/Thumbnails";
+        command=RunProcess(cstring);
+
+        if (!command.contains("No such file or directory"))
+          {
+             QMessageBox::critical(
                          this,
                          tr("adbFire"),
-                         tr("Data already moved"));
+                         tr("Thumnails already moved"));
 
                  logfile(cstring);
                  logfile(command);
 
                 return;
+      }
 
-       }
+// reset mvpath.
+
+ mvpath = "/storage/extUsb/mcfiles/"+hidden;
 
 
 QMessageBox::StandardButton reply1;
-reply1 = QMessageBox::question(this, "", "Move Media Center Thumbnails to extUsb?",
+reply1 = QMessageBox::question(this, "", "Move Thumbnails to external storage?",
                             QMessageBox::Yes|QMessageBox::No);
 if (reply1 == QMessageBox::No)
  {
@@ -9244,15 +9378,12 @@ rtimer.start();
                         return;
                        } else {
 
-                       cstring = adb + " shell cp "+mcpath+"/userdata/"+filename1+" "+mcpath+"/userdata/"+filename1+".old";
+                       cstring = adb + " shell mv "+mcpath+"/userdata/"+filename1+" "+mcpath+"/userdata/"+filename1+".backup";
                        command=RunProcess(cstring);
                        logfile(cstring);
                        logfile(command);
 
-                       cstring = adb + " shell rm "+mcpath+"/userdata/"+filename1;
-                       command=RunProcess(cstring);
-                       logfile(cstring);
-                       logfile(command);
+
 
                     }
                    }  // end if exists
@@ -9310,13 +9441,13 @@ rtimer.start();
     connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
     timer->start(tsvalue);
 
-    cstring = adb +" shell mkdir -p /storage/extUsb/mcfiles";
+    cstring = adb +" shell mkdir -p /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     logfile(cstring);
     logfile(command);
 
-    cstring = adb +" shell cp -R /sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/Thumbnails" + " /storage/extUsb/mcfiles";
+    cstring = adb +" shell cp -R /sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/Thumbnails" + " /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
 
@@ -9343,7 +9474,7 @@ rtimer.start();
   QMessageBox::information(
                  this,
                 "",
-                 "Thumbnails moved to extUsb");
+                 "Thumbnails moved to external storage");
 
 }
 
@@ -9363,14 +9494,58 @@ void MainWindow::internal_thumb()
     }
 
 
+    int i =  filepath.indexOf(".");
+    QString hidden = filepath.mid(i);
+
 
     QString cstring;
     QString command;
+    QString mvpath;
+    QString userdatapath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/";
 
-    QString xpath = "";
-    QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
 
-    cstring = adb + " shell ls "+mcpath;
+
+
+
+       cstring = adb +" shell ls /storage/extUsb/mcfiles/Thumbnails";
+       command=RunProcess(cstring);
+
+       if (command.contains("No such file or directory"))
+         {
+          mvpath = "/storage/extUsb/mcfiles/"+hidden;
+          }
+
+          else
+          {
+           mvpath = "/storage/extUsb/mcfiles";
+          }
+
+
+
+           cstring = adb +" shell ls "+mvpath+"/Thumbnails";
+           command=RunProcess(cstring);
+
+           if (command.contains("No such file or directory"))
+             {
+                QMessageBox::critical(
+                            this,
+                            tr("adbFire"),
+                            tr("Thumnails not found"));
+
+                    logfile(cstring);
+                    logfile(command);
+
+                   return;
+         }
+
+
+
+
+
+
+
+
+    cstring = adb + " shell ls "+userdatapath;
 
     command=RunProcess(cstring);
 
@@ -9386,27 +9561,10 @@ void MainWindow::internal_thumb()
 
 
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles/Thumbnails";
-    command=RunProcess(cstring);
-
-    if (command.contains("No such file or directory"))
-      {
-
-            QMessageBox::critical(
-                         this,
-                         tr("adbFire"),
-                         tr("Thumnails not found"));
-
-                 logfile(cstring);
-                 logfile(command);
-
-                return;
-
-       }
 
 
 QMessageBox::StandardButton reply1;
-reply1 = QMessageBox::question(this, "", "Move Media Center Thumbnails to internal storage?",
+reply1 = QMessageBox::question(this, "", "Move Thumbnails to internal storage?",
                             QMessageBox::Yes|QMessageBox::No);
 if (reply1 == QMessageBox::No)
  {
@@ -9420,7 +9578,7 @@ rtimer.start();
               QString filename1 = "advancedsettings.xml";
               QString filename2 = adbdir+filename1;
 
-              cstring = adb + " shell ls "+mcpath+"/userdata/"+filename1;
+              cstring = adb + " shell ls "+userdatapath+filename1;
               command=RunProcess(cstring);
 
               logfile(cstring);
@@ -9432,7 +9590,7 @@ rtimer.start();
 
 
 
-                       cstring = adb + " shell mv "+mcpath+"/userdata/"+filename1+" "+mcpath+"/userdata/"+"advancedsettings.backup";
+                       cstring = adb + " shell mv "+userdatapath+filename1+" "+userdatapath+"advancedsettings.backup";
                        command=RunProcess(cstring);
                        logfile(cstring);
                        logfile(command);
@@ -9449,7 +9607,7 @@ rtimer.start();
     timer->start(tsvalue);
 
 
-    cstring = adb +" shell cp -R /storage/extUsb/mcfiles/Thumbnails /sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/";
+    cstring = adb +" shell cp -R "+mvpath+"/Thumbnails "+userdatapath;
     command=RunProcess(cstring);
 
 
@@ -9457,11 +9615,17 @@ rtimer.start();
     logfile(command);
 
 
-   cstring = adb +" shell rm -r /storage/extUsb/mcfiles";
-   command=RunProcess(cstring);
+    cstring = adb + " shell ls "+userdatapath+"/Thumbnails";
+    command=RunProcess(cstring);
 
-   logfile(cstring);
-   logfile(command);
+    if (!command.contains("No such file or directory"))
+     {
+        cstring = adb +" shell rm -r "+mvpath;
+        command=RunProcess(cstring);
+        logfile(cstring);
+        logfile(command);
+
+    }
 
    if (fileExists(filename2))
      QFile::remove(filename2);
@@ -9489,6 +9653,9 @@ void MainWindow::data_external()
 {
 
 
+
+
+
     if (!isConnected)
        { QMessageBox::critical(
              this,
@@ -9501,8 +9668,11 @@ void MainWindow::data_external()
     QString command;
 
 
+    int i =  filepath.indexOf(".");
+    QString hidden = filepath.mid(i);
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles";
+
+    cstring = adb +" shell ls /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     if (!command.contains("No such file or directory"))
@@ -9522,13 +9692,13 @@ void MainWindow::data_external()
 
 
     QMessageBox::StandardButton reply1;
-       reply1 = QMessageBox::question(this, "", "Move Media Center Data to extUsb?",
+       reply1 = QMessageBox::question(this, "", "Move Media Center Data to external storage?",
                                     QMessageBox::Yes|QMessageBox::No);
        if (reply1 == QMessageBox::No)
          {
            return;}
 
-logfile("Moving media center data to extUsb");
+logfile("Moving media center data to external storage");
 
    QElapsedTimer rtimer;
    int nMilliseconds;
@@ -9541,9 +9711,11 @@ logfile("Moving media center data to extUsb");
     connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
     timer->start(tsvalue);
 
+    cstring = adb +" shell mkdir -p /storage/extUsb/mcfiles";
+    command=RunProcess(cstring);
 
 
-    cstring = adb +" shell cp -R /sdcard/Android/data/"+xbmcpackage+"/files" + " /storage/extUsb/mcfiles";
+    cstring = adb +" shell cp -R /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden + " /storage/extUsb/mcfiles";
     command=RunProcess(cstring);
 
     logfile(cstring);
@@ -9556,7 +9728,7 @@ logfile("Moving media center data to extUsb");
     logfile(cstring);
     logfile(command);
 
-    cstring = adb +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files";
+    cstring = adb +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden;
     command=RunProcess(cstring);
 
     logfile(cstring);
@@ -9571,7 +9743,7 @@ logfile("Moving media center data to extUsb");
   QMessageBox::information(
                  this,
                 "",
-                 "Data moved to extUsb");
+                 "Data moved to external storage");
 
 }
 
@@ -9591,9 +9763,11 @@ void MainWindow::data_internal()
     QString cstring;
     QString command;
 
+    int i =  filepath.indexOf(".");
+    QString hidden = filepath.mid(i);
 
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles";
+    cstring = adb +" shell ls /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     if (command.contains("No such file or directory"))
@@ -9611,7 +9785,7 @@ void MainWindow::data_internal()
 
        }
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles";
+    cstring = adb +" shell ls /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     if (command.contains("No such file or directory"))
@@ -9650,7 +9824,7 @@ void MainWindow::data_internal()
        }
 
     QMessageBox::StandardButton reply1;
-       reply1 = QMessageBox::question(this, "", "Move Media Center Data from extUsb?",
+       reply1 = QMessageBox::question(this, "", "Move Media Center data to internal storage?",
                                     QMessageBox::Yes|QMessageBox::No);
        if (reply1 == QMessageBox::No)
          {
@@ -9669,32 +9843,65 @@ logfile("Moving media center data to internal storage");
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
        timer->start(tsvalue);
 
-       cstring = adb +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files";
+       cstring = adb +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden;
        command=RunProcess(cstring);
 
        logfile(cstring);
        logfile(command);
 
-       cstring = adb +" shell cp -R /storage/extUsb/mcfiles /sdcard/Android/data/"+xbmcpackage+"/files";
+       cstring = adb +" shell cp -R /storage/extUsb/mcfiles/"+hidden + " /sdcard/Android/data/"+xbmcpackage+"/files/";
        command=RunProcess(cstring);
 
        logfile(cstring);
        logfile(command);
 
-       cstring = adb + " shell rm /sdcard/xbmc_env.properties";
+       cstring = adb +" shell ls /sdcard/Android/data/"+xbmcpackage+filepath;
        command=RunProcess(cstring);
 
-       logfile(cstring);
-       logfile(command);
+       if (!command.contains("No such file or directory"))
+         {
 
-       cstring = adb +" shell rm -r /storage/extUsb/mcfiles";
-       command=RunProcess(cstring);
 
-       logfile(cstring);
-       logfile(command);
+           cstring = adb + " shell rm /sdcard/xbmc_env.properties";
+           command=RunProcess(cstring);
+           logfile(cstring);
+           logfile(command);
+
+           cstring = adb +" shell rm -r /storage/extUsb/mcfiles/"+hidden;
+           command=RunProcess(cstring);
+           logfile(cstring);
+           logfile(command);
+
+
+
+
+           QString cstring = adb + " shell ls -a /storage/extUsb/mcfiles/";
+           QString command=RunProcess(cstring);
+
+           if (command.contains("."))
+             {
+
+               QMessageBox::information(0,"","There appears to be data from a different media center still in external storage. You may need to move this data back to internal storage for the software to properly function.");
+
+              }
+
+         else {
+
+               QString cstring = adb + " shell rm -r /storage/extUsb/mcfiles/";
+               QString command=RunProcess(cstring);
+               logfile(cstring);
+               logfile(command);
+               logfile("Deleted /storage/extUsb/mcfiles");
+             }
+
+
+       }
+
+
+
+
 
      ui->progressBar->setHidden(true);
-
      nMilliseconds = rtimer.elapsed();
      logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
@@ -9770,19 +9977,107 @@ void MainWindow::on_actionMove_Restore_Data_triggered()
 
 }
 
-///////////////////////////////
+////////////////////////////////////////
+void MainWindow::on_usbmode_clicked()
+{
+
+    if (ui->override->isChecked() )
+      {
+
+          QMessageBox::critical(
+               this,
+               tr("adbFire"),
+               tr("Inactive in Console Mode"));
+
+          ui->usbmode->setChecked(false);
+          return;
+      }
 
 
 
+    QString msg;
+
+      if (ui->usbmode->isChecked() )
+        {
+
+          QString cstring = adb + " disconnect "+daddr+port ;
+          QString command=RunProcess(cstring);
+
+          logfile(cstring);
+          logfile(command);
+
+          kill_server();
+          start_server();
+
+          QString isdevice=list_devices();
+
+         if(isdevice=="device")
+          {isConnected=true;
+          ui->device_connected->setText(devstr3);
+          ui->update_status->setText(amazon_update2);
+          getpackage();
+         }
+
+         else  // connection failed
+            {
+              isConnected=false;
+              ui->device_connected->setText(devstr2);
+              ui->update_status->setText(amazon_update2);
+              ui->usbmode->setChecked(false);
+
+              QMessageBox::critical(0, "","Device not found.",QMessageBox::Cancel);
+         }
+
+
+      }
+
+      else  // unchecked
+         {
+           isConnected=false;
+           ui->device_connected->setText(devstr2);
+           ui->update_status->setText(amazon_update2);
+          }
 
 
 
+}
+
+///////////////////////////////////////
+void MainWindow::on_override_clicked()
+{
+
+    if (ui->usbmode->isChecked() )
+      {
+
+          QMessageBox::critical(
+               this,
+               tr("adbFire"),
+               tr("Inactive in USB Mode"));
+
+          ui->override->setChecked(false);
+          return;
+      }
+
+
+    QString msg;
+
+      if (ui->override->isChecked() )
+        {
+          isConnected=true;
+          ui->device_connected->setText(devstr4);
+          ui->update_status->setText(amazon_update2);
+          getpackage();
+        }
+
+      else
+
+         {
+           isConnected=false;
+           ui->device_connected->setText(devstr2);
+           ui->update_status->setText(amazon_update2);
+         }
 
 
 
-
-
-
-
-
+}
 

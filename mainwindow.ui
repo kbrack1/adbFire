@@ -455,7 +455,7 @@
      <rect>
       <x>40</x>
       <y>120</y>
-      <width>89</width>
+      <width>92</width>
       <height>20</height>
      </rect>
     </property>
@@ -581,6 +581,22 @@
       </item>
      </layout>
     </widget>
+   </widget>
+   <widget class="QCheckBox" name="override">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>120</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tell adbFire that a USB connection has been made via console mode&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>USB via console</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">

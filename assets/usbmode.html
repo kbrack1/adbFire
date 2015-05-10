@@ -1,25 +1,34 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><title>USB Mode</title></head><body>
 <b><u>USB Mode</b></u><br>
-The USB Mode checkbox allows adbFire to perform all non-root functions via a
-USB connection to the Fire TV Stick. It does not work with the standard Fire TV.<p>
-The connect and disconnect buttons are disabled when the USB Mode box is checked. A
-USB connection is obtained when the ADB server detects the Stick connected via USB.
-<p>
-Sometimes, getting a connection is tricky. You may have to stop/start the ADB server
-several times or unplug/plug in the Stick before a connection locks in.
-<p>
-You may also try the <a href="console.html">File->Console</a> command. This opens a terminal session where you can issue adb commands via
-the command-line to establish the connection.
-<p>
-Once a connection is "live" you will be able to open an ADB Shell to the Stick or open a
-console and issue the command "adb devices" and see the Stick listed.
+
+
+USB on the Stick is used when a normal connection cannot be made. Getting a USB connection is not foolproof/. You may have to check/uncheck the USB mode checkbox several times, stop/start the ADB server
+several times or unplug/plugin the Stick before a connection locks in.
 <p>
 In order to connect Windows to the Stick via USB, Google's WinUSB device driver must be
 installed. This driver is included with adbFire in the "winusb" folder. Directions for
 installation can be seen at jocala.com; the link is below this help doc. You can also see its
 installation in adbFire's Video Help.
 <p>
+The USB Mode checkbox allows adbFire to perform all non-root functions via a
+USB connection to the Fire TV Stick. It does not work with the standard Fire TV.<p>
+The connect/disconnect buttons are disabled when the USB Mode box is checked. A
+USB connection is obtained when the ADB server detects the Stick connected via USB.
+<p>
+
+You may also try the <a href="console.html">File->Console</a> command. This opens a terminal session where you can issue adb commands via
+the command-line to establish a connection, but if you make a USB connection via console will have to check the <b><u>USB via Console</b></u> checkbox to tell adbFire that a USB connection has been manually obtained.
+<p>
+The <b><u>USB via Console</u></b> checkbox tells adbFire that a connection has been made manually,
+using the adbFire Console. The <b>USB mode</b> checkbox, and the connect/disconnect buttons are disabled
+when this checkbox is clicked.
+<p>
+In either case, when you request a USB connection a dialog will pop up asking you to select your media center software packagename and filepath. You can select
+from the list of presets, or select other and fill in
+the values manually.
+<p>
+
 <p>
 If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
 <a href="menu.html">main menu</a>

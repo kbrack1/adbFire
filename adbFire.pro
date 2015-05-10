@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     unlockdialog.cpp \
     bootmenudialog.cpp \
     unbootdialog.cpp \
-    datadialog.cpp
+    datadialog.cpp \
+    mediacenterdialog.cpp
 
 
 RESOURCES = adbFire.qrc
@@ -50,7 +51,8 @@ HEADERS  += mainwindow.h \
     unlockdialog.h \
     bootmenudialog.h \
     unbootdialog.h \
-    datadialog.h
+    datadialog.h \
+    mediacenterdialog.h
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -68,7 +70,8 @@ FORMS    += mainwindow.ui \
     unlockdialog.ui \
     bootmenudialog.ui \
     unbootdialog.ui \
-    datadialog.ui
+    datadialog.ui \
+    mediacenterdialog.ui
 
 RC_FILE = adbFire.rc
 

@@ -57,6 +57,10 @@ private slots:
 
     void on_actionPreferences_triggered();
 
+
+    void getpackage();
+
+
     void on_actionReboot_triggered();
 
     void on_actionRecovery_triggered();
@@ -114,7 +118,7 @@ private slots:
     void on_actionMount_CIFS_triggered();
 
 
-    void on_usbmode_toggled();
+    // void on_usbmode_toggled();
 
     void on_actionVideo_Help_triggered();
 
@@ -127,8 +131,6 @@ private slots:
     void on_actionInstall_Samba_triggered();
 
     void on_actionUninstall_Samba_triggered();
-
-
 
     void on_actionInstallBootmenu_triggered();
 
@@ -144,6 +146,15 @@ private slots:
 
 
     void on_actionMove_Restore_Data_triggered();
+
+
+
+
+
+
+    void on_usbmode_clicked();
+
+    void on_override_clicked();
 
 private:
     Ui::MainWindow *ui;

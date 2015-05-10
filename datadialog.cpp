@@ -1,7 +1,7 @@
 #include "datadialog.h"
 #include "ui_datadialog.h"
 
-int rval2 = 1;
+int rval2;
 
 int dataDialog::returnval2() {
    return rval2;
@@ -13,6 +13,7 @@ dataDialog::dataDialog(QWidget *parent) :
     ui(new Ui::dataDialog)
 {
     ui->setupUi(this);
+    rval2=1;
 }
 
 dataDialog::~dataDialog()

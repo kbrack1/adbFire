@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>292</width>
+    <width>329</width>
     <height>211</height>
    </rect>
   </property>
@@ -26,12 +26,12 @@
     <string>Media Center Data Functions</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>40</x>
      <y>60</y>
-     <width>211</width>
+     <width>251</width>
      <height>77</height>
     </rect>
    </property>
@@ -39,7 +39,7 @@
     <item>
      <widget class="QRadioButton" name="dataButton1">
       <property name="text">
-       <string>Move data to extUsb</string>
+       <string>Move data to external storage</string>
       </property>
       <property name="checked">
        <bool>true</bool>
@@ -49,27 +49,27 @@
     <item>
      <widget class="QRadioButton" name="dataButton2">
       <property name="text">
-       <string>Move data from extUsb</string>
+       <string>Move data to internal storage</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QRadioButton" name="dataButton3">
       <property name="text">
-       <string>Move thumbnails to extUsb</string>
+       <string>Move thumbnails to external storage</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QRadioButton" name="dataButton4">
       <property name="text">
-       <string>Move thumbnails from extUsb</string>
+       <string>Move thumbnails to internal storage</string>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>60</x>
