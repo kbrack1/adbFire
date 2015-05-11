@@ -3313,6 +3313,14 @@ void MainWindow::on_restoreButton_clicked()
  {
 
 
+   if (!QDir(dir+"/userdata").exists() )
+
+     {
+       QMessageBox::critical(0,"","Invalid backup folder!" );
+       return;
+     }
+
+
  QMessageBox::StandardButton reply;
    reply = QMessageBox::question(this, "Restore", "Restore Kodi from "+dir+"\n"+"\n"+"This will overwrite the existing setup!",
                                  QMessageBox::Yes|QMessageBox::No);

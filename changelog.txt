@@ -1,3 +1,28 @@
+
+adbFire 1.25 changelog
+
+/data swap init.bueller.sh script edited
+for pre-rooted firmware 51.1.5. Thanks to
+derpeter@xda for the fix.
+
+code edit for cache routine in device setup
+to put advancedsettings.xml in extUsb if required.
+
+Backup routine fixed to allow for relocated Thumbnails.
+
+USB mode routines expanded. The USB mode checkbox now
+attempts to detect if a device is connected via USB. A
+USB via console checkbox is provided as a backup method
+if a USB connection is made manually at the adbFire console.
+
+Please refer to the USB mode/USB via console help file
+for more detail.
+
+
+
+
+
+
 adbFire 1.24 changelog
 
 Kodi/Fork data move to/from extUsb
