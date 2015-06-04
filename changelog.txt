@@ -1,3 +1,23 @@
+adbFire 1.26 changelog
+
+Google adb for Windows/OSX/Linux updated to 1.0.32.
+
+Classic TV Llama routine updated to Tubi TV. Classic
+TV has been replaced by Tubi TV. Docs/Icons/filepaths updated.
+
+TVMC packagename/filepath updated based on 
+new specifications from TVMC development team.
+
+USB mode tested with Fire TV.
+
+Documentation updated to reflect USB debugging
+availability for Fire TV.  
+
+regression error, embedded spaces in filename issue in
+push/pull/delete fixed
+
+
+
 
 adbFire 1.25 changelog
 
@@ -17,11 +37,6 @@ if a USB connection is made manually at the adbFire console.
 
 Please refer to the USB mode/USB via console help file
 for more detail.
-
-
-
-
-
 
 adbFire 1.24 changelog
 
