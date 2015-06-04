@@ -1,5 +1,0 @@
-Host firetv
-HostName firetv
-IdentityFile ~/.ssh/id_adbfire
-User root
-
