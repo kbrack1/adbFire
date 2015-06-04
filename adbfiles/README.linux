@@ -1,0 +1,27 @@
+adbFire 1.08 for Linux
+
+Place adbl108 folder somewhere you have r/w privs.
+
+Distros tested:
+
+Ubuntu 14.04 32/64
+
+Run adbfiles/install32.sh script for Ubuntu 
+64bit to resolve library dependencies
+
+Linux Mint 17  64/32
+
+Debian test 32bit
+
+Fedora 20 32bit
+Run script adbfiles/fedora.sh to enable ADB shell
+
+
+
+It may work on untested distros. Run ldd adbFire to check
+library dependencies that need resolution for your distro.
+
+adbFire is released under the GPL V3. Full source available at
+https://github.com/jocala/adbFire
+
+
