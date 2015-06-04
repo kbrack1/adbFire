@@ -59,10 +59,25 @@
 int os=2;
 #endif
 
+
+// ag.tvaddons.tvmc
+
 // QString num="123";
 //  int n = num.toInt();
 
-const QString version = "1.25";
+/*
+
+ro.product.model=AFTM
+stick
+
+
+ro.product.model=AFTB
+tv
+
+ */
+
+
+const QString version = "1.26";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -5128,7 +5143,12 @@ void MainWindow::on_fdellButton_clicked()
         return;
 
              
-             cstring = adb + " shell rm "+pullfile;
+             // cstring = adb + " shell rm "+pullfile;
+                cstring = adb + " shell rm "+'"'+pullfile+'"';
+             //   cstring = adb + " push "+'"'+fileName+'"'+ " "+xpath;
+
+
+
              command=RunProcess(cstring);
 
              if (command.contains("exist"))
@@ -6110,7 +6130,8 @@ void MainWindow::on_fpullButton_clicked()
 
 
              // cstring = adb + " pull "+xpath+fileName+" " +'"'+pulldir+'"';
-             cstring = adb + " pull "+fileName+" " +'"'+pulldir+'"';
+             cstring = adb + " pull "+'"'+fileName+'"'+" "+'"'+pulldir+'"';
+
 
 
              command=RunProcess(cstring);
@@ -6338,11 +6359,7 @@ void MainWindow::on_llamaButton_clicked()
     if(dialog.exec() == QDialog::Accepted)
     {        
 
-
-
-
-
-       llamaInstall = dialog.llamacheck();
+        llamaInstall = dialog.llamacheck();
 
        llamaRadio1 = dialog.llamaradio1();
        llamaRadio2 = dialog.llamaradio2();
@@ -6418,9 +6435,9 @@ void MainWindow::on_llamaButton_clicked()
        if (tvmcButton)
           {
 
-           /*
 
-          is_package("ag.tvmc.tvmc");
+
+          is_package("ag.tvaddons.tvmc");
 
            if (!is_packageInstalled)
               { QMessageBox::critical(
@@ -6431,7 +6448,7 @@ void MainWindow::on_llamaButton_clicked()
                return;
            }
 
-         */
+
 
            mediacenter=4;
 
@@ -6443,18 +6460,18 @@ void MainWindow::on_llamaButton_clicked()
 
        if (ctvButton)
           {
-            is_package("com.adrise.profilms");
+            is_package("com.adrise.tubitv");
 
            if (!is_packageInstalled)
-              { QMessageBox::critical(
-                    this,
-                    "",
-                    "Classic TV Not Installed");
-                     logfile("classic tv not installed for llama options");
-                     classicTV = false;
-           }
+              {
 
-           classicTV = true;
+                  // QMessageBox::critical(this,"","Tubi TV Not Installed");
+
+                     logfile("tubi tv not installed for llama options");
+                     classicTV = false;
+              }
+
+              else classicTV = true;
        }
 
        if (!ctvButton)
@@ -6462,14 +6479,14 @@ void MainWindow::on_llamaButton_clicked()
             is_package("org.ikonotv.smarttv");
 
            if (!is_packageInstalled)
-              { QMessageBox::critical(
-                    this,
-                    "",
-                    "Ikono TV Not Installed");
+              {
+
+                 // QMessageBox::critical(this,"","Ikono TV Not Installed");
+
                      logfile("ikono tv not installed for llama options");
                      classicTV = false;
-           }
-             classicTV = true;
+               }
+             else classicTV = true;
        }
 
 
@@ -6499,14 +6516,14 @@ void MainWindow::on_llamaButton_clicked()
            ctvIcon = 3;
 
 
+       if (ctvButton)
+           programname="Tubi TV";
+       else
+           programname="Ikono TV";
+
+
        if (!classicTV )
          {
-
-           if (ctvButton)
-               programname="Classic TV";
-           else
-               programname="Ikono TV";
-
 
 
            if (ctvIcon < 4)
@@ -6514,16 +6531,13 @@ void MainWindow::on_llamaButton_clicked()
            QMessageBox::information(this,"","Please install "+programname);
            ui->progressBar->setHidden(true);
            return;
-         }
+           }
         }
 
 
        if (!classicTV && llamaInstall)
          {
-           if (ctvButton)
-               programname="Classic TV";
-           else
-               programname="Ikono TV";
+
 
          if (llamaEvent > 1)
           {
@@ -6710,7 +6724,7 @@ void MainWindow::on_llamaButton_clicked()
 
 
       if (ctvButton)
-         cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+         cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
        else
          cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
 
@@ -6720,7 +6734,7 @@ void MainWindow::on_llamaButton_clicked()
 
 
        if (ctvButton)
-           cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+           cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
        else
            cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
 
@@ -6737,7 +6751,7 @@ void MainWindow::on_llamaButton_clicked()
                if (mediacenter==kodi)
                  {
                    if (ctvButton)
-                     cstring = adb + " push "+adbdir+ "icons/ctvkodi.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+                     cstring = adb + " push "+adbdir+ "icons/ctvkodi.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
                     cstring = adb + " push "+adbdir+ "icons/ikokodi.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
@@ -6745,7 +6759,7 @@ void MainWindow::on_llamaButton_clicked()
                if (mediacenter==xbmc)
                  {
                    if (ctvButton)
-                    cstring = adb + " push "+adbdir+ "icons/ctvxbmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+                    cstring = adb + " push "+adbdir+ "icons/ctvxbmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
                     cstring = adb + " push "+adbdir+ "icons/ikoxbmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
@@ -6753,7 +6767,7 @@ void MainWindow::on_llamaButton_clicked()
                if (mediacenter==spmc)
                  {
                    if (ctvButton)
-                    cstring = adb + " push "+adbdir+ "icons/ctvspmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+                    cstring = adb + " push "+adbdir+ "icons/ctvspmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
                     cstring = adb + " push "+adbdir+ "icons/ikospmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
@@ -6761,7 +6775,7 @@ void MainWindow::on_llamaButton_clicked()
                if (mediacenter==tvmc)
                  {
                    if (ctvButton)
-                    cstring = adb + " push "+adbdir+ "icons/ctvtvmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+                    cstring = adb + " push "+adbdir+ "icons/ctvtvmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
                     cstring = adb + " push "+adbdir+ "icons/ikotvmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
@@ -6782,7 +6796,7 @@ void MainWindow::on_llamaButton_clicked()
 
 
                    if (ctvButton)
-                     cstring = adb + " push "+adbdir+ "icons/ctv.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.profilms";
+                     cstring = adb + " push "+adbdir+ "icons/ctv.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
                     cstring = adb + " push "+adbdir+ "icons/iko.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
 

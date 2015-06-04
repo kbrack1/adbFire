@@ -202,7 +202,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ClassicTV is a priigram used as as a surrogate for your media center on the Fire TV's home page Recent section. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>Classic TV</string>
+        <string>Tubi TV</string>
        </property>
       </widget>
      </item>
@@ -250,7 +250,7 @@
    <property name="title">
     <string>Media Center</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>

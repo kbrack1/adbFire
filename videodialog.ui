@@ -44,7 +44,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;adbFire Video Help&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -54,19 +54,6 @@
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QLabel" name="label_7">
-      <property name="text">
-       <string>&lt;a href=&quot;https://www.youtube.com/watch?v=uWFR3vMlnrY&quot;&gt;adbFire USB Mode&lt;/a&gt;</string>
-      </property>
-      <property name="openExternalLinks">
-       <bool>true</bool>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
-    </item>
     <item>
      <widget class="QLabel" name="label_9">
       <property name="text">

@@ -16,7 +16,7 @@ int rval1 = 0;
 QString packagepreset1 = "org.xbmc.kodi";
 QString packagepreset2 = "org.xbmc.xbmc";
 QString packagepreset3 = "com.semperpax.spmc";
-QString packagepreset4 = "ag.tvmc.tvmc";
+QString packagepreset4 = "ag.tvaddons.tvmc";
 
 QString xpackage;
 
@@ -410,6 +410,6 @@ void preferencesDialog::on_otherButton_clicked()
 
 void preferencesDialog::on_tvmcButton_clicked()
 {
-    ui->packagename->setText("ag.tvmc.tvmc");
-    ui->filepath->setText("/files/.spmc");
+    ui->packagename->setText("ag.tvaddons.tvmc");
+    ui->filepath->setText("/files/.tvmc");
 }

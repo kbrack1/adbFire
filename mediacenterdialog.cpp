@@ -51,8 +51,8 @@ void mediacenterDialog::on_spmcButton_clicked()
 
 void mediacenterDialog::on_tvmcButton_clicked()
 {
-    ui->packagename->setText("ag.tvmc.tvmc");
-        ui->filepath->setText("/files/.spmc");
+    ui->packagename->setText("ag.tvaddons.tvmc");
+        ui->filepath->setText("/files/.tvmc");
 }
 
 void mediacenterDialog::on_otherButton_clicked()
