@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
+    <width>498</width>
     <height>480</height>
    </rect>
   </property>
@@ -16,23 +16,23 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>20</y>
-     <width>201</width>
+     <x>10</x>
+     <y>10</y>
+     <width>251</width>
      <height>41</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;Llama Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Llama Options&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>170</y>
-     <width>251</width>
-     <height>131</height>
+     <x>20</x>
+     <y>230</y>
+     <width>291</width>
+     <height>181</height>
     </rect>
    </property>
    <property name="title">
@@ -43,8 +43,8 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>211</width>
-      <height>103</height>
+      <width>246</width>
+      <height>121</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -103,71 +103,13 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>300</y>
-     <width>221</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Icon choice</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>30</y>
-      <width>167</width>
-      <height>76</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QRadioButton" name="ctvradio1">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The icon for your Program Choice will be replaced by the icon of your media center.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>Replace Program icon </string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="ctvradio2">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore the default icon for the Program Choice above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>Restore Program icon</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="ctvradio3">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do nothing &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>No action</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>80</y>
+     <x>10</x>
+     <y>60</y>
      <width>131</width>
-     <height>81</height>
+     <height>101</height>
     </rect>
    </property>
    <property name="title">
@@ -178,8 +120,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>91</width>
-      <height>49</height>
+      <width>101</width>
+      <height>57</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -209,42 +151,13 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_4">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>80</y>
-     <width>141</width>
-     <height>71</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Llama</string>
-   </property>
-   <widget class="QCheckBox" name="llamacheckBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install Llama&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="text">
-     <string>Install Llama</string>
-    </property>
-   </widget>
-  </widget>
   <widget class="QGroupBox" name="groupBox_5">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>170</y>
-     <width>91</width>
-     <height>121</height>
+     <x>150</x>
+     <y>60</y>
+     <width>111</width>
+     <height>171</height>
     </rect>
    </property>
    <property name="title">
@@ -255,8 +168,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>66</width>
-      <height>77</height>
+      <width>77</width>
+      <height>121</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -309,10 +222,10 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>420</y>
-     <width>195</width>
-     <height>32</height>
+     <x>130</x>
+     <y>430</y>
+     <width>235</width>
+     <height>36</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -337,6 +250,80 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>60</y>
+     <width>231</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Icon choice</string>
+   </property>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>194</width>
+      <height>89</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="ctvradio1">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The icon for your Program Choice will be replaced by the icon of your media center.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Replace Program icon </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="ctvradio2">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Restore the default icon for the Program Choice above.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Restore Program icon</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="ctvradio3">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Do nothing &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>No action</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QCheckBox" name="llamacheckBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>160</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Install Llama&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="text">
+    <string>Install Llama</string>
+   </property>
   </widget>
  </widget>
  <resources/>

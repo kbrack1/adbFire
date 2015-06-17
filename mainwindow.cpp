@@ -77,7 +77,7 @@ tv
  */
 
 
-const QString version = "1.26";
+const QString version = "1.27";
 
 bool isConnected = false;
 bool serverRunning = false;
