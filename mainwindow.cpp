@@ -48,6 +48,7 @@
 #include <QtNetwork/QNetworkInterface>
 #include <adblogdialog.h>
 #include <QFileInfo>
+#include <QThread>
 
 // #include <QDebug>
 
@@ -77,7 +78,7 @@ tv
  */
 
 
-const QString version = "1.27";
+const QString version = "1.28";
 
 bool isConnected = false;
 bool serverRunning = false;
@@ -2520,14 +2521,18 @@ void MainWindow::on_connButton_clicked()
      if(isConnected)
        {
 
+       if (os == 0)
+          QObject().thread()->usleep(1000*1000*.1);
+          // patch from superelchi@xda
 
-         if (!is_su())
+       if (!is_su())
             {
              busybox_nonroot();
              busypath="/data/local/tmp/";
              }
 
           else
+
          {
              busypath="/system/xbin/";
          }
@@ -10032,13 +10037,28 @@ void MainWindow::on_usbmode_clicked()
           start_server();
 
           QString isdevice=list_devices();
-
+//zzz
          if(isdevice=="device")
-          {isConnected=true;
-          ui->device_connected->setText(devstr3);
-          ui->update_status->setText(amazon_update2);
-          getpackage();
-         }
+          {
+             isConnected=true;
+             ui->device_connected->setText(devstr3);
+             ui->update_status->setText(amazon_update2);
+             getpackage();
+
+             if (!is_su())
+                {
+                 busybox_nonroot();
+                 busypath="/data/local/tmp/";
+                 }
+
+              else
+             {
+                 busypath="/system/xbin/";
+             }
+
+
+
+}
 
          else  // connection failed
             {

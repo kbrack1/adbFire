@@ -1,3 +1,11 @@
+adbFire 1.28 changelog
+
+Busybox non-root install and path fixed
+for USB mode.
+
+Linux: sucheck delay added
+
+
 adbFire 1.27 changelog
 
 Qt Framework updated from 5.3.2 to 5.4.2 
