@@ -7,6 +7,10 @@ namespace Ui {
 class MainWindow;
 }
 
+
+
+
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -22,10 +26,6 @@ private slots:
     void on_actionAbout_triggered();
 
     void on_connButton_clicked();
-
-    void on_astart_Button_clicked();
-
-    void on_akill_Button_clicked();
 
     void TimerEvent();
 
@@ -43,8 +43,6 @@ private slots:
 
     void on_backupButton_clicked();
 
-    void on_rootButton_clicked();
-
     void on_fpushButton_clicked();
 
     void on_fpullButton_clicked();
@@ -53,13 +51,15 @@ private slots:
 
     void on_pushRemote_clicked();
 
-    void on_consoleButton_clicked();
+    void on_adbshellButton_clicked();
 
-    void on_actionPreferences_triggered();
+    void check_update_status();
 
+ //   void on_actionPreferences_triggered();
 
     void getpackage();
 
+    bool find_daddr(QString);
 
     void on_actionReboot_triggered();
 
@@ -111,20 +111,17 @@ private slots:
 
     void on_actionUnlock_Bootloader_triggered();
 
-    // void on_actionBuild_mount_script_triggered();
 
     void on_actionConsole_triggered();
 
     void on_actionMount_CIFS_triggered();
 
 
-    // void on_usbmode_toggled();
-
     void on_actionVideo_Help_triggered();
 
     void on_actionDownload_Kodi_triggered();
 
-    void on_pushButton_clicked();
+    void on_editRecord_clicked();
 
     void on_actionInstall_Stock_Recovery_triggered();
 
@@ -136,6 +133,8 @@ private slots:
 
     void on_actionUninstall_Boot_Menu_triggered();
 
+    void dataentry(int flag);
+
     void data_external();
 
     void data_internal();
@@ -143,21 +142,42 @@ private slots:
     void external_thumb();
 
     void internal_thumb();
-
+    void loaddevicebox();
 
     void on_actionMove_Restore_Data_triggered();
 
+    void on_pushButton_2_clicked();
+
+    void on_fdellButton_2_clicked();
+
+    void on_actionSplash_Screen_triggered();
+
+    void on_doConsole_clicked();
+
+    void on_killServer_clicked();
+
+    void on_refreshConnectedDevices_clicked();
+
+
+   void on_listDevices_doubleClicked();
+    // void on_listDevices_doubleClicked(const QModelIndex &index);
+
+   void on_newRecord_clicked();
+
+
+   void on_delRecord_clicked();
 
 
 
+   void on_logButton_clicked();
 
+   void on_actionRoot_device_triggered();
 
-    void on_usbmode_clicked();
-
-    void on_override_clicked();
 
 private:
     Ui::MainWindow *ui;
+
+
 
 };
 

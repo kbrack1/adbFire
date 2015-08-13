@@ -1,31 +1,94 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>About adbFire</title></head><body>
+<html><head><title>adbFire Overview</title></head><body>
+<b><u>adbFire Overview</b></u>
+<p>
+<u><b>adbFire</b></u> is a companion program for Amazon Fire TV & Android Kodi and its forks. <p><b>adbFire</b> allows you to
+install (sideload) apps to your Android device without the bother of installing the Android SDK. <p>
+Additionally, it allows you copy files to and from your device, backup and restore Kodi's data, and more. <p>
+<p>
 
-<u><b>adbFire</b></u> is a companion program for Android Kodi and its forks. It also has many special features for the AFTV. <p>adbFire allows you to
-install (sideload) Kodi and other apps to your Android device without the bother of installing the Android SDK. <p>
-Additionally, it allows you to mount USB drives (when rooted) copy files to and from Kodi, backup and restore Kodi's data, root the AFTV (51.1.1.0 or earlier) and much more. <p>
+
+
+The upper left Current Device combobox contains the names of your Android devices.
+This dropdown combobox is empty when you first run adbFire. Once you add
+devices, you choose a device from this menu in order to interact with it. 
+This combobox is empty when you first start <b>adbFire</b>. It fills as you add device records.
 <p>
-For Windows XP and up, the <b><u>adbFire</b></u> folder can be located wherever you wish.<p>
-Under OS X, adbFire.app may also be located wherever you wish. <p>
-adbFire keeps two log files adbfire.log and adbfire.old.log. Please use the <a href="vlog.html">View Log</a> menu function to see your logs and to copy them to the clipboard for tech support.
+The buttons associated with the device dropdown menu are:<p>
+<b>Edit:</b>  Edit the selected device.<br>
 <p>
-The adb binaries and dlls are part of the Android SDK.
+<b>New:</b>   Display a blank device data entry screen (New USB devices are also added
+via a double-click in the Connected Devices listbox, see below).<br>
 <p>
-adbFire depends on these apps:<br><br>
-com.geohot.towelroot<br>
-eu.chainfire.supersu<br>
-com.kebab.llama<br>
-com.funkyfresh.samba<br>
-CWM Recovery<br><br>
-They are copywritten by the respective developers. Please click the credits menu selection for links to these fine apps and please support the sevelopers with your donations!
+<b>Delete:</b> Delete the selected device.<br>
+<p>
+<b>Connect:</b> Connect the selected device..<br>
+<p>
+<b>Disconnect:</b>  Disconnect the selected device.<br>
+
 
 <p>
-The mount.exfat-fuse binary binary was compiled by from shardul_seth@xda.
-CWM Recovery is modified and compiled for Fire TV by rbox@xda
+The Connect and Disconnect buttons are disabled if the selected
+device is connected via USB.
 <p>
-adbFire is released under the GPL V3. Source is available at http://github.com/jocala/adbFire<p>
+Connections are attempted automatically for most adbFire
+functions. For example, should the Backup button be pressed
+and the selected device uses IP for a connection, adbFire
+will make the connection without a button press.
+<p>
+The <b>Connected Devices</b> listbox shows all current adb connections.<p>
+The </b>Status</b> listbox shows the device status (device/emulator/offline,etc).<br>
+<p>
+Double-clicking a USB device ID in the Connected Devices listbox opens
+a new device record with the ID filled in. This allows you to easily
+create a device record for USB connections
+<p>
+The <b>Restart ADB</b> button: Does refresh of connected devices
+<p>
+The <b>Stop ADB button</b> stops the ADB server.<br>
+<p>
+The <b>Preset directories</b> dropdown menu allows you to select a directory to push files to,
+pull files from or delete files. All Kodi directories are included as well as sdcard and extUsb
+<p>
+The <b>Ad Hoc</b> Directory entry field allows entry of any
+directory you have access to on the device for push/pull/delete.
+<p>
+The <b>Push</b> button allows selection of a file on the PC to be pushed
+to the selected directory on the connected device.
+<p>
+The <b>Pull</b> button allows selection of a file on the device to be pulled
+from the selected directory on the connected device.
+<p>
+The <b>Del</b> button allows selection of a file on the device for deletion.
+ <p>
+The <b>Clear</b> button clears the <b>Ad Hoc</b> directory selection.
+<p>
+The lower buttons are:<p>
+
+<b>Install apk:</b> Installs an apk file.<p>
+<b>Uninstall apk:</b> Uninstalls an apk file.<p>
+<b>Screen Shot:</b> Takes a screen shot of whatever is on your device's TV screen.<p>
+<b>ADB Shell:</b> Opens a console on the connected device. Much like telnet.<p>
+<b>Backup:</b> Create a Kodi backup.<p>
+<b>Restore:</b> Restore a Kodi backup (made by adbFire).<p>
+<b>Console:</b> Opens a console for command-line entry of adb commands.<p>
+<b>View Log:</b> View a log of your current or previous adbFire session. Copy the
+log to the system clipboard for pasting into messages,email,etc.<p>
+<b>Llama options: Use Llama to make Kodi appear on Launcher "Recent" menu<p>
+<b>Push Remote:</b> Push a remote control XML file to Kodi<p>
 
 <p>
-If you have questions or comments, please email jocala@jocala.com or visit one of the forums linked below. adbFire produces a log file, adbfire.log, with each run. Include it in your email or post if you're having problems.<p>
+<u><b>The following buttons Require Root</b></u><p>
+<b>Mount:</b> Mount USB drives/sticks<p>
+<b>Unmount:</b>Unmount USB drives/sticks<p>
+<b>SSH:</b>SSH into selected device<p>
+<b>SFTP:</b>SFTP into selected device<p>
+<b>FS R/O:</b>Make the file system read-only<p>
+<b>FS R/W:</b>Make the file system read-write<p>
+<p>
+<b>adbFire</b> is released under the GPL V3. Source is available at http://github.com/jocala/adbFire
+<p>
+<p>
+If you have questions or comments, please email jocala@jocala.com. adbFire produces a log file, adbshield.log, with each run. Include it in your email or post if you're having problems.<p>
 <a href="menu.html">main menu</a>
 </body</html>

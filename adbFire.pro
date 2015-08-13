@@ -4,10 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql network
+QT       += core gui sql network multimedia
 
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
 
 TARGET = adbFire
 TEMPLATE = app
@@ -30,7 +30,7 @@ SOURCES += main.cpp\
     bootmenudialog.cpp \
     unbootdialog.cpp \
     datadialog.cpp \
-    mediacenterdialog.cpp
+    mediacenterdialog.cpp 
 
 
 RESOURCES = adbFire.qrc
@@ -52,7 +52,7 @@ HEADERS  += mainwindow.h \
     bootmenudialog.h \
     unbootdialog.h \
     datadialog.h \
-    mediacenterdialog.h
+    mediacenterdialog.h 
 
 FORMS    += mainwindow.ui \
     dialog2.ui \
@@ -75,6 +75,6 @@ FORMS    += mainwindow.ui \
 
 RC_FILE = adbFire.rc
 
-ICON = adbfire.icns
+ICON = adbFire.icns
 
 OTHER_FILES +=

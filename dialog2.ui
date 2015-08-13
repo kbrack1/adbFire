@@ -104,7 +104,7 @@
        </font>
       </property>
       <property name="text">
-       <string>adbFire</string>
+       <string>adbShield</string>
       </property>
       <property name="textFormat">
        <enum>Qt::PlainText</enum>

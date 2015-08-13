@@ -49,6 +49,7 @@
 #include <adblogdialog.h>
 #include <QFileInfo>
 #include <QThread>
+#include <QMediaPlayer>
 
 // #include <QDebug>
 
@@ -60,8 +61,6 @@
 int os=2;
 #endif
 
-
-// ag.tvaddons.tvmc
 
 // QString num="123";
 //  int n = num.toInt();
@@ -78,12 +77,15 @@ tv
  */
 
 
-const QString version = "1.28";
+// const QString vqurl = "http://www.jocala.com/version.txt";
+
+const QString vqurl = "http://www.jocala.com/version.txt";
+const QString version = "1.29";
 
 bool isConnected = false;
 bool serverRunning = false;
-bool  is_packageInstalled = false;
-bool  mounted_op = false;
+bool is_packageInstalled = false;
+bool mounted_op = false;
 bool firstrun=true;
 bool dbexists = false;
 bool updatecheck = true;
@@ -93,8 +95,13 @@ bool mountcheck = false;
 bool killadbBool = true;
 bool resetadbBool = true;
 bool usbdev;
+bool    select1;
+bool    select2;
+bool isusb = false;
+bool    select3;
+bool    select4;
 
-QString port = ":5555";
+QString port = "5555";
 QString filename = "";
 QString adbdir =  "";
 QString adb = "";
@@ -109,7 +116,6 @@ QString pushdir = "";
 QString pulldir = "";
 QString xbmcpackage ="";
 QString sshpassword = "";
-int buffermode = 1;
 QString buffersize = "";
 QString bufferfactor = "";
 QString dbstring = "";
@@ -120,51 +126,67 @@ QString ipaddress1;
 QString share1;
 QString mount1;
 QString nfs1;
-bool    select1;
-
+QString adblog;
 QString ipaddress2;
 QString share2;
 QString mount2;
 QString nfs2;
-bool    select2;
-
 QString ipaddress3;
 QString share3;
 QString mount3;
 QString nfs3;
-bool    select3;
-
 QString ipaddress4;
 QString share4;
 QString mount4;
 QString nfs4;
-bool    select4;
-
-
 QString adbstr1 = "ADB running. ";
-QString adbstr2 = "ADB not running. ";
+QString adbstr2 = "ADB stopped. ";
 QString devstr1 = "  Device connected";
 QString devstr2 = "  Device not connected.";
 QString devstr3 = "  USB Mode";
 QString devstr4 = "  Console Mode";
-
-QString amazon_update1 = "Amazon updates on.      ";
-QString amazon_update0 = "Amazon updates off.     ";
-QString amazon_update2 = "                        ";
-
+QString amazon_update1 = "Amazon updates on   ";
+QString amazon_update0 = "Amazon updates off  ";
 QString sshserver1 = "SSH server on       ";
 QString sshserver2 = "SSH server off      ";
-
-
+QString program = "adbFire";
 
 int usbcheck;
 int ftvupdate;
 int checkversion;
 int extdata;
-
+int buffermode = 1;
 int tsvalue = 4000;
+int ct = 1;
+int Id = 0;
+int deviceboxindex = 0;
 
 QSqlDatabase db;
+
+/////////////////
+QString getadb()
+
+{
+    QString gadb="";
+    QString editport="";
+
+    if (!isusb)
+        editport=":"+port;
+
+    gadb=adb+" -s "+daddr+editport+" ";
+
+    return gadb;
+
+
+}
+
+/////////////////////
+void delay(int secs)
+{
+    QTime dieTime= QTime::currentTime().addSecs(secs);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
 
 ///////////////////////////////
 bool fileExists(QString path) {
@@ -197,7 +219,6 @@ while(i == 0)
 
 
 }
-
 
 
 //////////////////////////////////////////////
@@ -250,7 +271,7 @@ QProcess reboot_device;
 rtimer.start();
 reboot_device.setProcessChannelMode(QProcess::MergedChannels);
 
-QString cstring = adb + " " + reboot;
+QString cstring = getadb() + " " + reboot;
 
 reboot_device.start(cstring);
 reboot_device.waitForStarted();
@@ -264,6 +285,7 @@ while(reboot_device.state() != QProcess::NotRunning)
 
 
 }
+
 
 
 
@@ -284,32 +306,62 @@ QString RunProcess(QString cstring)
  return command;
 }
 
+/////////////////////////////////////////////////////
+void busybox_install()
+{
+
+       QString busybox1 = adbdir+"busybox";
+       QString cstring = getadb() + " push "+busybox1+ " /data/local/tmp/";
+       QString command=RunProcess(cstring);
+
+       if (!command.contains("bytes"))
+         {
+           logfile("busybox install failed ");
+           logfile(cstring);
+            logfile(command);
+           return;
+           }
+
+        logfile(cstring);
+        logfile(command);
+
+        cstring = getadb() + " shell chmod 755 /data/local/tmp/busybox";
+        command=RunProcess(cstring);
+
+        logfile(cstring);
+        logfile(command);
+
+        cstring = getadb() + " shell /data/local/tmp/busybox --install -s /data/local/tmp";
+        command=RunProcess(cstring);
+
+        logfile(cstring);
+        logfile(command);
+
+
+
+}
 
 /////////////////////////////
 bool is_su()
 {
 
-QString cstring = adb + " shell ls /system/xbin/su";
+QString cstring = getadb() + " shell ls /system/xbin/su";
 QString command=RunProcess(cstring);
 
-//logfile("Root Check");
+
 
 if (command.contains("No such file or directory"))
   {
-    //logfile("not rooted");
-    //logfile(command);
+
     return false;
    }
     else
   {
-      //logfile("rooted");
-     // logfile(command);
-      return true;
+     return true;
    }
 
 
 }
-
 
 
 /////////////////////////////
@@ -318,24 +370,88 @@ bool is_busybox()
 
 QString cstring;
 QString command;
+busypath="";
+
+  cstring = getadb() + " shell ls /system/xbin/busybox";
+  command=RunProcess(cstring);
 
 
-
-if (is_su())
-   cstring = adb + " shell ls /system/xbin/busybox";
- else
-    cstring = adb + " shell ls /data/local/tmp/busybox";
-
-command=RunProcess(cstring);
-
-if (command.contains("No such file or directory"))
+  if (!command.contains("No such file or directory"))
   {
-    return false;
-   }
-    else
-  {
-     return true;
-   }
+      busypath="/system/xbin/";
+
+      return true;
+  }
+
+
+  cstring = getadb() + " shell ls /data/local/tmp/busybox";
+  command=RunProcess(cstring);
+
+
+  if (command.contains("No such file or directory"))
+     {
+      QString busybox = adbdir+"busybox";
+      QString cstring = getadb() + " push "+busybox+ " /data/local/tmp/";
+      QString command=RunProcess(cstring);
+      if (!command.contains("bytes"))
+        {
+          logfile("busybox install failed ");
+          logfile(cstring);
+           logfile(command);
+           busypath="";
+           QMessageBox::critical(0,"","busybox install failed. See log.");
+           return false;
+          }
+     else
+      {
+          logfile(cstring);
+          logfile(command);
+
+          cstring = getadb() + " shell chmod 755 /data/local/tmp/busybox";
+          command=RunProcess(cstring);
+
+          logfile(cstring);
+          logfile(command);
+
+          cstring = getadb() + " shell /data/local/tmp/busybox --install -s /data/local/tmp";
+          command=RunProcess(cstring);
+
+          logfile(cstring);
+          logfile(command);
+      }
+
+
+  }
+
+  busypath="/data/local/tmp/";
+  return true;
+
+
+
+}
+
+
+
+/////////////////////////////
+bool is_amazon()
+{
+
+QString cstring;
+QString command;
+bool amazon;
+
+  cstring = getadb() + " shell pm list packages";
+  command=RunProcess(cstring);
+
+  if (command.contains("com.amazon.device"))
+      amazon = true;
+  else
+      amazon = false;
+
+
+  return amazon;
+
+
 
 }
 
@@ -347,6 +463,26 @@ if (command.contains("No such file or directory"))
     str.replace( " ", "" );
     return str;
 }
+
+ void blank_entry_form()
+ {
+
+     daddr="";
+     description="";
+     sldir = hdir;
+     pushdir = hdir;
+     pulldir = hdir;
+     isusb = false;
+     filepath = "/files/.kodi";
+     port = "5555";
+     buffermode = 1;
+     buffersize = "20971520";
+     bufferfactor = "1";
+     versioncheck=true;
+     xbmcpackage = "org.xbmc.kodi";
+
+ }
+
 
  //////////////////////////////////////////
  void kill_server()
@@ -365,13 +501,17 @@ if (command.contains("No such file or directory"))
 void start_server()
 {
 
- QString cstring = adb + " start-server";
- QString command=RunProcess(cstring);
+    QString cstring = adb + " kill-server";
+    QString command=RunProcess(cstring);
+
+
+      cstring = adb + " start-server";
+      command=RunProcess(cstring);
 
      if (command.contains("daemon started successfully"))
         {
            logfile("server started");
-           logfile(cstring);
+          logfile(cstring);
            logfile(command);
            serverRunning = true;
           }
@@ -385,92 +525,22 @@ void start_server()
          }
 }
 
-//////////////////////////////////////
-QString list_devices()
-{
-
- int i;
- QString isdevice;
- QString usbid;
- QString cstring = adb + " devices";
- QString command=RunProcess(cstring);
-
-
-
-     if (command.contains("device"))
-        {
-           //logfile("device(s) found");
-           //logfile(command);
-
-           QFile file21(adbdir+"temp.txt");
-
-             if(!file21.open(QFile::WriteOnly))
-               {
-                  QMessageBox::critical(0, "","Error creating daddr file!\n",QMessageBox::Cancel);
-                   logfile(cstring);
-                   logfile(command);
-                   logfile("error creating "+adbdir+ "device file");
-                   return "error";
-               }
-
-
-             QTextStream out1(&file21);
-             out1  << command << endl;
-
-             file21.flush();
-             file21.close();
-
-
-
-             QString tmpstr2 = adbdir+"temp.txt";
-             QString fline2;
-
-                QFile file32(tmpstr2);
-                  if (!file32.open(QIODevice::ReadOnly | QIODevice::Text))
-                    {QMessageBox::critical(0,"","Error reading file!");
-                       return "error"; }
-
-                  QTextStream in1(&file32);
-                   while (!in1.atEnd())
-                    {
-
-                     fline2 = in1.readLine();
-
-                       if (!fline2.isEmpty()  &&  (!fline2.contains("List of devices")))
-                        {
-
-
-                           i =  fline2.indexOf("\t");
-
-                           usbid =fline2.mid(0,i);
-                           isdevice = fline2.mid(i+1);
-
-                           logfile(usbid);
-                           logfile(isdevice);
-
-                       }
-
-                   }
-
-                     file32.close();
-
-               //QFile::remove(tmpstr2);
-
-     }
-
-
-         return isdevice;
-
-
-}
-
 
 /////////////////////////////////////////////////////
 bool is_package(QString package)
 {
 
-    QString cstring = adb + " shell pm list packages ";
+    QString editport = ":"+port;
+
+    if (isusb)
+    editport = "";
+
+
+
+
+    QString cstring = getadb() + " -s "+daddr+editport+" shell pm list packages ";
     QString command=RunProcess(cstring);
+    logfile ("package: "+cstring);
 
         if (command.contains(package))
             {
@@ -492,7 +562,7 @@ bool is_package(QString package)
 /////////////////////////////////////////////////////
 bool mount_system(QString mnt)
 {
-       QString cstring = adb + " shell su -c mount -o remount,"+mnt+ " /system";
+       QString cstring = getadb() + " shell su -c mount -o remount,"+mnt+ " /system";
        QString command=RunProcess(cstring);
 
 
@@ -517,7 +587,7 @@ bool mount_system(QString mnt)
 /////////////////////////////////////////////////////
 bool mount_root(QString mnt)
 {
-       QString cstring = adb + " shell su -c mount -o remount,"+mnt+ " /";
+       QString cstring = getadb() + " shell su -c mount -o remount,"+mnt+ " /";
        QString command=RunProcess(cstring);
 
        logfile(cstring);
@@ -546,7 +616,7 @@ bool amazon_updates(QString onoff)
 {
 
 
-       QString cstring = adb + " shell su -c pm "+ onoff + " com.amazon.dcp";
+       QString cstring = getadb() + " shell su -c pm "+ onoff + " com.amazon.dcp";
        QString command=RunProcess(cstring);
 
 
@@ -601,48 +671,57 @@ bool amazon_updates(QString onoff)
 }
 
 
-/////////////////////////////////////////////////////
-void busybox_nonroot()
+
+//////// DATABASE ///////////////////
+
+////////////////////////////////
+int getShareCount()
 {
 
-      if (is_busybox())
-      {
-       logfile("non-root.busybox already installed ");
-       return;
-      }
+   int rowcount;
+   QString sqlstatement = "SELECT Count(*) FROM netshare";
 
-       QString busybox1 = adbdir+"busybox";
-       QString cstring = adb + " push "+busybox1+ " /data/local/tmp/";
-       QString command=RunProcess(cstring);
+    QSqlQuery query;
+    query.exec(sqlstatement);
+    while (query.next()) {
+          rowcount = query.value(0).toInt();
+    }
 
-       if (!command.contains("bytes"))
-         {
-           logfile("non-root.busybox install failed ");
-           logfile(cstring);
-            logfile(command);
-           return;
-           }
-
-        logfile(cstring);
-        logfile(command);
-
-        cstring = adb + " shell chmod 755 /data/local/tmp/busybox";
-        command=RunProcess(cstring);
-
-        logfile(cstring);
-        logfile(command);
-
-        cstring = adb + " shell /data/local/tmp/busybox --install -s /data/local/tmp";
-        command=RunProcess(cstring);
-
-        logfile(cstring);
-        logfile(command);
+    if (query.lastError().isValid())
+     {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
 
 
-
+    return rowcount;
 }
 
 
+////////////////////////////////
+int getRows()
+{
+
+   int rowcount;
+   QString sqlstatement = "SELECT Count(*) FROM device";
+
+    QSqlQuery query;
+    query.exec(sqlstatement);
+    while (query.next()) {
+          rowcount = query.value(0).toInt();
+    }
+
+    if (query.lastError().isValid())
+     {
+        logfile(sqlstatement);
+        logfile("SqLite error:" + query.lastError().text());
+        logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+       }
+
+
+    return rowcount;
+}
 
 
 ////////////////////////////////
@@ -652,7 +731,7 @@ void createTables()
 
     logfile("creating adbfire.db");
 
-    QString sqlstatement = "create table device(id int primary key, name varchar(20) ,description varchar(20),sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , sshpassword varchar(10) , versioncheck int, buffermode int, buffersize varchar(10), bufferfactor varchar(10), filepath varchar(20) )";
+   QString sqlstatement = "create table device(Id INTEGER PRIMARY KEY, daddr varchar(130) ,description varchar(20) NOT NULL UNIQUE,sldir varchar(100),pushdir varchar(100),pulldir varchar(100), xbmcpackage varchar(50) , sshpassword varchar(10) , versioncheck int, buffermode int, buffersize varchar(10), bufferfactor varchar(10), filepath varchar(20), port varchar(6),isusb int )";
 
     QSqlQuery query;
     query.exec(sqlstatement);
@@ -664,34 +743,8 @@ void createTables()
         logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
        }
 
-       QString s;
 
-
-    for( int n = 0; n < 10; n = n + 1 )
-     {
-
-       s  = QString::number(n);
-       QString r  = "IP address "+ QString::number(n+1);
-
-       QString d  = "Description "+ QString::number(n+1);
-
-       QString z = "/files/.kodi";
-
-       sqlstatement="insert into device values('"+s+"','"+r+"', '"+d+"'  ,'"+hdir+"','"+hdir+"','"+hdir+"' ,'org.xbmc.kodi','password', 1 ,1,'20971520','1','"+z+"')";
-
-        query.exec(sqlstatement);
-
-        if (query.lastError().isValid())
-         {
-          logfile(sqlstatement);
-          logfile("SqLite error:" + query.lastError().text());
-          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
-        }
-     }
-
-
-
-   sqlstatement = "create table netshare(id int primary key, ipaddress varchar(20), share varchar(60), mount varchar(60), nfs varchar(1) )";
+   sqlstatement = "create table netshare(Id INTEGER PRIMARY KEY, sharedescrip varchar(20) NOT NULL UNIQUE, ipaddress1 varchar(20),ipaddress2 varchar(20), ipaddress3 varchar(20),ipaddress4 varchar(20),share1 varchar(60),share2 varchar(60), share3 varchar(60),share4 varchar(60),mount1 varchar(60), mount2 varchar(60), mount3 varchar(60), mount4 varchar(60), nfs1 varchar(1),  nfs2 varchar(1), nfs3 varchar(1), nfs4 varchar(1))";
 
     query.exec(sqlstatement);
 
@@ -705,35 +758,117 @@ void createTables()
 
 
 
-    for( int n2 = 1; n2 < 5; n2 = n2 + 1 )
-     {
+}
 
-       s  = QString::number(n2);
 
-       QString r  = "ipaddress"+s;
+////////////////////////////////
+void insertDevice()
+{
 
-        sqlstatement="insert into netshare values('"+s+"', '','','','0' )";
-        query.exec(sqlstatement);
+   logfile("Insert new record");
 
-        if (query.lastError().isValid())
-         {
-          logfile(sqlstatement);
-          logfile("SqLite error:" + query.lastError().text());
-          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+   QSqlQuery query;
+
+    daddr.replace(QString("'"), QString("''"));
+    description.replace(QString("'"), QString("''"));
+    xbmcpackage.replace(QString("'"), QString("''"));
+    sldir.replace(QString("'"), QString("''"));
+    pushdir.replace(QString("'"), QString("''"));
+    pulldir.replace(QString("'"), QString("''"));
+    xbmcpackage.replace(QString("'"), QString("''"));
+    filepath.replace(QString("'"), QString("''"));
+    port.replace(QString("'"), QString("''"));
+    sshpassword="";
+
+
+    // usbck.setNum(usbcheck);
+    // ftvupdt.setNum(ftvupdate);
+
+    QString ckversion;
+    QString buffermd;
+    QString usbflag;
+
+
+    ckversion.setNum(checkversion);
+    buffermd.setNum(buffermode);
+    usbflag.setNum(isusb);
+
+QString sql1  = "INSERT INTO device( daddr, description, sldir, pushdir, pulldir, xbmcpackage, sshpassword, versioncheck, buffermode, buffersize, bufferfactor, filepath , port ,isusb )";
+
+QString sql2 = " VALUES  ('"+daddr+"', '"+description+"', '"+sldir+"',  '"+pushdir+"', '"+pulldir+"', '"+xbmcpackage+"','"+sshpassword+"', '"+ckversion+"', '"+buffermd+"',  '"+buffersize+"',  '"+bufferfactor+"', '"+filepath+"', '"+port+"','"+usbflag+"' )";
+
+QString sqlstatement = sql1+sql2;
+
+      query.exec(sqlstatement);
+
+      if (query.lastError().isValid())
+       {
+         logfile(sqlstatement);
+         logfile("SqLite error:" + query.lastError().text());
+         logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
         }
-     }
-
 
 
 }
 
 
 ////////////////////////////////
-void updateTables(int i)
+void insertShare()
 {
 
+   logfile("Insert new share record");
+   logfile(description);
 
- // QMessageBox::critical(0, "",daddr,QMessageBox::Cancel);
+   QSqlQuery query;
+
+    description.replace(QString("'"), QString("''"));
+
+    ipaddress1.replace(QString("'"), QString("''"));
+    share1.replace(QString("'"), QString("''"));
+    mount1.replace(QString("'"), QString("''"));
+    nfs1.replace(QString("'"), QString("''"));
+
+    ipaddress2.replace(QString("'"), QString("''"));
+    share2.replace(QString("'"), QString("''"));
+    mount2.replace(QString("'"), QString("''"));
+    nfs2.replace(QString("'"), QString("''"));
+
+    ipaddress3.replace(QString("'"), QString("''"));
+    share3.replace(QString("'"), QString("''"));
+    mount3.replace(QString("'"), QString("''"));
+    nfs3.replace(QString("'"), QString("''"));
+
+    ipaddress4.replace(QString("'"), QString("''"));
+    share4.replace(QString("'"), QString("''"));
+    mount4.replace(QString("'"), QString("''"));
+    nfs4.replace(QString("'"), QString("''"));
+
+
+
+QString sql1 = " INSERT INTO netshare( sharedescrip , ipaddress1,share1 ,mount1 , nfs1 ,ipaddress2,share2 ,mount2 , nfs2,  ipaddress3,share3 ,mount3 , nfs3,ipaddress4,share4 ,mount4 , nfs4 )";
+
+QString sql2 = " VALUES  ('"+description+"', '"+ipaddress1+"', '"+share1+"','"+mount1+"','"+nfs1+"','"+ipaddress2+"','"+share2+"','"+mount2+"','"+nfs2+"','"+ipaddress3+"','"+share3+"','"+mount3+"','"+nfs3+"','"+ipaddress4+"','"+share4+"','"+mount4+"','"+nfs4+"' )";
+
+QString sqlstatement = sql1+sql2;
+
+      query.exec(sqlstatement);
+
+      if (query.lastError().isValid())
+       {
+         logfile(sqlstatement);
+         logfile("SqLite error:" + query.lastError().text());
+         logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+        }
+
+
+}
+
+
+
+////////////////////////////////
+void updateDevice(QString olddescription)
+{
+logfile("updateDevice()");
 
 
     logfile("updating database adbfire.db");
@@ -742,24 +877,54 @@ void updateTables(int i)
     QString str2;
     QString str3;
     QString str4;
-
+    QString str5;
     QString tempstring;
+    QString sqlstatement;
 
     str1.setNum(usbcheck);
     str2.setNum(ftvupdate);
     str3.setNum(checkversion);
     str4.setNum(buffermode);
+    str5.setNum(isusb);
 
-
-    QString idstring = QString::number(i);
-
+  //  int idstring = Id.t;
+    QString idstring;
+    idstring.setNum(Id);
+    logfile(idstring);
     QSqlQuery query;
+
+    QString quote = "\"";
+
+
+
+
+    if (olddescription != description)
+    {
+
+        tempstring = description;
+        tempstring.replace(QString("'"), QString("''"));
+
+           olddescription = quote+olddescription+quote;
+
+            sqlstatement = "UPDATE netshare SET sharedescrip='"+tempstring+"'  WHERE sharedescrip="+ olddescription;
+             query.exec(sqlstatement);
+
+             if (query.lastError().isValid())
+              {
+                logfile(sqlstatement);
+                logfile("SqLite error:" + query.lastError().text());
+                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+               }
+
+    }
+
 
     tempstring = daddr;
     tempstring.replace(QString("'"), QString("''"));
 
-    QString sqlstatement = "UPDATE device SET name='"+tempstring+"'  WHERE Id="+ idstring;
-     query.exec(sqlstatement);
+    sqlstatement = "UPDATE device SET daddr='"+tempstring+"'  WHERE Id="+ idstring;
+    logfile(sqlstatement);
+    query.exec(sqlstatement);
 
      if (query.lastError().isValid())
       {
@@ -927,9 +1092,38 @@ void updateTables(int i)
              }
 
 
+           tempstring = port;
+           tempstring.replace(QString("'"), QString("''"));
+
+           sqlstatement = "UPDATE device SET port='"+tempstring+"'  WHERE Id="+ idstring;
+           query.exec(sqlstatement);
+
+           if (query.lastError().isValid())
+            {
+              logfile(sqlstatement);
+              logfile("SqLite error:" + query.lastError().text());
+              logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+             }
+
+
+
+           tempstring = str5;
+           tempstring.replace(QString("'"), QString("''"));
+
+           sqlstatement = "UPDATE device SET isusb='"+tempstring+"'  WHERE Id="+ idstring;
+           query.exec(sqlstatement);
+
+           if (query.lastError().isValid())
+            {
+              logfile(sqlstatement);
+              logfile("SqLite error:" + query.lastError().text());
+              logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+             }
+
+
+
 
 }
-
 
 
 ////////////////////////////////
@@ -940,21 +1134,21 @@ void updateShares()
     logfile("updating shares table adbfire.db");
 
 
-
- // sqlstatement = "create table netshare(id int primary key, ipaddress varchar(20), share varchar(60), mount varchar(60), nfs varchar(1) )";
-
-
     QSqlQuery query;
-    QString idstring;
+    QString sharedescrip;
     QString tempstring;
+    QString sqlstatement;
+
+    QString quote = "\"";
+    QString descrip = quote+description+quote;
 
 
 
-    idstring = "1";
     tempstring = ipaddress1;
     tempstring.replace(QString("'"), QString("''"));
 
-     QString sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
+
+     sqlstatement = "UPDATE netshare SET ipaddress1='"+tempstring+"'  WHERE sharedescrip="+ descrip;
      query.exec(sqlstatement);
 
      if (query.lastError().isValid())
@@ -966,10 +1160,11 @@ void updateShares()
 
 
 
+
      tempstring = share1;
      tempstring.replace(QString("'"), QString("''"));
 
-     sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
+     sqlstatement = "UPDATE netshare SET share1='"+tempstring+"'  WHERE sharedescrip="+ descrip;
       query.exec(sqlstatement);
 
       if (query.lastError().isValid())
@@ -983,7 +1178,7 @@ void updateShares()
       tempstring = mount1;
       tempstring.replace(QString("'"), QString("''"));
 
-       sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
+       sqlstatement = "UPDATE netshare SET mount1='"+tempstring+"'  WHERE sharedescrip="+ descrip;
        query.exec(sqlstatement);
 
        if (query.lastError().isValid())
@@ -998,7 +1193,7 @@ void updateShares()
        tempstring = nfs1;
        tempstring.replace(QString("'"), QString("''"));
 
-        sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
+        sqlstatement = "UPDATE netshare SET nfs1='"+tempstring+"'  WHERE sharedescrip="+ descrip;
         query.exec(sqlstatement);
 
         if (query.lastError().isValid())
@@ -1009,12 +1204,11 @@ void updateShares()
           }
 
 
-        idstring = "2";
 
         tempstring = ipaddress2;
         tempstring.replace(QString("'"), QString("''"));
 
-         sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
+         sqlstatement = "UPDATE netshare SET ipaddress2='"+tempstring+"'  WHERE sharedescrip="+ descrip;
          query.exec(sqlstatement);
 
          if (query.lastError().isValid())
@@ -1029,7 +1223,7 @@ void updateShares()
          tempstring = share2;
          tempstring.replace(QString("'"), QString("''"));
 
-         sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
+         sqlstatement = "UPDATE netshare SET share2='"+tempstring+"'  WHERE sharedescrip="+ descrip;
           query.exec(sqlstatement);
 
           if (query.lastError().isValid())
@@ -1043,7 +1237,7 @@ void updateShares()
           tempstring = mount2;
           tempstring.replace(QString("'"), QString("''"));
 
-           sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
+           sqlstatement = "UPDATE netshare SET mount2='"+tempstring+"'  WHERE sharedescrip="+ descrip;
            query.exec(sqlstatement);
 
            if (query.lastError().isValid())
@@ -1058,7 +1252,7 @@ void updateShares()
            tempstring = nfs2;
            tempstring.replace(QString("'"), QString("''"));
 
-            sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
+            sqlstatement = "UPDATE netshare SET nfs2='"+tempstring+"'  WHERE sharedescrip="+ descrip;
             query.exec(sqlstatement);
 
             if (query.lastError().isValid())
@@ -1070,12 +1264,11 @@ void updateShares()
 
 
 
-            idstring = "3";
 
             tempstring = ipaddress3;
             tempstring.replace(QString("'"), QString("''"));
 
-             sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
+             sqlstatement = "UPDATE netshare SET ipaddress3='"+tempstring+"'  WHERE sharedescrip="+ descrip;
              query.exec(sqlstatement);
 
              if (query.lastError().isValid())
@@ -1090,7 +1283,7 @@ void updateShares()
              tempstring = share3;
              tempstring.replace(QString("'"), QString("''"));
 
-             sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
+             sqlstatement = "UPDATE netshare SET share3='"+tempstring+"'  WHERE sharedescrip="+ descrip;
               query.exec(sqlstatement);
 
               if (query.lastError().isValid())
@@ -1104,7 +1297,7 @@ void updateShares()
               tempstring = mount3;
               tempstring.replace(QString("'"), QString("''"));
 
-               sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
+               sqlstatement = "UPDATE netshare SET mount3='"+tempstring+"'  WHERE sharedescrip="+ descrip;
                query.exec(sqlstatement);
 
                if (query.lastError().isValid())
@@ -1119,7 +1312,7 @@ void updateShares()
                tempstring = nfs3;
                tempstring.replace(QString("'"), QString("''"));
 
-                sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
+                sqlstatement = "UPDATE netshare SET nfs3='"+tempstring+"'  WHERE sharedescrip="+ descrip;
                 query.exec(sqlstatement);
 
                 if (query.lastError().isValid())
@@ -1132,14 +1325,10 @@ void updateShares()
 
 
 
-                idstring = "4";
-
-
-
                 tempstring = ipaddress4;
                 tempstring.replace(QString("'"), QString("''"));
 
-                 sqlstatement = "UPDATE netshare SET ipaddress='"+tempstring+"'  WHERE Id="+ idstring;
+                 sqlstatement = "UPDATE netshare SET ipaddress4='"+tempstring+"'  WHERE sharedescrip="+ descrip;
                  query.exec(sqlstatement);
 
                  if (query.lastError().isValid())
@@ -1154,7 +1343,7 @@ void updateShares()
                  tempstring = share4;
                  tempstring.replace(QString("'"), QString("''"));
 
-                 sqlstatement = "UPDATE netshare SET share='"+tempstring+"'  WHERE Id="+ idstring;
+                 sqlstatement = "UPDATE netshare SET share4='"+tempstring+"'  WHERE sharedescrip="+ descrip;
                   query.exec(sqlstatement);
 
                   if (query.lastError().isValid())
@@ -1168,7 +1357,7 @@ void updateShares()
                   tempstring = mount4;
                   tempstring.replace(QString("'"), QString("''"));
 
-                   sqlstatement = "UPDATE netshare SET mount='"+tempstring+"'  WHERE Id="+ idstring;
+                   sqlstatement = "UPDATE netshare SET mount4='"+tempstring+"'  WHERE sharedescrip="+ descrip;
                    query.exec(sqlstatement);
 
                    if (query.lastError().isValid())
@@ -1183,7 +1372,7 @@ void updateShares()
                    tempstring = nfs4;
                    tempstring.replace(QString("'"), QString("''"));
 
-                    sqlstatement = "UPDATE netshare SET nfs='"+tempstring+"'  WHERE Id="+ idstring;
+                    sqlstatement = "UPDATE netshare SET nfs4='"+tempstring+"'  WHERE sharedescrip="+ descrip;
                     query.exec(sqlstatement);
 
                     if (query.lastError().isValid())
@@ -1198,45 +1387,8 @@ void updateShares()
 
 
 
-
 ////////////////////////////////
-QString loadDevices(int i)
-{
-
-  QString sqlstatement;
-  QString description;
-
-   // logfile("reading database");
-
-     QSqlQuery query;
-
-
-     QString idstring = QString::number(i);
-
-     sqlstatement= "SELECT description FROM device WHERE Id="+ idstring;
-     query.exec(sqlstatement);
-         while (query.next()) {
-            description = query.value(0).toString();
-         }
-
-
-       // logfile(sqlstatement);
-
-         if (query.lastError().isValid())
-          {
-            logfile(sqlstatement);
-            logfile("SqLite error:" + query.lastError().text());
-            logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
-           }
-
-
-     return description;
-
-}
-
-
-////////////////////////////////
-void readTables(int i)
+void getRecord(QString descrip)
 
 {
 
@@ -1244,44 +1396,59 @@ void readTables(int i)
   QString sqlstatement;
 
 
-   // logfile("reading database");
+  logfile("getting database record");
 
-     QSqlQuery query;
+  QString quote = "\"";
 
-
-
-    QString id = QString::number(i);
-
-
-     sqlstatement= "SELECT name FROM device WHERE id=" + id;
-     query.exec(sqlstatement);
-         while (query.next()) {
-              daddr = query.value(0).toString();
-         }
+  descrip = quote+descrip+quote;
+  QSqlQuery query;
 
 
-       // logfile(sqlstatement);
-       // logfile(daddr);
-
-         // QMessageBox::critical(0, "",daddr,QMessageBox::Cancel);
-
-
-         if (query.lastError().isValid())
-          {
-            logfile(sqlstatement);
-            logfile("SqLite error:" + query.lastError().text());
-            logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
-           }
+   sqlstatement= "SELECT Id FROM device WHERE description=" + descrip;
+   query.exec(sqlstatement);
+   logfile(sqlstatement);
 
 
-         sqlstatement="SELECT sldir FROM device  WHERE id=" + id;
+           while (query.next()) {
+                  Id = query.value(0).toInt();
+                }
+
+
+             if (query.lastError().isValid())
+              {
+                logfile(sqlstatement);
+                logfile("SqLite error:" + query.lastError().text());
+                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+               }
+
+
+
+             sqlstatement= "SELECT daddr FROM device WHERE description=" + descrip;
+             query.exec(sqlstatement);
+             logfile(sqlstatement);
+
+
+                     while (query.next()) {
+                            daddr = query.value(0).toString();
+                          }
+
+
+                       if (query.lastError().isValid())
+                        {
+                          logfile(sqlstatement);
+                          logfile("SqLite error:" + query.lastError().text());
+                          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+                         }
+
+
+
+
+
+         sqlstatement="SELECT sldir FROM device  WHERE description=" + descrip;
          query.exec(sqlstatement);
            while (query.next()) {
                 sldir = query.value(0).toString();
           }
-
-         //   logfile(sqlstatement);
-          //  logfile(sldir);
 
            if (query.lastError().isValid())
             {
@@ -1291,7 +1458,7 @@ void readTables(int i)
              }
 
 
-           sqlstatement="SELECT pushdir FROM device  WHERE id=" + id;
+           sqlstatement="SELECT pushdir FROM device  WHERE description=" + descrip;
            query.exec(sqlstatement);
             while (query.next()) {
                  pushdir = query.value(0).toString();
@@ -1308,7 +1475,7 @@ void readTables(int i)
               }
 
 
-           sqlstatement="SELECT pulldir FROM device  WHERE id=" + id;
+           sqlstatement="SELECT pulldir FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   pulldir = query.value(0).toString();
@@ -1326,7 +1493,7 @@ void readTables(int i)
 
 
 
-            sqlstatement="SELECT xbmcpackage FROM device  WHERE id=" + id;
+            sqlstatement="SELECT xbmcpackage FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   xbmcpackage = query.value(0).toString();
@@ -1343,7 +1510,7 @@ void readTables(int i)
               }
 
 
-            sqlstatement="SELECT sshpassword FROM device  WHERE id=" + id;
+            sqlstatement="SELECT sshpassword FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   sshpassword = query.value(0).toString();
@@ -1360,7 +1527,7 @@ void readTables(int i)
               }
 
 
-            sqlstatement="SELECT versioncheck FROM device  WHERE id=" + id;
+            sqlstatement="SELECT versioncheck FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   checkversion = query.value(0).toInt();
@@ -1377,7 +1544,7 @@ void readTables(int i)
 
           //  logfile(sqlstatement);
 
-            sqlstatement="SELECT buffermode FROM device  WHERE id=" + id;
+            sqlstatement="SELECT buffermode FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   buffermode = query.value(0).toInt();
@@ -1394,7 +1561,7 @@ void readTables(int i)
 
 
 
-            sqlstatement="SELECT buffersize FROM device  WHERE id=" + id;
+            sqlstatement="SELECT buffersize FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   buffersize = query.value(0).toString();
@@ -1412,7 +1579,7 @@ void readTables(int i)
               }
 
 
-            sqlstatement="SELECT bufferfactor FROM device  WHERE id=" + id;
+            sqlstatement="SELECT bufferfactor FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   bufferfactor = query.value(0).toString();
@@ -1429,7 +1596,7 @@ void readTables(int i)
               }
 
 
-            sqlstatement="SELECT description FROM device  WHERE id=" + id;
+            sqlstatement="SELECT description FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   description = query.value(0).toString();
@@ -1446,7 +1613,7 @@ void readTables(int i)
               }
 
 
-            sqlstatement="SELECT filepath FROM device  WHERE id=" + id;
+            sqlstatement="SELECT filepath FROM device  WHERE description=" + descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   filepath = query.value(0).toString();
@@ -1462,6 +1629,40 @@ void readTables(int i)
                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
               }
 
+
+
+            sqlstatement="SELECT port FROM device  WHERE description=" + descrip;
+            query.exec(sqlstatement);
+            while (query.next()) {
+                  port = query.value(0).toString();
+            }
+
+        //    logfile(sqlstatement);
+        //    logfile(filepath);
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
+
+
+
+            sqlstatement="SELECT isusb FROM device  WHERE description=" + descrip;
+            query.exec(sqlstatement);
+            while (query.next()) {
+                  isusb = query.value(0).toInt();
+            }
+
+        //    logfile(sqlstatement);
+
+            if (query.lastError().isValid())
+             {
+               logfile(sqlstatement);
+               logfile("SqLite error:" + query.lastError().text());
+               logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
+              }
 
 
 
@@ -1499,16 +1700,23 @@ void readShares()
 
      QSqlQuery query;
 
-     QString idstring = "1";
 
-     sqlstatement= "SELECT ipaddress FROM netshare WHERE Id="+ idstring;
+
+     QString quote = "\"";
+
+     QString descrip = quote+description+quote;
+
+
+
+
+     sqlstatement= "SELECT ipaddress1 FROM netshare WHERE sharedescrip="+ descrip;
      query.exec(sqlstatement);
          while (query.next()) {
              ipaddress1 = query.value(0).toString();
          }
 
 
-  //      logfile(sqlstatement);
+
 
          if (query.lastError().isValid())
           {
@@ -1520,7 +1728,7 @@ void readShares()
 
 
 
-         sqlstatement="SELECT share FROM netshare  WHERE Id="+ idstring;
+         sqlstatement="SELECT share1 FROM netshare  WHERE sharedescrip="+ descrip;
          query.exec(sqlstatement);
            while (query.next()) {
                 share1 = query.value(0).toString();
@@ -1538,7 +1746,7 @@ void readShares()
 
 
 
-           sqlstatement="SELECT mount FROM netshare WHERE Id="+ idstring;
+           sqlstatement="SELECT mount1 FROM netshare WHERE sharedescrip="+ descrip;
            query.exec(sqlstatement);
             while (query.next()) {
                  mount1 = query.value(0).toString();
@@ -1554,7 +1762,7 @@ void readShares()
               }
 
 
-           sqlstatement="SELECT nfs FROM netshare  WHERE Id="+ idstring;
+           sqlstatement="SELECT nfs1 FROM netshare  WHERE sharedescrip="+ descrip;
             query.exec(sqlstatement);
             while (query.next()) {
                   nfs1 = query.value(0).toString();
@@ -1568,16 +1776,16 @@ void readShares()
                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
               }
 
-        idstring = "2";
 
-        sqlstatement= "SELECT ipaddress FROM netshare WHERE Id="+ idstring;
+
+        sqlstatement= "SELECT ipaddress2 FROM netshare WHERE sharedescrip="+ descrip;
         query.exec(sqlstatement);
             while (query.next()) {
                 ipaddress2 = query.value(0).toString();
             }
 
 
-       //    logfile(sqlstatement);
+
 
             if (query.lastError().isValid())
              {
@@ -1586,7 +1794,7 @@ void readShares()
                logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
               }
 
-            sqlstatement="SELECT share FROM netshare  WHERE Id="+ idstring;
+            sqlstatement="SELECT share2 FROM netshare  WHERE sharedescrip="+ descrip;
             query.exec(sqlstatement);
               while (query.next()) {
                    share2 = query.value(0).toString();
@@ -1601,7 +1809,7 @@ void readShares()
                  logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
                 }
 
-              sqlstatement="SELECT mount FROM netshare WHERE Id="+ idstring;
+              sqlstatement="SELECT mount2 FROM netshare WHERE sharedescrip="+ descrip;
               query.exec(sqlstatement);
                while (query.next()) {
                     mount2 = query.value(0).toString();
@@ -1617,7 +1825,7 @@ void readShares()
                  }
 
 
-              sqlstatement="SELECT nfs FROM netshare  WHERE Id="+ idstring;
+              sqlstatement="SELECT nfs2 FROM netshare  WHERE sharedescrip="+ descrip;
                query.exec(sqlstatement);
                while (query.next()) {
                      nfs2 = query.value(0).toString();
@@ -1631,9 +1839,8 @@ void readShares()
                   logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
                  }
 
-               idstring = "3";
 
-               sqlstatement= "SELECT ipaddress FROM netshare WHERE Id="+ idstring;
+               sqlstatement= "SELECT ipaddress3 FROM netshare WHERE sharedescrip="+ descrip;
                query.exec(sqlstatement);
                    while (query.next()) {
                        ipaddress3 = query.value(0).toString();
@@ -1652,7 +1859,7 @@ void readShares()
 
 
 
-                   sqlstatement="SELECT share FROM netshare  WHERE Id="+ idstring;
+                   sqlstatement="SELECT share3 FROM netshare  WHERE sharedescrip="+ descrip;
                    query.exec(sqlstatement);
                      while (query.next()) {
                           share3 = query.value(0).toString();
@@ -1670,7 +1877,7 @@ void readShares()
 
 
 
-                     sqlstatement="SELECT mount FROM netshare WHERE Id="+ idstring;
+                     sqlstatement="SELECT mount3 FROM netshare WHERE sharedescrip="+ descrip;
                      query.exec(sqlstatement);
                       while (query.next()) {
                            mount3 = query.value(0).toString();
@@ -1686,7 +1893,7 @@ void readShares()
                         }
 
 
-                     sqlstatement="SELECT nfs FROM netshare  WHERE Id="+ idstring;
+                     sqlstatement="SELECT nfs3 FROM netshare  WHERE sharedescrip="+ descrip;
                       query.exec(sqlstatement);
                       while (query.next()) {
                             nfs3 = query.value(0).toString();
@@ -1700,9 +1907,8 @@ void readShares()
                          logfile("SqLite error code:"+ QString::number( query.lastError().number() ));
                         }
 
-                      idstring = "4";
 
-                      sqlstatement= "SELECT ipaddress FROM netshare WHERE Id="+ idstring;
+                      sqlstatement= "SELECT ipaddress4 FROM netshare WHERE sharedescrip="+ descrip;
                       query.exec(sqlstatement);
                           while (query.next()) {
                               ipaddress4 = query.value(0).toString();
@@ -1721,7 +1927,7 @@ void readShares()
 
 
 
-                          sqlstatement="SELECT share FROM netshare  WHERE Id="+ idstring;
+                          sqlstatement="SELECT share4 FROM netshare  WHERE sharedescrip="+ descrip;
                           query.exec(sqlstatement);
                             while (query.next()) {
                                  share4 = query.value(0).toString();
@@ -1739,7 +1945,7 @@ void readShares()
 
 
 
-                            sqlstatement="SELECT mount FROM netshare WHERE Id="+ idstring;
+                            sqlstatement="SELECT mount4 FROM netshare WHERE sharedescrip="+ descrip;
                             query.exec(sqlstatement);
                              while (query.next()) {
                                   mount4 = query.value(0).toString();
@@ -1754,7 +1960,7 @@ void readShares()
                                }
 
 
-                            sqlstatement="SELECT nfs FROM netshare  WHERE Id="+ idstring;
+                            sqlstatement="SELECT nfs4 FROM netshare  WHERE sharedescrip="+ descrip;
                              query.exec(sqlstatement);
                              while (query.next()) {
                                    nfs4 = query.value(0).toString();
@@ -1770,6 +1976,40 @@ void readShares()
 
 
 }
+
+////////////////////////////////
+void deleteRecord(QString descrip)
+
+{
+
+
+  QString sqlstatement;
+  logfile("getting database record");
+
+  QString quote = "\"";
+
+  descrip = quote+descrip+quote;
+  QSqlQuery query;
+
+
+   sqlstatement= "DELETE FROM device WHERE description=" + descrip;
+   query.exec(sqlstatement);
+   logfile(sqlstatement);
+
+
+   sqlstatement= "DELETE FROM netshare WHERE sharedescrip=" + descrip;
+   query.exec(sqlstatement);
+   logfile(sqlstatement);
+
+
+
+
+
+
+}
+
+
+
 
 
 //////////////////////////////////////////////
@@ -1971,18 +2211,17 @@ if (!stringList.contains(l1))
  logfile(command);
 
 
-} ////////
+}
 
+
+
+/// ENTRYPOINT ///
 
 //////////////////////////////////////////////
  MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
-
-
-
 
      if (os == 1)
         {
@@ -2014,8 +2253,6 @@ if (!stringList.contains(l1))
            adb = '"'+adb+'"';
            QProcess::execute ("chmod 0755 "+ adb);
            }
-
-
 
    }
 
@@ -2056,32 +2293,31 @@ if (!stringList.contains(l1))
 
      ui->setupUi(this);
 
-    // ui->mountbox->setVisible(false);
-
      ui->statusBar->addPermanentWidget(ui->update_status);
      ui->statusBar->addPermanentWidget(ui->server_running);
-     ui->statusBar->addPermanentWidget(ui->device_connected);
+     //ui->statusBar->addPermanentWidget(ui->device_connected);
      ui->statusBar->addPermanentWidget( ui->progressBar);
      ui->progressBar->setHidden(true);
 
   //  this->setFixedSize(this->size().width(), this->size().height());
 
-     QPixmap pix(":/assets/donate.png");
+     QPixmap pix(":/assets/donatel.png");
      QIcon icon(pix);
      ui->donate->setIcon(icon);
+     ui->donate->setText("");
      ui->donate->setIconSize(pix.size());
 
 
-
+     ui->apptitle->setText("adbFire: Fire TV & Kodi Companion");
      ui->server_running->setText(adbstr2);
-     ui->device_connected->setText(devstr2);
+     // ui->device_connected->setText(devstr2);
      ui->update_status->setText("");
      ui->sambaLabel->setVisible(false);
 
   rotate_logfile();
 
 
-  logfile("adbFire v"+version);
+  logfile("adbFire "+version);
 
   QDateTime dateTime = QDateTime::currentDateTime();
   QString dtstr = dateTime.toString("MMddyyhhmmss");
@@ -2116,27 +2352,16 @@ if (!stringList.contains(l1))
    if (!dbexists)
     createTables();
 
-
-   for( int i = 0; i < 10; i = i + 1 )
-   {
-    ui->deviceBox->addItem(loadDevices(i));
-   }
+     db.open();
 
 
-
-   ui->deviceBox->setCurrentIndex(0);
-   // daddr = ui->deviceBox->currentText();
-
-
-   db.open();
-    readTables(ui->deviceBox->currentIndex());
-    db.close();
+    loaddevicebox();  // initial load
+    description = ui->deviceBox->currentText();
+    getRecord(description);
 
 
 
- //  readTables(ui->deviceBox->currentIndex()+1);
-
-   connect(ui->deviceBox, SIGNAL(currentIndexChanged(int)),
+    connect(ui->deviceBox, SIGNAL(currentIndexChanged(int)),
        SLOT(readInc()));
 
 
@@ -2144,9 +2369,6 @@ if (!stringList.contains(l1))
       {  QString cstring = "chmod 0755 "+adb;
          QString command=RunProcess(cstring);
        }
-
-   if (resetadbBool)
-         kill_server();
 
     start_server();
     logfile("starting server");
@@ -2156,21 +2378,20 @@ if (!stringList.contains(l1))
 
     else
     { ui->server_running->setText(adbstr2);
-      ui->device_connected->setText(devstr2);
+      //ui->device_connected->setText(devstr2);
       ui->update_status->setText("");
-      ui->sambaLabel->setVisible(false);
+      ui->sambaLabel->setVisible(true);
     }
 
-    firstrun=true;
-    logfile("initial open");
-    logfile(daddr);
-    on_connButton_clicked();
-
-    if (checkversion==1)
-         get_data();
 
 
 
+
+     on_refreshConnectedDevices_clicked();
+
+
+     if (checkversion==1)
+          get_data();
 
 }
 
@@ -2182,17 +2403,49 @@ MainWindow::~MainWindow()
 
     logfile("closing program");
     kill_server();
+    db.close();
     delete ui;
 
 }
 
 
+/////////////////////////////////////////////////////////////////////////
+bool MainWindow::find_daddr(QString deviceid)
+{
+   bool usbdaddr = false;
 
+   for(int row = 0; row < ui->listDevices->count(); row++)
+   {
+       if (ui->listDevices->item(row)->text()==deviceid)
+           usbdaddr=true;
+   }
+
+    return usbdaddr;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
+void MainWindow::loaddevicebox() {
+
+    QString sqlstatement;
+
+        QSqlQuery query;
+
+       ui->deviceBox->clear();
+       sqlstatement= "SELECT description FROM device";
+       query.exec(sqlstatement);
+           while (query.next()) {
+              description = query.value(0).toString();
+              ui->deviceBox->addItem(description);
+           }
+
+}
 
 //////////////////////////////////////////////////////////////////////
 void MainWindow::get_data() {
    QNetworkRequest request;
-   request.setUrl(QUrl("http://www.jocala.com/version.txt"));
+   request.setUrl(QUrl(vqurl));
 
    QNetworkAccessManager *nam = new QNetworkAccessManager();
    QNetworkReply *reply = nam->get(request);
@@ -2232,7 +2485,7 @@ void MainWindow::onReqCompleted() {
        if (version != s1)
        {
            QMessageBox::StandardButton reply;
-            reply = QMessageBox::question(0, "", "adbFire version "+s1+" is ready. Download?",
+            reply = QMessageBox::question(0, "", program+" version "+s1+" is ready. Download?",
                     QMessageBox::Yes|QMessageBox::No);
               if (reply == QMessageBox::Yes)
                {
@@ -2245,6 +2498,8 @@ void MainWindow::onReqCompleted() {
        delete reply;
 
 }
+
+
 
 
 
@@ -2278,16 +2533,24 @@ void MainWindow::TimerEvent()
 /////////////////////////////////////////////////////
 void MainWindow::readInc()
 {
-    description = ui->deviceBox->currentText();
-    // readTables( idx + 1 );
-    on_disButton_clicked();
 
-    db.open();
-     readTables(ui->deviceBox->currentIndex());
-     db.close();
+     description = ui->deviceBox->currentText();
+     getRecord(description);
 
-     logfile(daddr);
-     on_connButton_clicked();
+     QString lookup=daddr;
+
+      if(!isusb)
+       lookup=lookup+":"+port;
+
+     isConnected=find_daddr(lookup);
+
+     if (!isConnected && !isusb)
+           on_connButton_clicked();
+
+      if (isConnected)
+     // package:com.amazon.device
+          check_update_status();
+
 
 }
 
@@ -2295,15 +2558,23 @@ void MainWindow::readInc()
 void MainWindow::on_sideload_Button_clicked()
 {
 
+    QString lookup=daddr;
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+     if(!isusb)
+      lookup=lookup+":"+port;
 
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+    QString cstring;
+    QString command;
 
     QElapsedTimer rtimer;
     int nMilliseconds;
@@ -2333,9 +2604,10 @@ void MainWindow::on_sideload_Button_clicked()
           connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
           timer->start(tsvalue);
 
-          QString cstring = adb + " install -r " + '"'+ fileName+'"';
+           cstring = getadb() + " install -r " + '"'+ fileName+'"';
 
-          QString command=RunProcess(cstring);
+
+           QString command=RunProcess(cstring);
 
            ui->progressBar->setHidden(true);
 
@@ -2365,27 +2637,46 @@ void MainWindow::on_sideload_Button_clicked()
 void MainWindow::on_uninstall_Button_clicked()
 {
 
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 QString package = "";
 QString cstring;
 bool keepbox = false;
 
-    if (!isConnected)
-           { QMessageBox::critical(
-                 this,
-                 tr("adbFire"),
-                 tr("Device not connected"));
-              return;
-        }
+
+
 
     QElapsedTimer rtimer;
     int nMilliseconds;
     rtimer.start();
 
 
+
+
     logfile("open uninstall dialog");
 
-    uninstallDialog dialog;
-    dialog.setModal(true);
+
+
+    uninstallDialog dialog(port,daddr);
+
+
+    dialog.setdescription(description);
+
+    // dialog.setModal(true);
     if(dialog.exec() == QDialog::Accepted)
     {
 
@@ -2430,9 +2721,11 @@ bool keepbox = false;
 
 
                       if (!keepbox)
-                      cstring = adb + " shell pm uninstall " + package;
+                      cstring = getadb()+" shell pm uninstall " + package;
                       else
-                      cstring = adb + " shell pm uninstall -k " + package;
+                      cstring = getadb()+" shell pm uninstall -k " + package;
+
+                      logfile("uninstall: "+cstring);
 
                       QString command=RunProcess(cstring);
 
@@ -2472,41 +2765,46 @@ void MainWindow::on_connButton_clicked()
 {
 
 
-  if (ui->usbmode->isChecked() )
+    QString cstring;
+    QString command;
+
+
+    if (isusb )
+      {
+
+          QMessageBox::critical(
+               this,
+               tr("adbFire"),
+               tr("Inactive for USB connections"));
+            return;
+      }
+
+    if (daddr.isEmpty())
     {
 
         QMessageBox::critical(
              this,
              tr("adbFire"),
-             tr("Inactive in USB Mode"));
+             tr("Device address required."));
           return;
     }
 
-     if (ui->deviceBox->currentText().isEmpty())
-     {
 
-         QMessageBox::critical(
-              this,
-              tr("adbFire"),
-              tr("Device address required."));
-           return;
-     }
+
+
 
     QElapsedTimer rtimer;
     int nMilliseconds;
     rtimer.start();
 
-    kill_server();
-    start_server();
 
-    port = ":5555";
     QString sambastring;
     QString sambacheck;
 
-    // daddr = ui->deviceBox->currentText();
-
-    QString cstring = adb + " connect " +daddr+port;
-    QString command=RunProcess(cstring);
+    cstring = adb + " connect "+daddr+":"+port;
+      command=RunProcess(cstring);
+      logfile("connect"+command);
+      logfile("");
 
     logfile("connection attempt");
     logfile(cstring);
@@ -2514,7 +2812,11 @@ void MainWindow::on_connButton_clicked()
 
 
     if (command.contains("connected to"))
-           isConnected=true;
+    {   isConnected=true;
+        //on_utilityButton_clicked();
+        is_busybox();
+        on_refreshConnectedDevices_clicked();
+    }
        else
         isConnected=false;
 
@@ -2527,41 +2829,48 @@ void MainWindow::on_connButton_clicked()
 
        if (!is_su())
             {
-             busybox_nonroot();
-             busypath="/data/local/tmp/";
+
+            //ls /data/local/tmp/busybox
+            // /data/local/tmp/busybox: No such file or directory
+             //busybox();
+             //busypath="/data/local/tmp/";
              }
+
 
           else
 
          {
-             busypath="/system/xbin/";
+
+           cstring = getadb() + " shell pm list packages -d";
+           command=RunProcess(cstring);
+
+           if (command.contains("package:com.amazon.dcp"))
+           ui->update_status->setText(amazon_update0);
+           else
+            ui->update_status->setText(amazon_update1);
+
+
+           busypath="/system/xbin/";
          }
 
 
-         cstring = adb + " shell pm list packages -d";
-         command=RunProcess(cstring);
-
-         if (command.contains("package:com.amazon.dcp"))
-         ui->update_status->setText(amazon_update0);
-         else
-          ui->update_status->setText(amazon_update1);
 
 
 
-         ui->device_connected->setText(devstr1);
+       //  ui->device_connected->setText(devstr1);
          ui->server_running->setText(adbstr1);
          serverRunning = true;
 
-         if (is_su())
+         if (is_su() && isConnected)
           {
 
 
 
-             sambastring = adb + " shell su -c ps | grep smbd";
-             sambacheck=RunProcess(sambastring);
-
-             logfile(sambastring);
-             logfile(sambacheck);
+             //sambastring = getadb() + "-s firetv2:5555 shell ps | grep smbd";
+            // sambacheck=RunProcess(sambastring);
+            // logfile("zzz");
+            // logfile(sambastring);
+            // logfile(sambacheck);
 
 
               if (!sambacheck.isEmpty())
@@ -2585,15 +2894,8 @@ void MainWindow::on_connButton_clicked()
 
      }
        else
-        { ui->device_connected->setText(devstr2);
-
-
-        /* if (!firstrun)
-         QMessageBox::critical(
-                      this,
-                      tr("adbFire"),
-                      tr("Device not connected"));
-        */
+        {
+         //
 
      }
 
@@ -2612,18 +2914,19 @@ void MainWindow::on_connButton_clicked()
 void MainWindow::on_disButton_clicked()
 {
 
-    if (ui->usbmode->isChecked() )
-      {
 
+
+    if (isusb )
+      {
           QMessageBox::critical(
                this,
                tr("adbFire"),
-               tr("Inactive in USB Mode"));
+               tr("Inactive for USB connections"));
             return;
       }
 
 
-    if (ui->deviceBox->currentText().isEmpty())
+    if (daddr.isEmpty())
     {
 
         QMessageBox::critical(
@@ -2641,80 +2944,21 @@ void MainWindow::on_disButton_clicked()
 
 
         ui->sambaLabel->setVisible(false);
-        QString cstring = adb + " disconnect "+daddr+port ;
-        QString command=RunProcess(cstring);
 
+
+         QString cstring = adb + " disconnect "+daddr+":"+port ;
+         QString command=RunProcess(cstring);
+
+         logfile("disconnect: "+daddr);
+         logfile(cstring);
 
         isConnected=false;
-         ui->device_connected->setText("  Device not connected.");
+         ui->device_connected->setText("  Device disconnected.");
          ui->update_status->setText("");
+         //on_utilityButton_clicked();
+         on_refreshConnectedDevices_clicked();
          nMilliseconds = rtimer.elapsed();
          logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////
-void MainWindow::on_astart_Button_clicked()
-{
-
-    QElapsedTimer rtimer;
-    int nMilliseconds;
-    rtimer.start();
-
-
-    kill_server();
-    start_server();
-    if (serverRunning)
-     { ui->server_running->setText(adbstr1);
-
-        if (ui->usbmode->isChecked() )
-          { isConnected=true;
-            ui->device_connected->setText(devstr3);
-          }
-        else
-           { isConnected=false;
-             ui->device_connected->setText(devstr2);
-           }
-
-     }
-
-    else
-     ui->server_running->setText(adbstr2);
-
-    nMilliseconds = rtimer.elapsed();
-    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
-
-
-
-}
-
-
-////////////////////////////////////////////////////////////////////
-void MainWindow::on_akill_Button_clicked()
-{
-
-    QElapsedTimer rtimer;
-    int nMilliseconds;
-    rtimer.start();
-
-
-    QString cstring = adb + "  disconnect "+daddr+port ;
-    QString command=RunProcess(cstring);
-
-    isConnected=false;
-     ui->device_connected->setText(devstr2);
-      ui->update_status->setText("");
-
-    kill_server();
-
-    if (serverRunning)
-      ui->server_running->setText(adbstr1);
-    else
-     ui->server_running->setText(adbstr2);
-
-    nMilliseconds = rtimer.elapsed();
-    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
 
 }
@@ -2748,13 +2992,22 @@ void MainWindow::on_actionHelp_triggered()
 void MainWindow::on_backupButton_clicked()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+ logfile("backup function started");
+
+ QString lookup=daddr;
+
+  if(!isusb)
+   lookup=lookup+":"+port;
+
+ isConnected=find_daddr(lookup);
+
+ if (!isConnected && !isusb)
+       on_connButton_clicked();
+
+  if (!isConnected)
+        { QMessageBox::critical(0,"",devstr2);
+           return;
+        }
 
     is_package(xbmcpackage);
 
@@ -2777,7 +3030,7 @@ void MainWindow::on_backupButton_clicked()
 
 
  QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
- QString cstring = adb + " shell ls "+mcpath;
+ QString cstring = getadb() + " shell ls "+mcpath;
 
  QString command=RunProcess(cstring);
 
@@ -2791,11 +3044,19 @@ void MainWindow::on_backupButton_clicked()
 
 
 
- cstring = adb + " shell ls "+mcpath;
+ cstring = getadb() + " shell ls "+mcpath;
+
+ logfile("backup command: "+cstring);
+
  command=RunProcess(cstring);
+
+logfile("backup: "+command);
 
  if (command.contains("No such file or directory"))
   {
+
+     logfile("backup result: "+command);
+
      QMessageBox::critical(
                  this,
                 "",
@@ -2829,9 +3090,9 @@ void MainWindow::on_backupButton_clicked()
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
        timer->start(tsvalue);
 
-       QString cstring = adb + " pull "+mcpath+" "+'"'+dir+'"';
+       QString cstring = getadb() +  " pull "+mcpath+" "+'"'+dir+'"';
        QString command=RunProcess(cstring);
-
+       logfile("backup: "+command);
        if (command.contains("bytes"))
 
 
@@ -2843,8 +3104,8 @@ void MainWindow::on_backupButton_clicked()
 
 
 
-           if (fileExists(dbfile))
-             QFile::remove(dbfile);
+           //if (fileExists(dbfile))
+            // QFile::remove(dbfile);
 
 
           if (!QDir(thfile).exists())
@@ -2854,9 +3115,9 @@ void MainWindow::on_backupButton_clicked()
               thpath.replace(QString("file"), QString("mcfile"));
 
 
-                 cstring = adb + " shell ls "+thpath+"/Thumbnails";
+                 cstring = getadb() + " shell ls "+thpath+"/Thumbnails";
                  command=RunProcess(cstring);
-
+                 logfile("backup: "+command);
                  if (command.contains("No such file or directory"))
                   {                
                    logfile("Thumbnails not found");
@@ -2864,8 +3125,9 @@ void MainWindow::on_backupButton_clicked()
 
                else
                  {
-                    QString cstring = adb + " pull "+thpath+"/ "+'"'+udir+'"';
+                    QString cstring = getadb() + " pull "+thpath+"/ "+'"'+udir+'"';
                     QString command=RunProcess(cstring);
+                    logfile(command);
                     QFile::rename(dir+"/userdata/advancedsettings.xml", dir+"/userdata/advancedsettings.backup");
 
                     if (!QDir(thfile).exists())
@@ -2922,136 +3184,34 @@ void MainWindow::on_backupButton_clicked()
 
 
 
-////////////////////////////////////////////////////////////////////
- void MainWindow::on_rootButton_clicked()
- {
-
-     QString rootfile1 = adbdir+"tr.apk";
-     QString rootfile2 = adbdir+"su.apk";
-
-     bool file1 = false;
-     bool file2 = false;
-
-                        if (!isConnected)
-                           { QMessageBox::critical(
-                                 this,
-                                 tr("adbFire"),
-                                 tr("Device not connected"));
-                              return;
-                        }
-
-                        QElapsedTimer rtimer;
-                        int nMilliseconds;
-                        rtimer.start();
-
-
-
-                        QFile Fout1(rootfile1);
-
-                        if(!Fout1.exists())
-                        {
-
-                            QMessageBox::critical(
-                               this,
-                               tr("adbFire"),
-                               rootfile1+" not found.");
-                               logfile(rootfile1+" not found.");
-
-                               return;
-                        }
-
-
-                        QFile Fout2(rootfile2);
-
-                        if(!Fout2.exists())
-                        {
-
-                            QMessageBox::critical(
-                               this,
-                               tr("adbFire"),
-                               rootfile2+" not found.");
-                               logfile(rootfile2+" not found.");
-                               return;
-                        }
-
-                              ui->progressBar->setHidden(false);
-                              ui->progressBar->setValue(0);
-
-                              QTimer *timer = new QTimer(this);
-                              connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
-                              timer->start(tsvalue);
-
-                              QString cstring = adb + " install -r "+rootfile1;
-
-                            QString command=RunProcess(cstring);
-
-                              if (!command.contains("Success"))
-                                 {
-                                  logfile(cstring);
-                                  logfile(command);
-                                  QMessageBox::information(
-                                              this,
-                                              "",
-                                              "tr.apk install failed");                                 
-                                   ui->progressBar->setHidden(true);
-                                   return;
-                                 }
-
-                              else
-                                  file1 = true;
-
-                              logfile(cstring);
-                              logfile(command);
-
-                              cstring = adb + " install -r "+rootfile2;
-
-                              command=RunProcess(cstring);
-                                     
-                                     ui->progressBar->setHidden(true);
-
-                                     if (!command.contains("Success"))
-                                        {
-                                         logfile(cstring);
-                                         logfile(command);
-                                         QMessageBox::information(
-                                                     this,
-                                                     "",
-                                                     "su.apk install failed");
-
-                                        }
-                                     else
-                                    file2 = true;
-
-                                     logfile(cstring);
-                                     logfile(command);
-
- if (file1 && file2)
- {
-
-  QMessageBox::information( this,"","Root software installed.\nRun towelroot on the FireTV\n to finish rooting process.");
-  logfile("Root software installed.\nRun towelroot on the FireTV\n to finish rooting process.");
-
-  nMilliseconds = rtimer.elapsed();
-  logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
-
-
- }
-
- }
-
-
-
 ///////////////////////////////////////////
 void MainWindow::on_fpushButton_clicked()
 
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             "adbFire",
-             devstr2);
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
+    if(!is_busybox())
+    {
+        QMessageBox::critical(0,"","Busybox not found");
+       return;
+ }
+
+
 
 
     QString cstring;
@@ -3068,7 +3228,7 @@ void MainWindow::on_fpushButton_clicked()
 
 // No such file or directory
 
-    cstring = adb + " shell ls "+mcpath;
+    cstring = getadb() + " shell ls "+mcpath;
 
     command=RunProcess(cstring);
 
@@ -3081,7 +3241,7 @@ void MainWindow::on_fpushButton_clicked()
 
 
 
-    cstring = adb + " shell ls "+mcpath;
+    cstring = getadb() + " shell ls "+mcpath;
 
     command=RunProcess(cstring);
 
@@ -3093,14 +3253,6 @@ void MainWindow::on_fpushButton_clicked()
                     "Destination path missing");
                     return;
     }
-
-
-
-
-
-
-   QString cname = ui->comboBox->currentText();
-
 
 
 switch(ui->comboBox->currentIndex() ){
@@ -3145,8 +3297,30 @@ xpath = mcpath+"/addons/";
 break;
 }
 
+QString cname = ui->comboBox->currentText();
+
+
+QString dirpath = ui->customdir->text();
+if (!dirpath.isEmpty())
+
+{
+    if(!dirpath.startsWith("/"))
+       dirpath.prepend("/");
+
+    if(!dirpath.endsWith("/"))
+       dirpath.append("/") ;
+
+       xpath=dirpath;
+       cname = xpath;
+
+
+}
+
+/*
+
 
 is_package(xbmcpackage);
+
 
 if (xpath != "/sdcard/")
    if (!is_packageInstalled)
@@ -3158,6 +3332,7 @@ if (xpath != "/sdcard/")
         return;
      }
 
+*/
 
 
  QString fileName = QFileDialog::getOpenFileName(this,
@@ -3170,7 +3345,7 @@ if (xpath != "/sdcard/")
      QFileInfo finfo(fileName);
      pushdir = finfo.absolutePath();
 
-     QString cstring = adb + " shell ls "+xpath;
+     QString cstring = getadb() + " shell ls "+xpath;
 
      QString command=RunProcess(cstring);
 
@@ -3202,7 +3377,7 @@ if (xpath != "/sdcard/")
            connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
            timer->start(tsvalue);
 
-           cstring = adb + " push "+'"'+fileName+'"'+ " "+xpath;
+           cstring = getadb() + " push "+'"'+fileName+'"'+ " "+xpath;
 
            command=RunProcess(cstring);
 
@@ -3244,13 +3419,22 @@ if (xpath != "/sdcard/")
 void MainWindow::on_restoreButton_clicked()
 
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
 
     is_package(xbmcpackage);
 
@@ -3278,7 +3462,7 @@ void MainWindow::on_restoreButton_clicked()
 
  QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
 
- cstring = adb + " shell ls "+mcpath;
+ cstring = getadb() + " shell ls "+mcpath;
 
  command=RunProcess(cstring);
 
@@ -3291,7 +3475,7 @@ void MainWindow::on_restoreButton_clicked()
 
 
 
- cstring = adb + " shell ls "+mcpath;
+ cstring = cstring =  getadb() +" shell ls "+mcpath;
 
  command=RunProcess(cstring);
 
@@ -3309,7 +3493,7 @@ void MainWindow::on_restoreButton_clicked()
 
 
 
- cstring = adb + " shell ps | grep "+xbmcpackage;
+ cstring = cstring = getadb() +  " shell ps | grep "+xbmcpackage;
  command=RunProcess(cstring);
 
 
@@ -3354,11 +3538,11 @@ void MainWindow::on_restoreButton_clicked()
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
        timer->start(tsvalue);
 
-       cstring = adb + " shell rm -r "+mcpath + "/*";
+       cstring = getadb() + " shell rm -r "+mcpath + "/*";
 
        command=RunProcess(cstring);
 
-       cstring = adb + " push "+'"'+dir+'"'+ " "+mcpath;
+       cstring = getadb() + " push "+'"'+dir+'"'+ " "+mcpath;
 
         command=RunProcess(cstring);
 
@@ -3399,13 +3583,23 @@ void MainWindow::on_restoreButton_clicked()
 //////////////////////////////////////////
 void MainWindow::on_pushRemote_clicked()
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             "adbFire",
-             devstr2);
-          return;
-    }
+
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
     is_package(xbmcpackage);
 
@@ -3426,10 +3620,10 @@ rtimer.start();
 
 QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/keymaps/";
 
-QString cstring = adb + " shell ls "+mcpath;
+QString cstring = getadb() + " shell ls "+mcpath;
 
 QString command=RunProcess(cstring);
-
+logfile("push remote:"+command);
 if (command.contains("No such file or directory"))
  {
 
@@ -3439,9 +3633,11 @@ if (command.contains("No such file or directory"))
 
 
 
-cstring = adb + " shell ls "+mcpath;
+cstring = getadb() + " shell ls "+mcpath;
 
 command=RunProcess(cstring);
+
+logfile("push remote:"+command);
 
 if (command.contains("No such file or directory"))
  {
@@ -3468,12 +3664,12 @@ if (command.contains("No such file or directory"))
        if (reply == QMessageBox::Yes) {
 
 
-           cstring = adb + " push "+'"'+fileName+'"'+ " "+mcpath+"/keyboard.xml";
+           cstring = getadb() + " push "+'"'+fileName+'"'+ " "+mcpath+"/keyboard.xml";
 
            command=RunProcess(cstring);
 
            logfile(cstring);
-           logfile(command);
+           logfile("push remote:"+command);
 
            nMilliseconds = rtimer.elapsed();
            logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
@@ -3507,24 +3703,34 @@ if (command.contains("No such file or directory"))
 }
 
 ////////////////////////////////////////////////
-void MainWindow::on_consoleButton_clicked()
+void MainWindow::on_adbshellButton_clicked()
 {
 
+  // PATH=$PATH:/data/local/tmp
+
+   QString lookup=daddr;
+
+    if(!isusb)
+     lookup=lookup+":"+port;
+
+   isConnected=find_daddr(lookup);
+
+   if (!isConnected && !isusb)
+         on_connButton_clicked();
+
+    if (!isConnected)
+          { QMessageBox::critical(0,"",devstr2);
+             return;
+          }
 
 
-   if (!isConnected)
-        { QMessageBox::critical(
-              this,
-             "adbFire",
-              devstr2);
-        return;
-      }
-
+    description = ui->deviceBox->currentText();
+    getRecord(description);
 
 
 
     logfile("detaching console process");
-    logfile(daddr);
+    logfile(daddr+":"+port);
 
     QString cstring = "";
 
@@ -3532,39 +3738,50 @@ void MainWindow::on_consoleButton_clicked()
     if (os == 1)
 
        {
-       cstring = "cmd /k  adb shell";
-       QProcess::startDetached(cstring);
-       }
+
+       if (isusb)
+           { cstring = "cmd /k  adb -s "+daddr+" shell";
+             logfile(cstring);
+              QProcess::startDetached(cstring);
+            }
+        else
+          {   cstring = "cmd /k  adb -s "+daddr+":"+port+ " shell";
+              logfile(cstring);
+              QProcess::startDetached(cstring);
+           }
+     }
 
 
      else
 
        {
 
+        QString commstr = adbdir+"console.sh";
+        QFile::remove(commstr);
+        QFile file(commstr);
 
-         QString commstr = adbdir+"console.sh";
-         QFile file(commstr);
 
-             //if(!file.open(QFile::WriteOnly |
-                //           QFile::Text))
 
                  if(!file.open(QFile::WriteOnly))
 
              {
-
-
-
-                 logfile("error creating console.sh!");
+                logfile("error creating console.sh!");
                  QMessageBox::critical(this,"","Error creating command file!");
                  return;
              }
 
 
 
-             QTextStream out(&file);
-             out  << "#!/bin/sh" << endl;
-             out  <<  adb+ " shell" << endl;
+       QTextStream out(&file);
 
+       out  << "#!/bin/sh" << endl;
+
+
+
+
+       out  <<  getadb()+ " shell " << endl;
+       cstring = getadb()+ " shell";
+       logfile(cstring);
 
              file.flush();
              file.close();
@@ -3578,7 +3795,7 @@ void MainWindow::on_consoleButton_clicked()
        if (os == 0)
          cstring = "x-terminal-emulator -e "+adbdir+"console.sh";
        if (os == 2)
-        cstring = "open -a Terminal.app "+adbdir+"console.sh";
+       cstring = "open -a Terminal.app "+adbdir+"console.sh";
 
 
 
@@ -3587,614 +3804,6 @@ void MainWindow::on_consoleButton_clicked()
 
 
 }
-
-
-//////////////////////////////////////////////////
-void MainWindow::on_actionPreferences_triggered()
-{
-
-
-logfile("opening preferences dialog");
-
-    QString cstring;
-    QString command;
-    QString oldpass;
-    QString olddaddr;
-
-
-
-    QString recnum  = QString::number(ui->deviceBox->currentIndex());
-
-
-    oldpass = sshpassword;
-    olddaddr = daddr;
-    sshcheck = false;  
-    mountcheck = false;
-    updatecheck = true;
-
-    bool sshstate;
-    bool updatestate;
-    bool mountstate;
-
-
-  if (is_su() && isConnected)
-   {
-
-       // check mount status set toggle value
-        cstring = adb + " shell ls /system/etc/init.d/02mntdrives";
-        command=RunProcess(cstring);
-
-
-
-     if (command.contains("No such file or directory"))
-         mountcheck = false;
-      else
-      mountcheck = true;
-  }
-
-  else mountcheck = false;
-
-   mountstate = mountcheck;
-
-
-   if (is_su() && isConnected)
-    {
-
-
-
-
-        // check ssh boot status set toggle value
-         cstring = adb + " shell ls /system/etc/init.d/03sshd";
-         command=RunProcess(cstring);
-
-
-
-      if (command.contains("No such file or directory"))
-          sshcheck = false;
-       else
-       sshcheck = true;
-   }
-
-   else sshcheck = false;
-
-    sshstate = sshcheck;
-
-
-
-
- if (is_su() && isConnected)
-   {
-
-      // QMessageBox::critical(this,"","filepath");
-
-       // check atv update status set toggle value
-
-       cstring = adb + " shell pm list packages -d";
-       command=RunProcess(cstring);
-
-        if (command.contains("package:com.amazon.dcp"))
-           {
-            ui->update_status->setText(amazon_update0);
-            updatecheck = false;
-           }
-
-        else
-          {
-               ui->update_status->setText(amazon_update1);
-               updatecheck = true;
-          }
-
-     }
-
-
-      updatestate = updatecheck;
-
-   // QMessageBox::critical(this,"",filepath);
-
-    // bool currentupdate = updatecheck;
-
-    preferencesDialog dialog;
-    dialog.setPackagename(xbmcpackage);
-    dialog.setPulldir(pulldir);
-    dialog.setftvUpdate(updatecheck);
-    dialog.setsshBoot(sshcheck);
-    dialog.setmountBoot(mountcheck);
-    dialog.setversioncheck(versioncheck);
-    dialog.setversionLabel(version);
-    dialog.setdaddr(daddr);
-    dialog.setbuffermode(buffermode);
-    dialog.setbuffersize(buffersize);
-    dialog.setbufferfactor(bufferfactor);
-    dialog.setdescription(description);
-    dialog.setfilepath(filepath);
-    dialog.setrecnum(recnum);  //hidden on form
-    dialog.setModal(true);
-
-
-    if(dialog.exec() == QDialog::Accepted)
-    {
-
-
-
-    int x = dialog.returnval1();
-
-//    QString s  = QString::number(x);
-//    QMessageBox::critical(this,"",s);
-
-    xbmcpackage = dialog.xbmcpackageName();
-    pulldir = dialog.pulldir();
-    updatecheck = dialog.updatecheck();
-    sshcheck = dialog.sshcheck();
-    mountcheck = dialog.mountcheck();
-    versioncheck = dialog.versioncheck();
-    buffermode = dialog.buffermode();
-    buffersize = dialog.buffersize();
-    bufferfactor = dialog.bufferfactor();
-    description = dialog.description();
-    filepath = dialog.filepath();
-    daddr = dialog.daddr();
-
-    // if(bypasscheck)
-    // QMessageBox::critical(this,"","Bypassed");
-
-    if (versioncheck)
-        checkversion = 1;
-    else
-        checkversion = 0;
-
-    if (x == 1)
-           {
-             logfile("Saving Device Record");
-                // open_pref_database();
-                db.open();
-                updateTables(ui->deviceBox->currentIndex());
-                db.close();
-
-                // QMessageBox::critical(this,"",daddr);
-
-                 if (daddr != olddaddr)
-                {
-                    isConnected=false;
-                    ui->device_connected->setText(devstr2);
-                    ui->update_status->setText(amazon_update2);
-                    ui->deviceBox->setItemText(ui->deviceBox->currentIndex(),description);
-                }
-
-
-
-    }  // end x1
-
-
-    if (x == 2)
-          {
-
-          if (!isConnected)
-              return;
-
-           logfile("write advancedsettings.xml");
-
-              QString str1;
-              str1.setNum(buffermode-1);
-
-              QString xpath = "";
-              QString hidden;
-              QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
-
-              QString filename1 = "advancedsettings.xml";
-              QString filename2 = adbdir+filename1;
-
-
-
-             cstring = adb + " shell ls "+mcpath;
-             command=RunProcess(cstring);
-
-                     if (command.contains("No such file or directory"))
-                      {
-
-                        mcpath = "/storage/extUsb/"+filepath;
-                        mcpath.replace(QString("file"), QString("mcfile"));
-                     }
-
-
-
-                     cstring = adb + " shell ls "+mcpath;
-
-                     command=RunProcess(cstring);
-
-                     if (command.contains("No such file or directory"))
-                      {
-                         QMessageBox::critical(
-                                     this,
-                                    "",
-                                     "Destination path missing");
-                                     return;
-                     }
-
-                 xpath = mcpath+"/userdata/";
-
-                     cstring = adb + " shell ls "+xpath+filename1;
-                     command=RunProcess(cstring);
-
-                     logfile(cstring);
-                     logfile(command);
-
-                      if (!command.contains("No such file or directory"))
-                         {
-                          logfile("advancedsettings.xml exists");
-
-                          QMessageBox::StandardButton reply;
-                           reply = QMessageBox::question(this, "XML", "advancedsettings.xml exists. Overwrite?\n(will backup original)",
-                                                         QMessageBox::Yes|QMessageBox::No);
-                           if (reply == QMessageBox::No) {
-                               logfile("abort xml write");
-                               return;
-                              } else {
-                              logfile("continue xml write");
-                              logfile("backup advancedsettings.xml");
-                              cstring = adb + " shell cp "+xpath+filename1+" "+xpath+filename1+".old";
-                              command=RunProcess(cstring);
-                              }
-                          }  // end if exists
-
-
-
-          QString line1 ="<advancedsettings>";
-          QString line2 ="  <network>";
-          QString line3 ="    <buffermode>"+str1+"</buffermode>";
-          QString line4 ="    <cachemembuffersize>"+buffersize+"</cachemembuffersize>";
-          QString line5 ="    <readbufferfactor>"+bufferfactor+"</readbufferfactor>";
-          QString line6 ="  </network>";
-          QString line7 ="</advancedsettings>";
-
-          QFile file(filename2);
-
-
-          if(!file.open(QFile::WriteOnly))
-                {
-                  logfile("error creating advancedsettings.xml.");
-                  QMessageBox::critical(this,"","Unknown error creating xml file!");
-                   return;
-                 }
-
-                  QTextStream out(&file);
-
-                  out  << line1 << endl;
-                  out  << line2 << endl;
-                  out  << line3 << endl;
-                  out  << line4 << endl;
-                  out  << line5 << endl;
-                  out  << line6 << endl;
-                  out  << line7 << endl;
-
-                  file.flush();
-                  file.close();
-
-                  cstring = adb + " push "+filename2+ " "+xpath+filename1;
-                  command=RunProcess(cstring);
-
-                   if (!command.contains("bytes"))
-                      {
-                        logfile(cstring);
-                        logfile(command);
-                        logfile("error pushing xml script to device!");
-                        QMessageBox::critical(this,"","Error pushing xml from PC to device!");
-                        return;
-                      }
-                    else {
-                       QMessageBox::information(this,"","advancedsettings.xml written");
-                   }
-
-
-
-           }  //end x2
-
-
-
-    if (is_su() && isConnected )  // superuser block
-    {
-
-      if (updatestate != updatecheck)
-       {
-
-         logfile("Amazon update state toggled");
-
-
-         if (updatecheck)  // turn updates on
-                    {
-
-                      if (amazon_updates("enable"))
-                        {
-                          logfile("Amazon updates on, com.amazon.dcp enabled");
-                          cstring = adb + " shell pm list packages -d";
-                          command=RunProcess(cstring);
-
-                          logfile(cstring);
-                          logfile(command);
-
-
-                          if (!command.contains("package:com.amazon.dcp"))
-                            {
-                              ui->update_status->setText(amazon_update1);
-                            }
-
-                          else { QMessageBox::critical(this,"","Problem: com.amazon.dcp not enabled!");
-                                  logfile("Problem: com.amazon.dcp not enabled!");
-                                  ui->update_status->setText(amazon_update0);
-                               }
-
-                        }  //  if (amazon_updates("enable"))
-
-
-
-             }  // if (updatecheck)
-
-
-         if (!updatecheck)  // turn updates off
-              {
-
-                if (amazon_updates("disable"))
-                              {
-                               logfile("Amazon updates off, com.amazon.dcp disabled");
-                               cstring = adb + " shell pm list packages -d";
-                               command=RunProcess(cstring);
-
-                               logfile(cstring);
-                               logfile(command);
-
-                               if (command.contains("package:com.amazon.dcp"))
-                               ui->update_status->setText(amazon_update0);
-
-                           }
-                         else
-                            { QMessageBox::critical(this,"","Problem: com.amazon.dcp not disabled!");
-                               logfile("Problem: com.amazon.dcp not disabled!");
-                               ui->update_status->setText(amazon_update1);
-                             }
-
-             }
-         }
-
-      if (sshcheck != sshstate)
-      {
-
-          logfile("SSH at boot toggled");
-
-           if (!is_busybox())
-           {
-               QMessageBox::critical(this,"","System Tools required for ssh");
-               logfile("System Tools required for ssh");
-               return;
-           }
-
-         if (!sshcheck )    // rm ssh at boot
-                 {
-
-                       mount_system("rw");
-                       cstring = adb + " shell su -c rm /system/etc/init.d/03sshd";
-                       command=RunProcess(cstring);
-
-                      logfile(cstring);
-                      logfile(command);
-
-                      if (command.isEmpty())
-                          logfile("/system/etc/init.d/03sshd deleted");
-                      else
-                          logfile("/system/etc/init.d/03sshd not deleted");
-
-                 }  // end rm ssh at boot
-
-
-         if (sshcheck )  // start ssh at boot
-               {
-
-                  logfile("write 03sshd");
-                  QString hashbang = "#!/system/bin/sh";
-                  QString filename = adbdir+"03sshd";
-                  QString makepst = "/system/xbin/sshstart";
-
-
-                  QFile file(filename);
-
-                  if(!file.open(QFile::WriteOnly))
-                        {
-                          logfile(cstring);
-                          logfile(command);
-                          logfile("error creating 03sshd file.");
-                          QMessageBox::critical(this,"","Error creating 03sshd file!");
-                          return;
-                       }
-
-
-                      QTextStream out(&file);
-                      out  << hashbang + "\n";
-                      out  << makepst + "\n";
-
-                      file.flush();
-                      file.close();
-
-                      mount_system("rw");
-
-                       cstring = adb + " push " +filename+ " /sdcard/";
-                       command=RunProcess(cstring);
-
-                       if (!command.contains("bytes"))
-                            {
-                              logfile(cstring);
-                              logfile(command);
-                              logfile("error pushing shell script to device!");
-                               QMessageBox::critical(this,"","Error pushing file frpm PC to device!");
-                               mount_system("ro");
-                               return;
-                             }
-
-                       cstring = adb + " shell cp /sdcard/03sshd /system/etc/init.d/";
-                       command=RunProcess(cstring);
-
-                      if (!command.isEmpty())
-                           {
-                             logfile(cstring);
-                             logfile(command);
-                             logfile("file copy error, sdcard to /system/etc/init.d");
-                             QMessageBox::critical(this,"","Error: cp /sdcard/03sshd /system/etc/init.d failed");
-                              mount_system("ro");
-                              return;
-                            }
-
-
-                      logfile(cstring);
-                      logfile(command);
-
-                      cstring = adb + " shell su -c chmod 0755 " + " /system/etc/init.d/03sshd";
-                      command=RunProcess(cstring);
-
-                      if (!command.isEmpty())
-                        {
-                          logfile(cstring);
-                          logfile(command);
-                          logfile("chmod error, system/etc/init.d/03sshd");
-                           QMessageBox::critical(this,"","Error: chmod of /system/etc/init.d/03sshd failed");
-                           mount_system("ro");
-                           return;
-                         }
-
-
-                      logfile(cstring);
-                      logfile(command);
-
-                      cstring = adb + " shell rm " + " /sdcard/03sshd";
-                     command=RunProcess(cstring);
-
-                      if (!command.isEmpty())
-                           {
-                          logfile(cstring);
-                          logfile(command);
-                          logfile("error: rm /sdcard/03sshd");
-                            }
-
-
-                      cstring = adb + " shell ls /system/etc/init.d/03sshd";
-                      command=RunProcess(cstring);
-
-                      if (!command.contains("/system/etc/init.d/03sshd"))
-                           {
-                             logfile(cstring);
-                             logfile(command);
-                             logfile("Error: /etc/init.d/03sshd not created. SSH is not persistent");
-                             QMessageBox::critical(this,"","Error: /etc/init.d/03sshd not created.SSH is not persistent");
-                            }
-
-                       else
-                            {
-
-                              logfile(cstring);
-                              logfile(command);
-                              logfile("SSH is now persistent");
-                             }
-
-                     mount_system("ro");
-                     QFile::remove(filename);
-
-            } // ssh at boot
-        }
-
-
-      if (mountcheck != mountstate)
-          {
-             logfile("Mount at boot toggled");
-
-             if (!is_busybox())
-             {
-                 QMessageBox::critical(this,"","System Tools required for USB mount.");
-                 logfile("System Tools required for USB mount.");
-                 return;
-             }
-
-             if (!mountcheck )
-                     {
-                      logfile ("Remove init.d/02mntdrives");
-
-                      //
-
-                      mount_system("rw");
-
-                      cstring = adb + " shell ls /system/etc/init.d/04mntshares";
-                      command=RunProcess(cstring);
-
-                      if (command.contains("No such file or directory"))
-                           {
-                              cstring = adb + " shell su -c rm /system/etc/init.d/01sleep";
-                              command=RunProcess(cstring);
-                            }
-
-
-
-                             cstring = adb + " shell su -c rm /system/etc/init.d/02mntdrives";
-                             command=RunProcess(cstring);
-
-                             mount_system("ro");
-
-                             logfile(cstring);
-                             logfile(command);
-
-                             mount_system("ro");
-
-                             logfile(cstring);
-                             logfile(command);
-                             logfile("USB drive is not persistent");
-
-
-             }  // rm mount at boot
-
-
-
-
-             if (mountcheck )  // start mount at boot
-                   {
-                     logfile ("Create init.d/02mntdrives");
-
-
-                     mount_system("rw");
-
-
-                             cstring = adb + " shell su -c cp " + " /system/xbin/01sleep /system/etc/init.d";
-                             command=RunProcess(cstring);
-
-                             if (!command.isEmpty())
-                                  {
-                                    logfile(cstring);
-                                    logfile(command);
-                                    logfile("file copy error, xbin to system/etc");
-                                     mount_system("ro");
-                                     return;
-                                   }
-
-                             cstring = adb + " shell su -c cp " + " /system/xbin/02mntdrives /system/etc/init.d";
-                             command=RunProcess(cstring);
-
-                             if (!command.isEmpty())
-                                  {
-                                    logfile(cstring);
-                                    logfile(command);
-                                    logfile("file copy error, xbin to system/etc");
-                                     mount_system("ro");
-                                     return;
-                                   }
-
-
-                   } // mount at boot
-            }
-
-
-    }  //  end superuser block
-
-
-
-  }  //end accepted
-
-
-
-} // end preferences
-
 
 
 //////////////////////////////////////////////////
@@ -4223,13 +3832,21 @@ void MainWindow::on_actionReboot_triggered()
 
      QString cstring;
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+     QString lookup=daddr;
+
+      if(!isusb)
+       lookup=lookup+":"+port;
+
+     isConnected=find_daddr(lookup);
+
+     if (!isConnected && !isusb)
+           on_connButton_clicked();
+
+      if (!isConnected)
+            { QMessageBox::critical(0,"",devstr2);
+               return;
+            }
+
 
 
 
@@ -4238,7 +3855,7 @@ void MainWindow::on_actionReboot_triggered()
          QMessageBox::Yes|QMessageBox::No);
      if (reply == QMessageBox::Yes) {
          isConnected=false;
-         ui->device_connected->setText(devstr2);
+         //ui->device_connected->setText(devstr2);
          ui->update_status->setText("");
         logfile("rebooting device");
         rebootDevice(" reboot");
@@ -4249,16 +3866,23 @@ void MainWindow::on_actionReboot_triggered()
 ///////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_actionRecovery_triggered()
 {
-
     QString cstring;
+    QString lookup=daddr;
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
    QMessageBox::StandardButton reply;
@@ -4266,7 +3890,7 @@ void MainWindow::on_actionRecovery_triggered()
          QMessageBox::Yes|QMessageBox::No);
      if (reply == QMessageBox::Yes) {
          isConnected=false;
-         ui->device_connected->setText(devstr2);
+         //ui->device_connected->setText(devstr2);
          ui->update_status->setText("");
          logfile("rebooting device recovery");
          rebootDevice(" reboot recovery");
@@ -4277,14 +3901,20 @@ void MainWindow::on_actionRecovery_triggered()
 void MainWindow::on_screenshotButton_clicked()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
 
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
     QElapsedTimer rtimer;
     int nMilliseconds;
@@ -4295,7 +3925,7 @@ void MainWindow::on_screenshotButton_clicked()
         QDateTime dateTime = QDateTime::currentDateTime();
         QString dtstr = dateTime.toString("MMddyyhhmmss");
 
-        QString cstring = adb + " shell screencap -p /sdcard/"+dtstr+".png";
+        QString cstring = getadb() + " shell screencap -p /sdcard/"+dtstr+".png";
 
 
     QString command=RunProcess(cstring);
@@ -4318,7 +3948,7 @@ void MainWindow::on_screenshotButton_clicked()
         logfile(cstring);
         logfile(command);
 
-        QString cstring = adb + " pull /sdcard/"+dtstr+".png "  +'"'+pulldir+'"';
+        QString cstring = getadb() + " pull /sdcard/"+dtstr+".png "  +'"'+pulldir+'"';
 
         command=RunProcess(cstring);
 
@@ -4346,7 +3976,7 @@ void MainWindow::on_screenshotButton_clicked()
                            "Screenshot "+dtstr+ " copied to "+pulldir);
         }
 
-        cstring = adb + " shell rm /sdcard/"+dtstr+".png " ;
+        cstring = getadb() + " shell rm /sdcard/"+dtstr+".png " ;
         command=RunProcess(cstring);
         logfile(cstring);
 
@@ -4364,13 +3994,22 @@ void MainWindow::on_screenshotButton_clicked()
 void MainWindow::on_actionInstall_busybox_triggered()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
 
 
 
@@ -4478,7 +4117,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
 
 
-      QString cstring = adb + " push "+busybox1+ " /sdcard/";
+      QString cstring = getadb() + " push "+busybox1+ " /sdcard/";
 
       QString command=RunProcess(cstring);
 
@@ -4500,7 +4139,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
          logfile(command);
 
 
-               cstring = adb + " push "+busybox3+ " /sdcard/";
+               cstring = getadb() + " push "+busybox3+ " /sdcard/";
                command=RunProcess(cstring);
 
                if (!command.contains("bytes"))
@@ -4520,7 +4159,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
                logfile(command);
 
 
-                cstring = adb + " push "+busybox4+ " /sdcard/";
+                cstring = getadb() + " push "+busybox4+ " /sdcard/";
                 command=RunProcess(cstring);
 
 
@@ -4541,7 +4180,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
                 logfile(cstring);
                 logfile(command);
 
-                 cstring = adb + " push "+busybox5+ " /sdcard/";
+                 cstring = getadb() + " push "+busybox5+ " /sdcard/";
 
                  command=RunProcess(cstring);
 
@@ -4565,13 +4204,13 @@ void MainWindow::on_actionInstall_busybox_triggered()
       mount_system("rw");
 
 
-     cstring = adb + " shell su -c cp " + " /sdcard/busybox /system/xbin";
+     cstring = getadb() + " shell su -c cp " + " /sdcard/busybox /system/xbin";
      command=RunProcess(cstring);
      
      logfile(cstring);
      logfile(command);
 
-     cstring = adb + " shell su -c chmod 0755 /system/xbin/busybox";
+     cstring = getadb() + " shell su -c chmod 0755 /system/xbin/busybox";
      command=RunProcess(cstring);
 
      logfile(cstring);
@@ -4579,47 +4218,47 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
 
 
-     cstring = adb + " shell su -c /system/xbin/busybox tar xf /sdcard/xbin.tar -C /system";
+     cstring = getadb() + " shell su -c /system/xbin/busybox tar xf /sdcard/xbin.tar -C /system";
      command=RunProcess(cstring);
 
      logfile(cstring);
      logfile(command);
 
-     cstring = adb + " shell su -c chmod 0755 /system/xbin/*.sh";
+     cstring = getadb() + " shell su -c chmod 0755 /system/xbin/*.sh";
      command=RunProcess(cstring);
 
      logfile(cstring);
      logfile(command);
 
 
-     cstring = adb + " shell su -c chmod 0755 /system/xbin/02mntdrives";
+     cstring = getadb() + " shell su -c chmod 0755 /system/xbin/02mntdrives";
      command=RunProcess(cstring);
      logfile(cstring);
      logfile(command);
 
-     cstring = adb + " shell su -c chmod 0755 /system/xbin/02sshd";
+     cstring = getadb() + " shell su -c chmod 0755 /system/xbin/02sshd";
      command=RunProcess(cstring);
      logfile(cstring);
      logfile(command);
 
-     cstring = adb + " shell su -c chmod 0755 /system/xbin/mount.exfat-fuse";
+     cstring = getadb() + " shell su -c chmod 0755 /system/xbin/mount.exfat-fuse";
      command=RunProcess(cstring);
      logfile(cstring);
      logfile(command);
 
-     cstring = adb + " shell su -c chmod 0755 /system/xbin/ntfs-3g";
+     cstring = getadb() + " shell su -c chmod 0755 /system/xbin/ntfs-3g";
      command=RunProcess(cstring);
      logfile(cstring);
      logfile(command);
 
 
-     cstring = adb + " shell su -c /system/xbin/binstall.sh";
+     cstring = getadb() + " shell su -c /system/xbin/binstall.sh";
      command=RunProcess(cstring);
 
      logfile(cstring);
      logfile(command);
      
-      cstring = adb + " shell ls /system/xbin/which";
+      cstring = getadb() + " shell ls /system/xbin/which";
       command=RunProcess(cstring);
       
       logfile(cstring);
@@ -4633,67 +4272,32 @@ void MainWindow::on_actionInstall_busybox_triggered()
         else
         {
 
-            cstring = adb + " shell su -c rm /sdcard/xbin.tar";
+            cstring = getadb() + " shell su -c rm /sdcard/xbin.tar";
             command=RunProcess(cstring);
 
             logfile(cstring);
             logfile(command);
 
-            cstring = adb + " shell su -c tar xf /sdcard/samba.tar -C /data/data";
+            cstring = getadb() + " shell su -c tar xf /sdcard/samba.tar -C /data/data";
             command=RunProcess(cstring);
 
             logfile(cstring);
             logfile(command);
 
-         cstring = adb + " shell su -c rm /sdcard/samba.tar";
+         cstring = getadb() + " shell su -c rm /sdcard/samba.tar";
          command=RunProcess(cstring);
 
          logfile(cstring);
          logfile(command);
 
 
-         cstring = adb + " shell su -c mkdir /system/etc/init.d";
+         cstring = getadb() + " shell su -c mkdir /system/etc/init.d";
          command=RunProcess(cstring);
 
          logfile(cstring);
          logfile(command);
 
-         cstring = adb + " shell su -c chmod 777 /system/etc/init.d";
-         command=RunProcess(cstring);
-
-         logfile(cstring);
-         logfile(command);
-
-
-
-         cstring = adb + " shell su -c cp /sdcard/install-recovery*  /system/etc/";
-         command=RunProcess(cstring);
-
-         logfile(cstring);
-         logfile(command);
-
-         cstring = adb + " shell su -c chmod 0755 /system/etc/install-recovery*";
-         command=RunProcess(cstring);
-
-         logfile(cstring);
-         logfile(command);
-
-
-         cstring = adb + " shell su -c rm /sdcard/install-recovery*";
-         command=RunProcess(cstring);
-
-         logfile(cstring);
-         logfile(command);
-
-
-         cstring = adb + " shell su -c cp /system/etc/init.bueller.sh  /system/etc/init.bueller.sh.old";
-         command=RunProcess(cstring);
-
-         logfile(cstring);
-         logfile(command);
-
-
-         cstring = adb + " shell su -c cp /system/xbin/init.bueller.sh  /system/etc/";
+         cstring = getadb() + " shell su -c chmod 777 /system/etc/init.d";
          command=RunProcess(cstring);
 
          logfile(cstring);
@@ -4701,7 +4305,42 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
 
 
-         cstring = adb + " shell ls /system/xbin/mntdrives.backup";
+         cstring = getadb() + " shell su -c cp /sdcard/install-recovery*  /system/etc/";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+         cstring = getadb() + " shell su -c chmod 0755 /system/etc/install-recovery*";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring = getadb() + " shell su -c rm /sdcard/install-recovery*";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring = getadb() + " shell su -c cp /system/etc/init.bueller.sh  /system/etc/init.bueller.sh.old";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+         cstring = getadb() + " shell su -c cp /system/xbin/init.bueller.sh  /system/etc/";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+
+
+         cstring = getadb() + " shell ls /system/xbin/mntdrives.backup";
          command=RunProcess(cstring);
 
          logfile(cstring);
@@ -4714,14 +4353,14 @@ void MainWindow::on_actionInstall_busybox_triggered()
                   QMessageBox::Yes|QMessageBox::No);
                if (reply == QMessageBox::Yes)
                 {
-                   cstring = adb + " shell su -c mv /system/xbin/mntdrives.backup  /system/xbin/mntdrives.sh";
+                   cstring = getadb() + " shell su -c mv /system/xbin/mntdrives.backup  /system/xbin/mntdrives.sh";
                    command=RunProcess(cstring);
                    logfile(cstring);
                    logfile(command);
                 }
               }
 
-               cstring = adb + " shell ls /system/xbin/mntdata.backup";
+               cstring = getadb() + " shell ls /system/xbin/mntdata.backup";
                command=RunProcess(cstring);
 
                logfile(cstring);
@@ -4734,7 +4373,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
                         QMessageBox::Yes|QMessageBox::No);
                      if (reply == QMessageBox::Yes)
                       {
-                         cstring = adb + " shell su -c mv /system/xbin/mntdata.backup  /system/xbin/mntdata.sh";
+                         cstring = getadb() + " shell su -c mv /system/xbin/mntdata.backup  /system/xbin/mntdata.sh";
                          command=RunProcess(cstring);
                          logfile(cstring);
                          logfile(command);
@@ -4766,13 +4405,22 @@ ui->progressBar->setHidden(true);
 void MainWindow::on_actionUninstall_Busybox_triggered()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
   //
@@ -4786,11 +4434,11 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
    }
 
 
-   if (!is_busybox())
-   {
-       QMessageBox::critical(this,"","System Tools not installed");
-       logfile("System Tools not installed");
-       return;
+  if (!is_busybox())
+  {
+      QMessageBox::critical(this,"","System Tools not installed");
+      logfile("System Tools not installed");
+     return;
    }
 
 
@@ -4802,7 +4450,7 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
    QString rmsh = "rm /system/etc/install-recovery-2.sh";
 
 
-   cstring = adb + " shell ls /system/xbin/busybox";
+   cstring = getadb() + " shell ls /system/xbin/busybox";
    command=RunProcess(cstring);
 
    logfile(cstring);
@@ -4836,7 +4484,7 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
          logfile("busybox uninstall");
 
-         cstring = adb + " shell su -c ls /storage/usb/drive*/";
+         cstring = getadb() + " shell su -c ls /storage/usb/drive*/";
          command=RunProcess(cstring);
 
        if (!command.contains("No such file or directory"))
@@ -4848,19 +4496,19 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
              mount_root("rw");
 
 
-         cstring = adb + " shell su -c " + rmsh;
+         cstring = getadb() + " shell su -c " + rmsh;
          command=RunProcess(cstring);;
 
          logfile(cstring);
          logfile(command);
 
-          cstring = adb + " shell su -c " + umntstring;
+          cstring = getadb() + " shell su -c " + umntstring;
           command=RunProcess(cstring);;
 
           logfile(cstring);
           logfile(command);
 
-          cstring = adb + " shell su -c " + rmsd;
+          cstring = getadb() + " shell su -c " + rmsd;
           command=RunProcess(cstring);
 
           logfile(cstring);
@@ -4875,13 +4523,13 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
         mount_system("rw");
 
 
-        cstring = adb + " shell ls /system/xbin/sshstop";
+        cstring = getadb() + " shell ls /system/xbin/sshstop";
         command=RunProcess(cstring);
 
         logfile(cstring);
         logfile(command);
 
-        cstring = adb + " shell ls /data/data/com.funkyfresh.samba/files/jocala.txt";
+        cstring = getadb() + " shell ls /data/data/com.funkyfresh.samba/files/jocala.txt";
         command=RunProcess(cstring);
 
        logfile(cstring);
@@ -4889,19 +4537,19 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
          if (!command.contains("No such file or directory"))
            {
-                 cstring = adb + " shell /system/xbin/samba stop";
+                 cstring = getadb() + " shell /system/xbin/samba stop";
                  command=RunProcess(cstring);
 
                  logfile(cstring);
                  logfile(command);
 
-                 cstring = adb + " shell su -c rm -r /system/xbin/samba";
+                 cstring = getadb() + " shell su -c rm -r /system/xbin/samba";
                  command=RunProcess(cstring);
 
                  logfile(cstring);
                  logfile(command);
 
-                 cstring = adb + " shell su -c rm -r /data/data/com.funkyfresh.samba";
+                 cstring = getadb() + " shell su -c rm -r /data/data/com.funkyfresh.samba";
                  command=RunProcess(cstring);
 
                  logfile(cstring);
@@ -4909,13 +4557,13 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
           }
 
 
-         cstring = adb + " shell su -c /system/xbin/buninstall.sh";
+         cstring = getadb() + " shell su -c /system/xbin/buninstall.sh";
          command=RunProcess(cstring);
 
          logfile(cstring);
          logfile(command);
 
-         cstring = adb + " shell ls /system/xbin/busybox";
+         cstring = getadb() + " shell ls /system/xbin/busybox";
          command=RunProcess(cstring);
          
          logfile(cstring);
@@ -4948,30 +4596,29 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 void MainWindow::on_fdellButton_clicked()
 {
 
-    if (!isConnected)
-          { QMessageBox::critical(
-                this,
-                "adbFire",
-                devstr2);
-             return;
-       }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
 
     if(!is_busybox())
     {
-       QString msg;
-
-        if(is_su())
-          msg  ="System Tools Required";
-        else
-         msg  ="Error: Disconnect then reconnect.\nNotify developer if error persists.";
-
-        QMessageBox::critical(
-          this,
-          "adbFire",
-          msg);
+        QMessageBox::critical(0,"","Busybox not found");
        return;
  }
+
+
 
 
 
@@ -4994,7 +4641,7 @@ void MainWindow::on_fdellButton_clicked()
 
      QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
 
-     cstring = adb + " shell ls "+mcpath;
+     cstring = getadb() + " shell ls "+mcpath;
 
      command=RunProcess(cstring);
 
@@ -5007,7 +4654,7 @@ void MainWindow::on_fdellButton_clicked()
 
 
 
-     cstring = adb + " shell ls "+mcpath;
+     cstring = getadb() + " shell ls "+mcpath;
 
      command=RunProcess(cstring);
 
@@ -5068,7 +4715,7 @@ void MainWindow::on_fdellButton_clicked()
        }
 
 
-
+/*
   is_package(xbmcpackage);
 
   if (xpath != "/sdcard/")
@@ -5081,17 +4728,31 @@ void MainWindow::on_fdellButton_clicked()
          logfile("xbmc not installed, path not found");
           return;
        }
+*/
+
+    QString dirpath = ui->customdir->text();
+       if (!dirpath.isEmpty())
+
+       {
+           if(!dirpath.startsWith("/"))
+              dirpath.prepend("/");
+
+           if(!dirpath.endsWith("/"))
+              dirpath.append("/") ;
+
+              xpath=dirpath;
+              cname = xpath;
+       }
 
 
 
 
-
-  //cstring = adb + " shell su -c find " +xpath+ " -type f ";
+  //cstring = getadb() + " shell su -c find " +xpath+ " -type f ";
   //QString command=RunProcess(cstring);
 
-  cstring = adb + " shell "+busypath+"find " +xpath+ " -type f ";
+  cstring = getadb() + " shell "+busypath+"find " +xpath+ " -type f ";
 
-  // cstring = adb + " shell ls " +xpath;
+  // cstring = getadb() + " shell ls " +xpath;
 
   command=RunProcess(cstring);
 
@@ -5148,9 +4809,9 @@ void MainWindow::on_fdellButton_clicked()
         return;
 
              
-             // cstring = adb + " shell rm "+pullfile;
-                cstring = adb + " shell rm "+'"'+pullfile+'"';
-             //   cstring = adb + " push "+'"'+fileName+'"'+ " "+xpath;
+             // cstring = getadb() + " shell rm "+pullfile;
+                cstring = getadb() + " shell rm "+'"'+pullfile+'"';
+             //   cstring = getadb() + " push "+'"'+fileName+'"'+ " "+xpath;
 
 
 
@@ -5186,6 +4847,11 @@ void MainWindow::on_fdellButton_clicked()
 void MainWindow::on_actionFirmware_install_triggered()
 {
 
+
+
+
+
+
     // recovery-stock-51.1.0.img
 
     bool usbstick = false;
@@ -5196,13 +4862,23 @@ void MainWindow::on_actionFirmware_install_triggered()
     QString tmpstr = adbdir+"tmpstr";
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
    if (!is_su())
@@ -5220,6 +4896,12 @@ void MainWindow::on_actionFirmware_install_triggered()
        logfile("System Tools required");
        return;
    }
+
+
+   if (!is_amazon())
+         { QMessageBox::critical(0,"","Not an Amazon Device");
+            return;
+         }
 
 
  logfile("firmware installation query");
@@ -5242,10 +4924,10 @@ void MainWindow::on_actionFirmware_install_triggered()
     logfile("firmware installation started");
 
 
-        cstring = adb + " shell su -c chmod 777 /cache";
+        cstring = getadb() + " shell su -c chmod 777 /cache";
         command=RunProcess(cstring);
 
-        cstring = adb + " shell su -c chmod 777 /cache/recovery";
+        cstring = getadb() + " shell su -c chmod 777 /cache/recovery";
         command=RunProcess(cstring);
 
 
@@ -5256,7 +4938,7 @@ void MainWindow::on_actionFirmware_install_triggered()
             logfile(command);
             logfile("/cache/recovery/ not found");
 
-            cstring = adb + " shell su -c mkdir -p /cache/recovery/";
+            cstring = getadb() + " shell su -c mkdir -p /cache/recovery/";
             command=RunProcess(cstring);
 
             logfile(cstring);
@@ -5272,7 +4954,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
 
-            cstring = adb + " shell su -c chmod 777 /cache/recovery";
+            cstring = getadb() + " shell su -c chmod 777 /cache/recovery";
             command=RunProcess(cstring);
 
             logfile(cstring);
@@ -5314,7 +4996,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
 
-    cstring = adb + " push "+commstr+ " /sdcard/";
+    cstring = getadb() + " push "+commstr+ " /sdcard/";
     command=RunProcess(cstring);
     
     if (!command.contains("bytes"))
@@ -5326,7 +5008,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
         return; }
 
-    cstring = adb + " shell su -c cp " + " /sdcard/command /cache/recovery/";
+    cstring = getadb() + " shell su -c cp " + " /sdcard/command /cache/recovery/";
     command=RunProcess(cstring);
 
     if (!command.isEmpty())
@@ -5341,7 +5023,7 @@ void MainWindow::on_actionFirmware_install_triggered()
     logfile(cstring);
     logfile(command);
 
-    cstring = adb + " shell su -c chmod 777 /cache/recovery/command";
+    cstring = getadb() + " shell su -c chmod 777 /cache/recovery/command";
     command=RunProcess(cstring);
 
     if (!command.isEmpty())
@@ -5366,7 +5048,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
           logfile("searching usb for files");
 
-          cstring = adb + " shell su -c find /storage/usb -name *.bin -o -name *.zip";
+          cstring = getadb() + " shell su -c find /storage/usb -name *.bin -o -name *.zip";
           command=RunProcess(cstring);
 
           if (command.isEmpty())
@@ -5425,7 +5107,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
           usbstick = true;
-          cstring = adb + " shell ls "+fileName;
+          cstring = getadb() + " shell ls "+fileName;
           command=RunProcess(cstring);
 
           if (command.contains("No such file or directory"))
@@ -5463,7 +5145,7 @@ void MainWindow::on_actionFirmware_install_triggered()
     if (!usbstick)
       {
         logfile("pushing "+fileName+" to /sdcard/");
-        cstring = adb + " push "  + '"' +   fileName + '"'   + " /sdcard/update.zip";
+        cstring = getadb() + " push "  + '"' +   fileName + '"'   + " /sdcard/update.zip";
         command=RunProcess(cstring);
 
         logfile(cstring);
@@ -5479,9 +5161,9 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
     if (!usbstick)
-    cstring = adb + " shell su -c cp " + " /sdcard/update.zip /cache/";
+    cstring = getadb() + " shell su -c cp " + " /sdcard/update.zip /cache/";
     else
-    cstring = adb + " shell su -c cp " + fileName + " /cache/update.zip";
+    cstring = getadb() + " shell su -c cp " + fileName + " /cache/update.zip";
 
     command=RunProcess(cstring);
 
@@ -5498,7 +5180,7 @@ void MainWindow::on_actionFirmware_install_triggered()
     
    if (!usbstick)
    {
-    cstring = adb + " shell rm /sdcard/update.zip";
+    cstring = getadb() + " shell rm /sdcard/update.zip";
     command=RunProcess(cstring);
     logfile(cstring);
     logfile(command);
@@ -5510,7 +5192,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
 
 
-    cstring = adb + " shell rm /sdcard/command";
+    cstring = getadb() + " shell rm /sdcard/command";
     command=RunProcess(cstring);
 
     logfile(cstring);
@@ -5543,13 +5225,13 @@ void MainWindow::on_actionFirmware_install_triggered()
 
           logfile("firmware installation cancelled by user");
 
-          cstring = adb + " shell su -c rm /cache/update.zip";
+          cstring = getadb() + " shell su -c rm /cache/update.zip";
           command=RunProcess(cstring);
 
           logfile(cstring);
           logfile(command);
 
-          cstring = adb + " shell su -c rm /cache/recovery/command";
+          cstring = getadb() + " shell su -c rm /cache/recovery/command";
           command=RunProcess(cstring);
 
 
@@ -5565,7 +5247,7 @@ void MainWindow::on_actionFirmware_install_triggered()
       rebootDevice(" reboot recovery");
      
      isConnected=false;
-     ui->device_connected->setText(devstr2);
+     //ui->device_connected->setText(devstr2);
 
     }
 
@@ -5577,13 +5259,23 @@ void MainWindow::on_actionFirmware_install_triggered()
 void MainWindow::on_mntButton_clicked()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
   //
@@ -5616,7 +5308,7 @@ QString sambastring;
    connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
    timer->start(tsvalue);
 
-   cstring = adb + " shell ls /system/xbin/mount";
+   cstring = getadb() + " shell ls /system/xbin/mount";
    command=RunProcess(cstring);
 
 
@@ -5629,9 +5321,7 @@ QString sambastring;
          return;
      }
 
-
-
-       cstring = adb + " shell su -c /system/xbin/mntdrives.sh";
+       cstring = getadb() + " shell su -c /system/xbin/mntdrives.sh";
        command=RunProcess(cstring);
 
        logfile(cstring);
@@ -5648,25 +5338,23 @@ QString sambastring;
            logfile(command);
 
 
-           sambastring = adb + " shell su -c /data/data/com.funkyfresh.samba/files/samba start";
+           sambastring = getadb() + " shell su -c /data/data/com.funkyfresh.samba/files/samba start";
            sambacheck=RunProcess(sambastring);
 
            logfile(sambastring);
            logfile(sambacheck);
 
-
-
-
-                   sambastring = adb + " shell su -c ps | grep smbd";
+                   sambastring = getadb() + " shell ps | grep smbd";
                    sambacheck=RunProcess(sambastring);
 
+                   logfile("xxx");
                    logfile(sambastring);
                    logfile(sambacheck);
 
 
                    if (!sambacheck.isEmpty())
                     {
-                       logfile("samba running");
+                       logfile("samba rxunning");
                        ui->sambaLabel->setVisible(true);
                     }
 
@@ -5718,13 +5406,21 @@ QString sambastring;
 void MainWindow::on_umntButton_clicked()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
 
 
   //
@@ -5744,7 +5440,7 @@ void MainWindow::on_umntButton_clicked()
 
 
 
-   QString cstring = adb + " shell ls /system/xbin/umount";
+   QString cstring = getadb() + " shell ls /system/xbin/umount";
    QString command=RunProcess(cstring);
 
 
@@ -5774,7 +5470,7 @@ void MainWindow::on_umntButton_clicked()
     mount_root("rw");
 
        logfile("stopping samba");
-       cstring = adb + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc stop";
+       cstring = getadb() + " shell su -c /data/data/com.funkyfresh.samba/files/samba-rc stop";
        command=RunProcess(cstring);
 
        logfile("samba off!");
@@ -5783,7 +5479,7 @@ void MainWindow::on_umntButton_clicked()
        logfile(cstring);
        logfile(command);
 
-       cstring = adb + " shell su -c " + umntstring;
+       cstring = getadb() + " shell su -c " + umntstring;
        command=RunProcess(cstring);
 
         ui->progressBar->setHidden(true);
@@ -5795,7 +5491,7 @@ void MainWindow::on_umntButton_clicked()
            QMessageBox::critical( this,"","USB drive not found!");}
        else
         {           
-           cstring = adb + " shell su -c " + rmsd;
+           cstring = getadb() + " shell su -c " + rmsd;
            command=RunProcess(cstring);
            QMessageBox::information( this,"","USB Drive(s) unmounted.");
            logfile(cstring);
@@ -5817,13 +5513,22 @@ void MainWindow::on_umntButton_clicked()
 ////////////////////////////////////////
 void MainWindow::on_rwButton_clicked()
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
    //
@@ -5872,13 +5577,23 @@ void MainWindow::on_rwButton_clicked()
 ////////////////////////////////////////
 void MainWindow::on_roButton_clicked()
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
  //
@@ -5930,30 +5645,28 @@ void MainWindow::on_roButton_clicked()
 void MainWindow::on_fpullButton_clicked()
 {
 
-    if (!isConnected)
-          { QMessageBox::critical(
-                this,
-                "adbFire",
-                devstr2);
-             return;
-       }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
 
     if(!is_busybox())
     {
-       QString msg;
-
-        if(is_su())
-          msg  ="System Tools Required";
-        else
-         msg  ="Error: Disconnect then reconnect.\nNotify developer if error persists.";
-
-        QMessageBox::critical(
-          this,
-          "adbFire",
-          msg);
+        QMessageBox::critical(0,"","Busybox not found");
        return;
  }
+
 
 
        if (!QDir(pulldir).exists())
@@ -5963,6 +5676,8 @@ void MainWindow::on_fpullButton_clicked()
              "Pull directory not found");
           return ;
        }
+
+
 
     QElapsedTimer rtimer;
     int nMilliseconds;
@@ -5978,7 +5693,7 @@ void MainWindow::on_fpullButton_clicked()
      QString command;
      QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
 
-     cstring = adb + " shell ls "+mcpath;
+     cstring = getadb() + " shell ls "+mcpath;
 
      command=RunProcess(cstring);
 
@@ -5991,7 +5706,7 @@ void MainWindow::on_fpullButton_clicked()
 
 
 
-     cstring = adb + " shell ls "+mcpath;
+     cstring = getadb() + " shell ls "+mcpath;
 
      command=RunProcess(cstring);
 
@@ -6051,7 +5766,8 @@ void MainWindow::on_fpullButton_clicked()
        break;
        }
 
-     is_package(xbmcpackage);
+    /*
+      is_package(xbmcpackage);
 
      if (xpath != "/sdcard/" )
         if (!is_packageInstalled)
@@ -6063,12 +5779,34 @@ void MainWindow::on_fpullButton_clicked()
             logfile("xbmc not installed");
             logfile("install xbmc for "+xpath);
 
+
+
              return;
           }
+*/
 
-     cstring = adb + " shell "+busypath+"find " +xpath+ " -type f ";
+     QString dirpath = ui->customdir->text();
+     if (!dirpath.isEmpty())
 
-     // cstring = adb + " shell ls " +xpath;
+     {
+         if(!dirpath.startsWith("/"))
+            dirpath.prepend("/");
+
+         if(!dirpath.endsWith("/"))
+            dirpath.append("/") ;
+
+            xpath=dirpath;
+
+
+     }
+
+
+
+
+
+     cstring = getadb() + " shell "+busypath+"find " +xpath+ " -type f ";
+
+     // cstring = getadb() + " shell ls " +xpath;
 
      command=RunProcess(cstring);
 
@@ -6134,8 +5872,8 @@ void MainWindow::on_fpullButton_clicked()
      timer->start(tsvalue);
 
 
-             // cstring = adb + " pull "+xpath+fileName+" " +'"'+pulldir+'"';
-             cstring = adb + " pull "+'"'+fileName+'"'+" "+'"'+pulldir+'"';
+             // cstring = getadb() + " pull "+xpath+fileName+" " +'"'+pulldir+'"';
+             cstring = getadb() + " pull "+'"'+fileName+'"'+" "+'"'+pulldir+'"';
 
 
 
@@ -6172,13 +5910,23 @@ void MainWindow::on_fpullButton_clicked()
 //////////////////////////////////////////////
 void MainWindow::on_pushSplash_clicked()
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             "adbFire",
-             devstr2);
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
     is_package(xbmcpackage);
 
@@ -6192,7 +5940,7 @@ void MainWindow::on_pushSplash_clicked()
 
    QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/media/";
 
-   QString cstring = adb + " shell ls "+mcpath;
+   QString cstring = getadb() + " shell ls "+mcpath;
 
    QString command=RunProcess(cstring);
 
@@ -6205,7 +5953,7 @@ void MainWindow::on_pushSplash_clicked()
 
 
 
-   cstring = adb + " shell ls "+mcpath;
+   cstring = getadb() + " shell ls "+mcpath;
 
    command=RunProcess(cstring);
 
@@ -6241,7 +5989,7 @@ rtimer.start();
        if (reply == QMessageBox::Yes) {
 
 
-           cstring = adb + " push "+'"'+fileName+'"'+ " "+mcpath+"/splash.png";
+           cstring = getadb() + " push "+'"'+fileName+'"'+ " "+mcpath+"/splash.png";
 
            command=RunProcess(cstring);
 
@@ -6287,14 +6035,35 @@ void MainWindow::on_llamaButton_clicked()
    logfile("llama options function entered");
 
 
+   QString lookup=daddr;
+
+    if(!isusb)
+     lookup=lookup+":"+port;
+
+   isConnected=find_daddr(lookup);
+
+   if (!isConnected && !isusb)
+         on_connButton_clicked();
+
     if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             "adbFire",
-             devstr2);
-         logfile("not connected -- bail");
-          return;
-    }
+          { QMessageBox::critical(0,"",devstr2);
+             return;
+          }
+
+
+    if (!is_amazon())
+          { QMessageBox::critical(0,"","Not an Amazon Device");
+             return;
+          }
+
+
+
+
+   if(!is_busybox())
+   {
+       QMessageBox::critical(0,"","Busybox not found");
+      return;
+}
 
 
 
@@ -6566,7 +6335,7 @@ void MainWindow::on_llamaButton_clicked()
            connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
            timer->start(tsvalue);
 
-           cstring = adb + " install -r "+llama;
+           cstring = getadb() + " install -r "+llama;
            command=RunProcess(cstring);
 
            if (!command.contains("Success"))
@@ -6596,7 +6365,7 @@ void MainWindow::on_llamaButton_clicked()
      if (llamaEvent < 4 && isLlama)
      {
 
-         cstring = adb + " shell rm -r /sdcard/Llama";
+         cstring = getadb() + " shell rm -r /sdcard/Llama";
          command=RunProcess(cstring);
 
          logfile(cstring);
@@ -6608,16 +6377,16 @@ void MainWindow::on_llamaButton_clicked()
 
 
         if (mediacenter==kodi)
-        cstring = adb + " push "+adbdir+"/events/llamakodi/bootstart /sdcard/Llama/";
+        cstring = getadb() + " push "+adbdir+"/events/llamakodi/bootstart /sdcard/Llama/";
 
         if (mediacenter==xbmc)
-        cstring = adb + " push "+adbdir+"/events/llamaxbmc/bootstart /sdcard/Llama/";
+        cstring = getadb() + " push "+adbdir+"/events/llamaxbmc/bootstart /sdcard/Llama/";
 
         if (mediacenter==spmc)
-        cstring = adb + " push "+adbdir+"/events/llamaspmc/bootstart /sdcard/Llama/";
+        cstring = getadb() + " push "+adbdir+"/events/llamaspmc/bootstart /sdcard/Llama/";
 
         if (mediacenter==tvmc)
-        cstring = adb + " push "+adbdir+"/events/llamatvmc/bootstart /sdcard/Llama/";
+        cstring = getadb() + " push "+adbdir+"/events/llamatvmc/bootstart /sdcard/Llama/";
 
 
           command=RunProcess(cstring);
@@ -6632,31 +6401,31 @@ void MainWindow::on_llamaButton_clicked()
            if (mediacenter==kodi)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamakodi/linkctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamakodi/linkiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamakodi/linkctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamakodi/linkiko /sdcard/Llama/";
            }
 
 
            if (mediacenter==xbmc)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamaxbmc/linkctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamaxbmc/linkiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamaxbmc/linkctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamaxbmc/linkiko /sdcard/Llama/";
            }
 
 
            if (mediacenter==spmc)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamaspmc/linkctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamaspmc/linkiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamaspmc/linkctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamaspmc/linkiko /sdcard/Llama/";
            }
 
            if (mediacenter==tvmc)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamatvmc/linkctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamatvmc/linkiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamatvmc/linkctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamatvmc/linkiko /sdcard/Llama/";
            }
 
 
@@ -6676,31 +6445,31 @@ void MainWindow::on_llamaButton_clicked()
            if (mediacenter==kodi)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamakodi/bootstartctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamakodi/bootstartiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamakodi/bootstartctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamakodi/bootstartiko /sdcard/Llama/";
            }
 
 
            if (mediacenter==xbmc)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamaxbmc/bootstartctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamaxbmc/bootstartiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamaxbmc/bootstartctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamaxbmc/bootstartiko /sdcard/Llama/";
            }
 
 
            if (mediacenter==spmc)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamaspmc/bootstartctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamaspmc/bootstartiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamaspmc/bootstartctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamaspmc/bootstartiko /sdcard/Llama/";
            }
 
            if (mediacenter==tvmc)
            {
               if (ctvButton)
-               cstring = adb + " push "+adbdir+"/events/llamatvmc/bootstartctv /sdcard/Llama/";
-               else cstring = adb + " push "+adbdir+"/events/llamatvmc/bootstartiko /sdcard/Llama/";
+               cstring = getadb() + " push "+adbdir+"/events/llamatvmc/bootstartctv /sdcard/Llama/";
+               else cstring = getadb() + " push "+adbdir+"/events/llamatvmc/bootstartiko /sdcard/Llama/";
            }
 
 
@@ -6729,9 +6498,9 @@ void MainWindow::on_llamaButton_clicked()
 
 
       if (ctvButton)
-         cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
+         cstring = getadb() + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
        else
-         cstring = adb + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
+         cstring = getadb() + " shell rm -r /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
 
          command=RunProcess(cstring);
          logfile(cstring);
@@ -6739,9 +6508,9 @@ void MainWindow::on_llamaButton_clicked()
 
 
        if (ctvButton)
-           cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
+           cstring = getadb() + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
        else
-           cstring = adb + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
+           cstring = getadb() + " shell mkdir -p /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
 
        command=RunProcess(cstring);
        logfile(cstring);
@@ -6756,33 +6525,33 @@ void MainWindow::on_llamaButton_clicked()
                if (mediacenter==kodi)
                  {
                    if (ctvButton)
-                     cstring = adb + " push "+adbdir+ "icons/ctvkodi.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
+                     cstring = getadb() + " push "+adbdir+ "icons/ctvkodi.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
-                    cstring = adb + " push "+adbdir+ "icons/ikokodi.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
+                    cstring = getadb() + " push "+adbdir+ "icons/ikokodi.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
 
                if (mediacenter==xbmc)
                  {
                    if (ctvButton)
-                    cstring = adb + " push "+adbdir+ "icons/ctvxbmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
+                    cstring = getadb() + " push "+adbdir+ "icons/ctvxbmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
-                    cstring = adb + " push "+adbdir+ "icons/ikoxbmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
+                    cstring = getadb() + " push "+adbdir+ "icons/ikoxbmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
 
                if (mediacenter==spmc)
                  {
                    if (ctvButton)
-                    cstring = adb + " push "+adbdir+ "icons/ctvspmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
+                    cstring = getadb() + " push "+adbdir+ "icons/ctvspmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
-                    cstring = adb + " push "+adbdir+ "icons/ikospmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
+                    cstring = getadb() + " push "+adbdir+ "icons/ikospmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
 
                if (mediacenter==tvmc)
                  {
                    if (ctvButton)
-                    cstring = adb + " push "+adbdir+ "icons/ctvtvmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
+                    cstring = getadb() + " push "+adbdir+ "icons/ctvtvmc.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
-                    cstring = adb + " push "+adbdir+ "icons/ikotvmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
+                    cstring = getadb() + " push "+adbdir+ "icons/ikotvmc.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
                   }
 
 
@@ -6801,9 +6570,9 @@ void MainWindow::on_llamaButton_clicked()
 
 
                    if (ctvButton)
-                     cstring = adb + " push "+adbdir+ "icons/ctv.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
+                     cstring = getadb() + " push "+adbdir+ "icons/ctv.icon /sdcard/.imagecache/com.amazon.venezia/com.adrise.tubitv";
                     else
-                    cstring = adb + " push "+adbdir+ "icons/iko.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
+                    cstring = getadb() + " push "+adbdir+ "icons/iko.icon /sdcard/.imagecache/com.amazon.venezia/org.ikonotv.smarttv";
 
                command=RunProcess(cstring);
                logfile(cstring);
@@ -6873,6 +6642,45 @@ void MainWindow::on_actionCredits_triggered()
     credits.exec();
 }
 
+
+
+///////////////////////////////////////////////
+void MainWindow::check_update_status()
+{
+
+    QString command;
+    QString cstring;
+
+
+     if (!is_amazon() || !is_su())
+      { ui->update_status->setText("");
+         return;
+     }
+
+    if (is_su() && isConnected)
+     {
+
+
+      cstring = getadb() + " shell pm list packages -d";
+      command=RunProcess(cstring);
+
+       if (command.contains("package:com.amazon.dcp"))
+          {
+           ui->update_status->setText(amazon_update0);
+           updatecheck = false;
+          }
+
+       else
+         {
+              ui->update_status->setText(amazon_update1);
+              updatecheck = true;
+         }
+
+    }
+
+}
+
+
 /////////////////////////////////////////////////////////
 void MainWindow::on_actionInstall_Recovery_triggered()
 {
@@ -6882,13 +6690,22 @@ void MainWindow::on_actionInstall_Recovery_triggered()
     QString command;
     QString fileName;
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
 
@@ -6912,8 +6729,15 @@ void MainWindow::on_actionInstall_Recovery_triggered()
    }
 
 
+   if (!is_amazon())
+         { QMessageBox::critical(0,"","Not an Amazon Device");
+            return;
+         }
 
-   cstring = adb + " shell su -c cat /system/build.prop | grep 51.1.1.0";
+
+
+
+   cstring = getadb() + " shell su -c cat /system/build.prop | grep 51.1.1.0";
    command=RunProcess(cstring);
 
    if (!command.isEmpty())
@@ -6955,7 +6779,7 @@ void MainWindow::on_actionInstall_Recovery_triggered()
     timer->start(tsvalue);
 
         logfile("pushing "+fileName+" to /sdcard/");
-        cstring = adb + " push "  + '"' +   fileName + '"'   + " /sdcard/recovery.img";
+        cstring = getadb() + " push "  + '"' +   fileName + '"'   + " /sdcard/recovery.img";
         command=RunProcess(cstring);
 
         logfile(cstring);
@@ -6969,7 +6793,7 @@ void MainWindow::on_actionInstall_Recovery_triggered()
 
 
 
-    cstring=adb + " shell su -c  dd if=/sdcard/recovery.img of=/dev/block/platform/msm_sdcc.1/by-name/recovery";
+    cstring=getadb() + " shell su -c  dd if=/sdcard/recovery.img of=/dev/block/platform/msm_sdcc.1/by-name/recovery";
     command=RunProcess(cstring);
     logfile(cstring);
     logfile(command);
@@ -6986,7 +6810,7 @@ void MainWindow::on_actionInstall_Recovery_triggered()
  }
 
 
-     cstring = adb + " shell rm /sdcard/recovery.img";
+     cstring = getadb() + " shell rm /sdcard/recovery.img";
      command=RunProcess(cstring);
      logfile(cstring);
      logfile(command);
@@ -7008,13 +6832,20 @@ void MainWindow::on_actionInstall_Recovery_triggered()
 void MainWindow::on_actionInstall_SSH_triggered()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
 
 
@@ -7036,7 +6867,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
 // /data/jocala/ssh/dropbear -A root -N root -s -g -R /data/jocala/ssh/.ssh/authorized_keys
 
-   cstring = adb + " shell ls /system/xbin/busybox";
+   cstring = getadb() + " shell ls /system/xbin/busybox";
    command=RunProcess(cstring);
 
 
@@ -7077,7 +6908,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
           logfile("starting ssh install");
 
 
-   cstring = adb + " push "+adbdir+ "/ssh.tar /sdcard/";
+   cstring = getadb() + " push "+adbdir+ "/ssh.tar /sdcard/";
    command=RunProcess(cstring);
 
 
@@ -7095,20 +6926,20 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
    mount_system("rw");
 
-   cstring = adb + " shell su -c tar xf /sdcard/ssh.tar -C /data";
+   cstring = getadb() + " shell su -c tar xf /sdcard/ssh.tar -C /data";
    command=RunProcess(cstring);
 
    logfile(cstring);
    logfile(command);
 
-cstring = adb + " shell su -c rm /sdcard/ssh.tar";
+cstring = getadb() + " shell su -c rm /sdcard/ssh.tar";
 command=RunProcess(cstring);
 
 logfile(cstring);
 logfile(command);
 
 
-cstring = adb + " shell su -c /data/jocala/ssh/setupssh";
+cstring = getadb() + " shell su -c /data/jocala/ssh/setupssh";
 command=RunProcess(cstring);
 
 logfile(cstring);
@@ -7116,7 +6947,7 @@ logfile(command);
 
 
 
-cstring = adb + " shell ls /data/jocala/ssh/sshstart";
+cstring = getadb() + " shell ls /data/jocala/ssh/sshstart";
 command=RunProcess(cstring);
 logfile(cstring);
 logfile(command);
@@ -7157,13 +6988,22 @@ mount_system("ro");
 void MainWindow::on_actionUninstall_SSH_triggered()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
    if (!is_su())
@@ -7178,7 +7018,7 @@ void MainWindow::on_actionUninstall_SSH_triggered()
    QString cstring;
    QString command;
 
-   cstring = adb + " shell su -c /data/jocala/ssh/sshstop";
+   cstring = getadb() + " shell su -c /data/jocala/ssh/sshstop";
    command=RunProcess(cstring);
    logfile(cstring);
    logfile(command);;
@@ -7213,15 +7053,15 @@ void MainWindow::on_actionUninstall_SSH_triggered()
 
        logfile("uninstall ssh");
 
-       cstring = adb + " shell su -c /data/jocala/ssh/rmssh";
+       cstring = getadb() + " shell su -c /data/jocala/ssh/rmssh";
        command=RunProcess(cstring);
 
-       cstring = adb + " shell su -c rm -r /data/jocala/";
+       cstring = getadb() + " shell su -c rm -r /data/jocala/";
        command=RunProcess(cstring);
 
 
 
-       cstring = adb + " shell sshstatus";
+       cstring = getadb() + " shell sshstatus";
        command=RunProcess(cstring);
 
 
@@ -7250,15 +7090,22 @@ void MainWindow::on_actionUninstall_SSH_triggered()
 void MainWindow::on_puttyButton_clicked()
 {
 
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
 
 
 
@@ -7280,7 +7127,7 @@ void MainWindow::on_puttyButton_clicked()
        writeConfig();
 
 
-    cstring = adb + " shell su -c /system/xbin/sshstart";
+    cstring = getadb() + " shell su -c /system/xbin/sshstart";
     command=RunProcess(cstring);
 
     logfile(cstring);
@@ -7364,13 +7211,22 @@ void MainWindow::on_sftpButton_clicked()
 {
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
 
@@ -7387,7 +7243,7 @@ void MainWindow::on_sftpButton_clicked()
        writeConfig();
 
 
-    QString cstring = adb + " shell su -c /system/xbin/sshstart";
+    QString cstring = getadb() + " shell su -c /system/xbin/sshstart";
     QString command=RunProcess(cstring);
 
     logfile(cstring);
@@ -7472,7 +7328,7 @@ void MainWindow::on_actionView_Log_triggered()
 {
 
 
-    logfile("opening adblog dialog");
+    //logfile("opening adblog dialog");
 
      adblogDialog dialog;
      dialog.setModal(true);
@@ -7493,13 +7349,23 @@ void MainWindow::on_actionSwap_data_triggered()
     QString fileName;
     bool worked = false;
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
    if (!is_su())
@@ -7511,6 +7377,13 @@ void MainWindow::on_actionSwap_data_triggered()
    }
 
 
+   if (!is_amazon())
+         { QMessageBox::critical(0,"","Not an Amazon Device");
+            return;
+         }
+
+
+
  logfile("swap /data to external ext4 drive");
 
 
@@ -7520,7 +7393,7 @@ void MainWindow::on_actionSwap_data_triggered()
 
           logfile("looking for drives");
 
-          cstring = adb + " shell su -c blkid /dev/block/sd* | grep ext4";
+          cstring = getadb() + " shell su -c blkid /dev/block/sd* | grep ext4";
           command=RunProcess(cstring);
 
           if (command.isEmpty())
@@ -7613,28 +7486,28 @@ void MainWindow::on_actionSwap_data_triggered()
 
          mount_system("rw");
 
-         cstring = adb + " shell su -c rm -r /system/temp";
+         cstring = getadb() + " shell su -c rm -r /system/temp";
          command=RunProcess(cstring);
 
-         cstring = adb + " shell su -c mkdir /system/temp";
-         command=RunProcess(cstring);
-
-         logfile(cstring);
-         logfile(command);
-
-         cstring = adb + " shell su -c busybox mount "+uuid+ " /system/temp";
+         cstring = getadb() + " shell su -c mkdir /system/temp";
          command=RunProcess(cstring);
 
          logfile(cstring);
          logfile(command);
 
-         cstring = adb + " shell su -c cp -av /data/. /system/temp/";
+         cstring = getadb() + " shell su -c busybox mount "+uuid+ " /system/temp";
+         command=RunProcess(cstring);
+
+         logfile(cstring);
+         logfile(command);
+
+         cstring = getadb() + " shell su -c cp -av /data/. /system/temp/";
          command=RunProcess(cstring);
 
           logfile(cstring);
           logfile(command);
 
-          cstring = adb + " shell su -c ls /system/temp/data/data";
+          cstring = getadb() + " shell su -c ls /system/temp/data/data";
           command=RunProcess(cstring);
 
           if (command.contains("No such file or directory"))
@@ -7645,26 +7518,26 @@ void MainWindow::on_actionSwap_data_triggered()
            logfile(cstring);
            logfile(command);
 
-          cstring = adb + " shell su -c busybox umount /system/temp/";
+          cstring = getadb() + " shell su -c busybox umount /system/temp/";
           command=RunProcess(cstring);
 
            logfile(cstring);
            logfile(command);
 
-           cstring = adb + " shell su -c rm -r /system/temp/";
+           cstring = getadb() + " shell su -c rm -r /system/temp/";
            command=RunProcess(cstring);
 
             logfile(cstring);
             logfile(command);
 
 
-          cstring = adb + " shell su -c cp /system/xbin/mntdata.orig /system/xbin/mntdata.sh";
+          cstring = getadb() + " shell su -c cp /system/xbin/mntdata.orig /system/xbin/mntdata.sh";
           command=RunProcess(cstring);
 
           logfile(cstring);
           logfile(command);
 
-          cstring = adb + " shell su -c sed -i  's/fakeuuid/"+uuid+"/g' /system/xbin/mntdata.sh";
+          cstring = getadb() + " shell su -c sed -i  's/fakeuuid/"+uuid+"/g' /system/xbin/mntdata.sh";
           command=RunProcess(cstring);
 
           logfile(cstring);
@@ -7680,7 +7553,7 @@ void MainWindow::on_actionSwap_data_triggered()
                                            QMessageBox::Yes|QMessageBox::No);
              if (reply3 == QMessageBox::Yes)
                 {
-                   ui->device_connected->setText(devstr2);
+                   //ui->device_connected->setText(devstr2);
                    mount_system("ro");
                    rebootDevice(" reboot");
                  }
@@ -7715,13 +7588,23 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
 {
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
    if (!is_su())
@@ -7741,7 +7624,15 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
    }
 
 
-   QString cstring = adb + " shell ls /system/xbin/aftv-full-unlock";
+   if (!is_amazon())
+         { QMessageBox::critical(0,"","Not an Amazon Device");
+            return;
+         }
+
+
+
+
+   QString cstring = getadb() + " shell ls /system/xbin/aftv-full-unlock";
    QString command=RunProcess(cstring);
    bool agree;
 
@@ -7769,7 +7660,7 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
         ui->update_status->setText("");
 
 
-        cstring = adb + " shell su -c /system/xbin/aftv-full-unlock";
+        cstring = getadb() + " shell su -c /system/xbin/aftv-full-unlock";
         command=RunProcess(cstring);
 
       logfile(cstring);
@@ -7839,7 +7730,7 @@ void MainWindow::on_actionBuild_mount_script_triggered()
 
           logfile("looking for drives");
 
-          cstring = adb + " shell su -c blkid /dev/block/sd*";
+          cstring = getadb() + " shell su -c blkid /dev/block/sd*";
           command=RunProcess(cstring);
 
           if (command.isEmpty())
@@ -8061,16 +7952,22 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
 {
 
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
 
-
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
 
 
    if (!is_su())
@@ -8096,9 +7993,10 @@ void MainWindow::on_actionMount_CIFS_triggered()
    bool selectedShare=false;
 
 
-    db.open();
-    readShares();
-    db.close();
+   int numrecs=getShareCount();
+
+   if (numrecs > 0)
+       readShares();
 
     logfile("opening shares dialog");
 
@@ -8205,21 +8103,21 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
            mount_system("rw");
 
-            cstring = adb + " shell ls /system/etc/init.d/02mntdrives";
+            cstring = getadb() + " shell ls /system/etc/init.d/02mntdrives";
             command=RunProcess(cstring);
 
             if (command.contains("No such file or directory"))
                  {
-                    cstring = adb + " shell su -c rm /system/etc/init.d/01sleep";
+                    cstring = getadb() + " shell su -c rm /system/etc/init.d/01sleep";
                     command=RunProcess(cstring);
                   }
 
-            cstring = adb + " shell ls /system/etc/init.d/04mntshares";
+            cstring = getadb() + " shell ls /system/etc/init.d/04mntshares";
             command=RunProcess(cstring);
 
             if (!command.contains("No such file or directory"))
                  {
-                    cstring = adb + " shell su -c rm /system/etc/init.d/04mntshares";
+                    cstring = getadb() + " shell su -c rm /system/etc/init.d/04mntshares";
                     command=RunProcess(cstring);
                   }
 
@@ -8237,7 +8135,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
                  if (nfs1=="1")
                  {
                      logfile("mounting nfs share");
-                     cstring = adb + " shell su -c "+nfsString+ipaddress1+":"+share1+" "+mount1;
+                     cstring = getadb() + " shell su -c "+nfsString+ipaddress1+":"+share1+" "+mount1;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8248,7 +8146,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
                  {
                      logfile("mounting cifs share");
-                     cstring = adb + " shell su -c "+cifsString+ipaddress1+share1+" "+mount1+ " -o username=guest";
+                     cstring = getadb() + " shell su -c "+cifsString+ipaddress1+share1+" "+mount1+ " -o username=guest";
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8266,7 +8164,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
                  if (nfs2=="1")
                  {
                      logfile("mounting nfs share");
-                     cstring = adb + " shell su -c "+nfsString+ipaddress2+":"+share2+" "+mount2;
+                     cstring = getadb() + " shell su -c "+nfsString+ipaddress2+":"+share2+" "+mount2;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8277,7 +8175,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
                  {
                      logfile("mounting cifs share");
-                     cstring = adb + " shell su -c "+cifsString+ipaddress2+share2+" "+mount2+ " -o username=guest";
+                     cstring = getadb() + " shell su -c "+cifsString+ipaddress2+share2+" "+mount2+ " -o username=guest";
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8294,7 +8192,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
                  if (nfs3=="1")
                  {
                      logfile("mounting nfs share");
-                     cstring = adb + " shell su -c "+nfsString+ipaddress3+":"+share3+" "+mount3;
+                     cstring = getadb() + " shell su -c "+nfsString+ipaddress3+":"+share3+" "+mount3;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8305,7 +8203,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
                  {
                      logfile("mounting cifs share");
-                     cstring = adb + " shell su -c "+cifsString+ipaddress3+share3+" "+mount3+ " -o username=guest";
+                     cstring = getadb() + " shell su -c "+cifsString+ipaddress3+share3+" "+mount3+ " -o username=guest";
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8321,7 +8219,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
                  if (nfs4=="1")
                  {
                      logfile("mounting nfs share");
-                     cstring = adb + " shell su -c "+nfsString+ipaddress4+":"+share4+" "+mount4;
+                     cstring = getadb() + " shell su -c "+nfsString+ipaddress4+":"+share4+" "+mount4;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8332,7 +8230,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
                  {
                      logfile("mounting cifs share");
-                     cstring = adb + " shell su -c "+cifsString+ipaddress4+share4+" "+mount4+ " -o username=guest";
+                     cstring = getadb() + " shell su -c "+cifsString+ipaddress4+share4+" "+mount4+ " -o username=guest";
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8349,7 +8247,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
             if (select1)
                 {
 
-                     cstring = adb + " shell su -c busybox umount "+mount1;
+                     cstring = getadb() + " shell su -c busybox umount "+mount1;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8359,7 +8257,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
             if (select2)
                 {
 
-                     cstring = adb + " shell su -c busybox umount "+mount2;
+                     cstring = getadb() + " shell su -c busybox umount "+mount2;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8369,7 +8267,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
             if (select3)
                 {
 
-                     cstring = adb + " shell su -c busybox umount "+mount3;
+                     cstring = getadb() + " shell su -c busybox umount "+mount3;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8380,7 +8278,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
             if (select4)
                 {
 
-                     cstring = adb + " shell su -c busybox umount "+mount4;
+                     cstring = getadb() + " shell su -c busybox umount "+mount4;
                      command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8395,9 +8293,12 @@ void MainWindow::on_actionMount_CIFS_triggered()
             case 3 :
                 // save
 
-                db.open();
-                updateShares();
-                db.close();
+
+                 if (numrecs > 0)
+                     updateShares();
+                 else
+                insertShare();
+
 
                 break;
 
@@ -8533,7 +8434,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
                  mount_system("rw");
 
-                      cstring = adb + " push "+adbdir+"04mntshares /sdcard/";
+                      cstring = getadb() + " push "+adbdir+"04mntshares /sdcard/";
                       command=RunProcess(cstring);
 
                       logfile(cstring);
@@ -8546,7 +8447,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
                              }
 
 
-                         cstring = adb + " shell su -c cp " + " /system/xbin/01sleep /system/etc/init.d";
+                         cstring = getadb() + " shell su -c cp " + " /system/xbin/01sleep /system/etc/init.d";
                          command=RunProcess(cstring);
 
                          if (!command.isEmpty())
@@ -8561,20 +8462,20 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
 
 
-                     cstring = adb + " shell su -c cp " + " /sdcard/04mntshares /system/etc/init.d/";
+                     cstring = getadb() + " shell su -c cp " + " /sdcard/04mntshares /system/etc/init.d/";
                      command=RunProcess(cstring);
 
                      logfile(cstring);
                      logfile(command);
 
 
-                         cstring = adb + " shell su -c chmod 0755 /system/etc/init.d/04mntshares";
+                         cstring = getadb() + " shell su -c chmod 0755 /system/etc/init.d/04mntshares";
                          command=RunProcess(cstring);
 
                          logfile(cstring);
                          logfile(command);
 
-                         cstring = adb + " shell su -c /system/xbin/dos2unix /system/etc/init.d/04mntshares";
+                         cstring = getadb() + " shell su -c /system/xbin/dos2unix /system/etc/init.d/04mntshares";
                          command=RunProcess(cstring);
 
                          logfile(cstring);
@@ -8582,7 +8483,7 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
 
 
-                         cstring = adb + " shell rm /sdcard/04mntshares";
+                         cstring = getadb() + " shell rm /sdcard/04mntshares";
                          command=RunProcess(cstring);
 
                          logfile(cstring);
@@ -8622,9 +8523,36 @@ void MainWindow::on_actionDownload_Kodi_triggered()
     kodidialog.exec();
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_editRecord_clicked()
 {
-    on_actionPreferences_triggered();
+
+    int row;
+      description = ui->deviceBox->currentText();
+
+     if (!description.isEmpty())
+      {
+
+
+         QString lookup=daddr;
+
+          if(!isusb)
+           lookup=lookup+":"+port;
+
+         isConnected=find_daddr(lookup);
+
+         if (!isConnected && !isusb)
+               on_connButton_clicked();
+
+         row = ui->deviceBox->currentIndex();
+         getRecord(description);
+         dataentry(0);
+         loaddevicebox();
+         ui->deviceBox->setCurrentIndex(row);
+     }
+
+
+
+
 }
 
 
@@ -8636,13 +8564,23 @@ void MainWindow::on_actionInstall_Stock_Recovery_triggered()
     QString command;
     QString fileName;
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
 
@@ -8662,6 +8600,10 @@ void MainWindow::on_actionInstall_Stock_Recovery_triggered()
        return;
    }
 
+   if (!is_amazon())
+         { QMessageBox::critical(0,"","Not an Amazon Device");
+            return;
+         }
 
    logfile("stock recovery installation starts");
 
@@ -8695,7 +8637,7 @@ void MainWindow::on_actionInstall_Stock_Recovery_triggered()
     timer->start(tsvalue);
 
         logfile("pushing "+fileName+" to /sdcard/");
-        cstring = adb + " push "  + '"' +   fileName + '"'   + " /sdcard/recovery.img";
+        cstring = getadb() + " push "  + '"' +   fileName + '"'   + " /sdcard/recovery.img";
         command=RunProcess(cstring);
 
         logfile(cstring);
@@ -8709,7 +8651,7 @@ void MainWindow::on_actionInstall_Stock_Recovery_triggered()
 
 
 
-    cstring=adb + " shell su -c  dd if=/sdcard/recovery.img of=/dev/block/platform/msm_sdcc.1/by-name/recovery";
+    cstring=getadb() + " shell su -c  dd if=/sdcard/recovery.img of=/dev/block/platform/msm_sdcc.1/by-name/recovery";
     command=RunProcess(cstring);
     logfile(cstring);
     logfile(command);
@@ -8726,7 +8668,7 @@ void MainWindow::on_actionInstall_Stock_Recovery_triggered()
  }
 
 
-     cstring = adb + " shell rm /sdcard/recovery.img";
+     cstring = getadb() + " shell rm /sdcard/recovery.img";
      command=RunProcess(cstring);
      logfile(cstring);
      logfile(command);
@@ -8750,13 +8692,23 @@ void MainWindow::on_actionInstall_Samba_triggered()
     QString command;
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
 
@@ -8819,7 +8771,7 @@ void MainWindow::on_actionInstall_Samba_triggered()
 
 
 
-              cstring = adb + " push "+busybox2+ " /sdcard/";
+              cstring = getadb() + " push "+busybox2+ " /sdcard/";
               command=RunProcess(cstring);
 
 
@@ -8839,20 +8791,20 @@ void MainWindow::on_actionInstall_Samba_triggered()
 
 
 
-            cstring = adb + " shell su -c tar xf /sdcard/samba.tar -C /data/data";
+            cstring = getadb() + " shell su -c tar xf /sdcard/samba.tar -C /data/data";
             command=RunProcess(cstring);
 
             logfile(cstring);
             logfile(command);
 
 
-            cstring = adb + " shell su -c ln -s /data/data/com.funkyfresh.samba/files/samba  /system/xbin/samba";
+            cstring = getadb() + " shell su -c ln -s /data/data/com.funkyfresh.samba/files/samba  /system/xbin/samba";
             command=RunProcess(cstring);
 
             logfile(cstring);
             logfile(command);
 
-            cstring = adb + " shell su -c rm /sdcard/samba.tar";
+            cstring = getadb() + " shell su -c rm /sdcard/samba.tar";
             command=RunProcess(cstring);
 
          logfile(cstring);
@@ -8886,13 +8838,22 @@ void MainWindow::on_actionUninstall_Samba_triggered()
     QString command;
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
 
@@ -8905,7 +8866,7 @@ void MainWindow::on_actionUninstall_Samba_triggered()
    }
 
 
-cstring = adb + " shell ls /system/xbin/which";
+cstring = getadb() + " shell ls /system/xbin/which";
 command=RunProcess(cstring);
 
 logfile(cstring);
@@ -8917,7 +8878,7 @@ logfile(command);
       return;
   }
 
-  cstring = adb + " shell ls /data/data/com.funkyfresh.samba/files/jocala.txt";
+  cstring = getadb() + " shell ls /data/data/com.funkyfresh.samba/files/jocala.txt";
   command=RunProcess(cstring);
 
   logfile(cstring);
@@ -8954,7 +8915,7 @@ logfile(command);
       mount_system("rw");
 
 
-      cstring = adb + " shell ls /data/data/com.funkyfresh.samba/files/jocala.txt";
+      cstring = getadb() + " shell ls /data/data/com.funkyfresh.samba/files/jocala.txt";
       command=RunProcess(cstring);
 
       logfile(cstring);
@@ -8970,19 +8931,19 @@ logfile(command);
           {
 
 
-            cstring = adb + " shell /system/xbin/samba stop";
+            cstring = getadb() + " shell /system/xbin/samba stop";
             command=RunProcess(cstring);
 
             logfile(cstring);
             logfile(command);
 
-            cstring = adb + " shell su -c rm -r /system/xbin/samba";
+            cstring = getadb() + " shell su -c rm -r /system/xbin/samba";
             command=RunProcess(cstring);
 
             logfile(cstring);
             logfile(command);
 
-            cstring = adb + " shell su -c rm -r /data/data/com.funkyfresh.samba";
+            cstring = getadb() + " shell su -c rm -r /data/data/com.funkyfresh.samba";
             command=RunProcess(cstring);
 
             logfile(cstring);
@@ -9014,13 +8975,23 @@ ui->progressBar->setHidden(true);
 ////////////////////////////////////////////////////
 void MainWindow::on_actionInstallBootmenu_triggered()
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
    if (!is_su())
@@ -9053,7 +9024,7 @@ void MainWindow::on_actionInstallBootmenu_triggered()
 
 
 
- QString cstring = adb + " shell ls /system/boot/";
+ QString cstring = getadb() + " shell ls /system/boot/";
  QString command=RunProcess(cstring);
  bool agree;
 
@@ -9101,7 +9072,7 @@ bytes transferred
 
 
 
-       cstring = adb + " push " + bootmenu + " /sdcard/";
+       cstring = getadb() + " push " + bootmenu + " /sdcard/";
        command=RunProcess(cstring);
 
        if (!command.contains("bytes"))
@@ -9123,13 +9094,13 @@ bytes transferred
 
        mount_system("rw");
 
-       cstring = adb +" shell su -c mkdir -p /system/boot";
+       cstring = getadb() +" shell su -c mkdir -p /system/boot";
        command=RunProcess(cstring);
 
        logfile(cstring);
        logfile(command);
 
-        cstring = adb +" shell su -c dd if=/dev/block/platform/msm_sdcc.1/by-name/boot of=/system/boot/boot.img";
+        cstring = getadb() +" shell su -c dd if=/dev/block/platform/msm_sdcc.1/by-name/boot of=/system/boot/boot.img";
         command=RunProcess(cstring);
 
         logfile(cstring);
@@ -9147,13 +9118,13 @@ bytes transferred
            }
 
 
-        cstring = adb +" shell su -c cp /system/boot/boot.img /system/boot/original.img";
+        cstring = getadb() +" shell su -c cp /system/boot/boot.img /system/boot/original.img";
         command=RunProcess(cstring);
 
         logfile(cstring);
         logfile(command);
 
-        cstring = adb +" shell su -c dd if=/sdcard/bootmenu.img of=/dev/block/platform/msm_sdcc.1/by-name/boot";
+        cstring = getadb() +" shell su -c dd if=/sdcard/bootmenu.img of=/dev/block/platform/msm_sdcc.1/by-name/boot";
         command=RunProcess(cstring);
 
         logfile(cstring);
@@ -9182,7 +9153,7 @@ bytes transferred
     }
 
 
-    cstring = adb +" shell rm /sdcard/bootmenu.img";
+    cstring = getadb() +" shell rm /sdcard/bootmenu.img";
     command=RunProcess(cstring);
 
 
@@ -9192,13 +9163,23 @@ bytes transferred
 //////////////////////////////////////////////////////////
 void MainWindow::on_actionUninstall_Boot_Menu_triggered()
 {
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
    if (!is_su())
@@ -9219,7 +9200,7 @@ void MainWindow::on_actionUninstall_Boot_Menu_triggered()
 
 
 
- QString cstring = adb + " shell ls /system/boot/original.img";
+ QString cstring = getadb() + " shell ls /system/boot/original.img";
  QString command=RunProcess(cstring);
  bool uagree;
 
@@ -9251,7 +9232,7 @@ if (command.contains("No such file or directory"))
            return;
 
 
-       cstring = adb +" shell su -c dd if=/system/boot/original.img  of=/dev/block/platform/msm_sdcc.1/by-name/boot";
+       cstring = getadb() +" shell su -c dd if=/system/boot/original.img  of=/dev/block/platform/msm_sdcc.1/by-name/boot";
        command=RunProcess(cstring);
 
        logfile(cstring);
@@ -9290,13 +9271,23 @@ void MainWindow::external_thumb()
 {
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
     int i =  filepath.indexOf(".");
     QString hidden = filepath.mid(i);
@@ -9320,7 +9311,7 @@ void MainWindow::external_thumb()
     QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
 
 
-    cstring = adb + " shell ls "+mcpath;
+    cstring = getadb() + " shell ls "+mcpath;
 
     command=RunProcess(cstring);
 
@@ -9336,7 +9327,7 @@ void MainWindow::external_thumb()
 
 
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles/Thumbnails";
+    cstring = getadb() +" shell ls /storage/extUsb/mcfiles/Thumbnails";
     command=RunProcess(cstring);
 
     if (command.contains("No such file or directory"))
@@ -9351,7 +9342,7 @@ void MainWindow::external_thumb()
 
 
 
-        cstring = adb +" shell ls "+mvpath+"/Thumbnails";
+        cstring = getadb() +" shell ls "+mvpath+"/Thumbnails";
         command=RunProcess(cstring);
 
         if (!command.contains("No such file or directory"))
@@ -9387,7 +9378,7 @@ rtimer.start();
               QString filename1 = "advancedsettings.xml";
               QString filename2 = adbdir+filename1;
 
-              cstring = adb + " shell ls "+mcpath+"/userdata/"+filename1;
+              cstring = getadb() + " shell ls "+mcpath+"/userdata/"+filename1;
               command=RunProcess(cstring);
 
               logfile(cstring);
@@ -9405,7 +9396,7 @@ rtimer.start();
                         return;
                        } else {
 
-                       cstring = adb + " shell mv "+mcpath+"/userdata/"+filename1+" "+mcpath+"/userdata/"+filename1+".backup";
+                       cstring = getadb() + " shell mv "+mcpath+"/userdata/"+filename1+" "+mcpath+"/userdata/"+filename1+".backup";
                        command=RunProcess(cstring);
                        logfile(cstring);
                        logfile(command);
@@ -9444,7 +9435,7 @@ rtimer.start();
            file.flush();
            file.close();
 
-           cstring = adb + " push "+filename2+ " "+mcpath+"/userdata/"+filename1;
+           cstring = getadb() + " push "+filename2+ " "+mcpath+"/userdata/"+filename1;
            command=RunProcess(cstring);
 
            logfile(cstring);
@@ -9468,20 +9459,20 @@ rtimer.start();
     connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
     timer->start(tsvalue);
 
-    cstring = adb +" shell mkdir -p /storage/extUsb/mcfiles/"+hidden;
+    cstring = getadb() +" shell mkdir -p /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     logfile(cstring);
     logfile(command);
 
-    cstring = adb +" shell cp -R /sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/Thumbnails" + " /storage/extUsb/mcfiles/"+hidden;
+    cstring = getadb() +" shell cp -R /sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/Thumbnails" + " /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
 
     logfile(cstring);
     logfile(command);
 
-   cstring = adb +" shell rm -r /sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/Thumbnails";
+   cstring = getadb() +" shell rm -r /sdcard/Android/data/"+xbmcpackage+filepath+"/userdata/Thumbnails";
    command=RunProcess(cstring);
 
    logfile(cstring);
@@ -9512,13 +9503,23 @@ void MainWindow::internal_thumb()
 {
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
 
 
     int i =  filepath.indexOf(".");
@@ -9534,7 +9535,7 @@ void MainWindow::internal_thumb()
 
 
 
-       cstring = adb +" shell ls /storage/extUsb/mcfiles/Thumbnails";
+       cstring = getadb() +" shell ls /storage/extUsb/mcfiles/Thumbnails";
        command=RunProcess(cstring);
 
        if (command.contains("No such file or directory"))
@@ -9549,7 +9550,7 @@ void MainWindow::internal_thumb()
 
 
 
-           cstring = adb +" shell ls "+mvpath+"/Thumbnails";
+           cstring = getadb() +" shell ls "+mvpath+"/Thumbnails";
            command=RunProcess(cstring);
 
            if (command.contains("No such file or directory"))
@@ -9572,7 +9573,7 @@ void MainWindow::internal_thumb()
 
 
 
-    cstring = adb + " shell ls "+userdatapath;
+    cstring = getadb() + " shell ls "+userdatapath;
 
     command=RunProcess(cstring);
 
@@ -9605,7 +9606,7 @@ rtimer.start();
               QString filename1 = "advancedsettings.xml";
               QString filename2 = adbdir+filename1;
 
-              cstring = adb + " shell ls "+userdatapath+filename1;
+              cstring = getadb() + " shell ls "+userdatapath+filename1;
               command=RunProcess(cstring);
 
               logfile(cstring);
@@ -9617,7 +9618,7 @@ rtimer.start();
 
 
 
-                       cstring = adb + " shell mv "+userdatapath+filename1+" "+userdatapath+"advancedsettings.backup";
+                       cstring = getadb() + " shell mv "+userdatapath+filename1+" "+userdatapath+"advancedsettings.backup";
                        command=RunProcess(cstring);
                        logfile(cstring);
                        logfile(command);
@@ -9634,7 +9635,7 @@ rtimer.start();
     timer->start(tsvalue);
 
 
-    cstring = adb +" shell cp -R "+mvpath+"/Thumbnails "+userdatapath;
+    cstring = getadb() +" shell cp -R "+mvpath+"/Thumbnails "+userdatapath;
     command=RunProcess(cstring);
 
 
@@ -9642,12 +9643,12 @@ rtimer.start();
     logfile(command);
 
 
-    cstring = adb + " shell ls "+userdatapath+"/Thumbnails";
+    cstring = getadb() + " shell ls "+userdatapath+"/Thumbnails";
     command=RunProcess(cstring);
 
     if (!command.contains("No such file or directory"))
      {
-        cstring = adb +" shell rm -r "+mvpath;
+        cstring = getadb() +" shell rm -r "+mvpath;
         command=RunProcess(cstring);
         logfile(cstring);
         logfile(command);
@@ -9681,15 +9682,23 @@ void MainWindow::data_external()
 
 
 
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+
 
     QString cstring;
     QString command;
@@ -9699,7 +9708,7 @@ void MainWindow::data_external()
     QString hidden = filepath.mid(i);
 
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles/"+hidden;
+    cstring = getadb() +" shell ls /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     if (!command.contains("No such file or directory"))
@@ -9738,24 +9747,24 @@ logfile("Moving media center data to external storage");
     connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
     timer->start(tsvalue);
 
-    cstring = adb +" shell mkdir -p /storage/extUsb/mcfiles";
+    cstring = getadb() +" shell mkdir -p /storage/extUsb/mcfiles";
     command=RunProcess(cstring);
 
 
-    cstring = adb +" shell cp -R /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden + " /storage/extUsb/mcfiles";
-    command=RunProcess(cstring);
-
-    logfile(cstring);
-    logfile(command);
-
-
-    cstring = adb + " shell echo xbmc.data=/storage/extUsb/mcfiles > /sdcard/xbmc_env.properties";
+    cstring = getadb() +" shell cp -R /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden + " /storage/extUsb/mcfiles";
     command=RunProcess(cstring);
 
     logfile(cstring);
     logfile(command);
 
-    cstring = adb +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden;
+
+    cstring = getadb() + " shell echo xbmc.data=/storage/extUsb/mcfiles > /sdcard/xbmc_env.properties";
+    command=RunProcess(cstring);
+
+    logfile(cstring);
+    logfile(command);
+
+    cstring = getadb() +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden;
     command=RunProcess(cstring);
 
     logfile(cstring);
@@ -9778,13 +9787,22 @@ logfile("Moving media center data to external storage");
 void MainWindow::data_internal()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
 
 
     QString cstring;
@@ -9794,7 +9812,7 @@ void MainWindow::data_internal()
     QString hidden = filepath.mid(i);
 
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles/"+hidden;
+    cstring = getadb() +" shell ls /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     if (command.contains("No such file or directory"))
@@ -9812,7 +9830,7 @@ void MainWindow::data_internal()
 
        }
 
-    cstring = adb +" shell ls /storage/extUsb/mcfiles/"+hidden;
+    cstring = getadb() +" shell ls /storage/extUsb/mcfiles/"+hidden;
     command=RunProcess(cstring);
 
     if (command.contains("No such file or directory"))
@@ -9832,7 +9850,7 @@ void MainWindow::data_internal()
 
 
 
-    cstring = adb +" shell ls /sdcard/Android/data/"+xbmcpackage+filepath;
+    cstring = getadb() +" shell ls /sdcard/Android/data/"+xbmcpackage+filepath;
     command=RunProcess(cstring);
 
     if (!command.contains("No such file or directory"))
@@ -9870,31 +9888,31 @@ logfile("Moving media center data to internal storage");
        connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
        timer->start(tsvalue);
 
-       cstring = adb +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden;
+       cstring = getadb() +" shell rm -r /sdcard/Android/data/"+xbmcpackage+"/files/"+hidden;
        command=RunProcess(cstring);
 
        logfile(cstring);
        logfile(command);
 
-       cstring = adb +" shell cp -R /storage/extUsb/mcfiles/"+hidden + " /sdcard/Android/data/"+xbmcpackage+"/files/";
+       cstring = getadb() +" shell cp -R /storage/extUsb/mcfiles/"+hidden + " /sdcard/Android/data/"+xbmcpackage+"/files/";
        command=RunProcess(cstring);
 
        logfile(cstring);
        logfile(command);
 
-       cstring = adb +" shell ls /sdcard/Android/data/"+xbmcpackage+filepath;
+       cstring = getadb() +" shell ls /sdcard/Android/data/"+xbmcpackage+filepath;
        command=RunProcess(cstring);
 
        if (!command.contains("No such file or directory"))
          {
 
 
-           cstring = adb + " shell rm /sdcard/xbmc_env.properties";
+           cstring = getadb() + " shell rm /sdcard/xbmc_env.properties";
            command=RunProcess(cstring);
            logfile(cstring);
            logfile(command);
 
-           cstring = adb +" shell rm -r /storage/extUsb/mcfiles/"+hidden;
+           cstring = getadb() +" shell rm -r /storage/extUsb/mcfiles/"+hidden;
            command=RunProcess(cstring);
            logfile(cstring);
            logfile(command);
@@ -9902,7 +9920,7 @@ logfile("Moving media center data to internal storage");
 
 
 
-           QString cstring = adb + " shell ls -a /storage/extUsb/mcfiles/";
+           QString cstring = getadb() + " shell ls -a /storage/extUsb/mcfiles/";
            QString command=RunProcess(cstring);
 
            if (command.contains("."))
@@ -9914,7 +9932,7 @@ logfile("Moving media center data to internal storage");
 
          else {
 
-               QString cstring = adb + " shell rm -r /storage/extUsb/mcfiles/";
+               QString cstring = getadb() + " shell rm -r /storage/extUsb/mcfiles/";
                QString command=RunProcess(cstring);
                logfile(cstring);
                logfile(command);
@@ -9944,17 +9962,27 @@ logfile("Moving media center data to internal storage");
 void MainWindow::on_actionMove_Restore_Data_triggered()
 {
 
-    if (!isConnected)
-       { QMessageBox::critical(
-             this,
-             tr("adbFire"),
-             tr("Device not connected"));
-          return;
-    }
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
 
 
 
-    QString cstring = adb + " shell ps | grep "+xbmcpackage;
+
+
+
+    QString cstring = getadb() + " shell ps | grep "+xbmcpackage;
     QString command=RunProcess(cstring);
 
 
@@ -10004,122 +10032,1221 @@ void MainWindow::on_actionMove_Restore_Data_triggered()
 
 }
 
+
+////////////////////////////////////////////
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+}
+
+
+void MainWindow::on_fdellButton_2_clicked()
+{
+    ui->customdir->setText("");
+}
+
+///////////////////////////////////////////////////
+void MainWindow::on_actionSplash_Screen_triggered()
+{
+    QString lookup=daddr;
+
+     if(!isusb)
+      lookup=lookup+":"+port;
+
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+
+
+
+    is_package(xbmcpackage);
+
+   if (!is_packageInstalled)
+      { QMessageBox::critical(
+            this,
+            "",
+            xbmcpackage+" not installed");
+         return;
+   }
+
+   QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/media/";
+
+   QString cstring = getadb() + " shell ls "+mcpath;
+
+   QString command=RunProcess(cstring);
+
+   if (command.contains("No such file or directory"))
+    {
+
+      mcpath = "/storage/extUsb/"+filepath+"/media/";
+      mcpath.replace(QString("file"), QString("mcfile"));
+   }
+
+
+
+   cstring = getadb() + " shell ls "+mcpath;
+
+   command=RunProcess(cstring);
+
+   if (command.contains("No such file or directory"))
+    {
+       QMessageBox::critical(
+                   this,
+                  "",
+                   "Destination path missing");
+                   return;
+   }
+
+
+
+QElapsedTimer rtimer;
+int nMilliseconds;
+rtimer.start();
+
+
+
+ QString fileName = QFileDialog::getOpenFileName(this,
+ "Choose splash screen file", splashdir, tr("Files (*.png)"));
+
+ if (!fileName.isEmpty() )
+ {
+
+
+
+
+     QMessageBox::StandardButton reply;
+       reply = QMessageBox::question(this, "Push", fileName+" selected. Continue?",
+           QMessageBox::Yes|QMessageBox::No);
+       if (reply == QMessageBox::Yes) {
+
+
+           cstring = getadb() + " push "+'"'+fileName+'"'+ " "+mcpath+"/splash.png";
+
+           command=RunProcess(cstring);
+
+           logfile(cstring);
+           logfile(command);
+
+           nMilliseconds = rtimer.elapsed();
+           logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+
+           if (command.contains("bytes"))
+
+
+           {
+
+               QMessageBox::information(
+                           this,
+                          "",
+                          "Splash screen installed." );
+           }
+               else
+
+           {
+
+               QMessageBox::critical(
+                           this,
+                           "",
+                        "Splash screen installation failed.");}
+
+
+   }
+
+}
+
+}
+
 ////////////////////////////////////////
-void MainWindow::on_usbmode_clicked()
+
+void MainWindow::on_doConsole_clicked()
 {
 
-    if (ui->override->isChecked() )
-      {
+    // set PATH=%PATH%;C:\xampp\php
 
-          QMessageBox::critical(
-               this,
-               tr("adbFire"),
-               tr("Inactive in Console Mode"));
+    logfile("detaching console process");
 
-          ui->usbmode->setChecked(false);
-          return;
-      }
+     QString cstring = "";
 
 
+     if (os == 1)
 
-    QString msg;
-
-      if (ui->usbmode->isChecked() )
         {
 
-          QString cstring = adb + " disconnect "+daddr+port ;
-          QString command=RunProcess(cstring);
+        QString commstr = adbdir+"cpath.bat";
+        QFile file(commstr);
 
-          logfile(cstring);
-          logfile(command);
+            if(!file.open(QFile::WriteOnly |
+                          QFile::Text))
+            {
+                logfile("error creating cpath.bat!");
+                QMessageBox::critical(this,"","Error creating bat file!");
+                return;
+            }
 
-          kill_server();
-          start_server();
 
-          QString isdevice=list_devices();
-//zzz
-         if(isdevice=="device")
-          {
-             isConnected=true;
-             ui->device_connected->setText(devstr3);
-             ui->update_status->setText(amazon_update2);
-             getpackage();
 
-             if (!is_su())
-                {
-                 busybox_nonroot();
-                 busypath="/data/local/tmp/";
-                 }
+            QTextStream out(&file);
+            out  << "set PATH=%PATH%;"+QDir::currentPath()+";"<< endl;
 
-              else
-             {
-                 busypath="/system/xbin/";
-             }
 
+
+            file.flush();
+            file.close();
+
+            cstring = "cmd /k " +QDir::currentPath()+"/cpath.bat";
+            QProcess::startDetached(cstring);
+
+
+
+     }
+
+     QString pathdir = QCoreApplication::applicationDirPath() +"/adbfiles";
+
+       if (os == 2 || os == 0)
+         {
+
+           QString commstr = adbdir+"cpath.sh";
+
+
+           QFile file(commstr);
+
+               if(!file.open(QFile::WriteOnly |
+                             QFile::Text))
+               {
+                   logfile("error creating cpath!");
+                   QMessageBox::critical(this,"","Error creating sh file!");
+                   return;
+               }
+
+
+
+               QTextStream out(&file);
+                out  << "#!/bin/sh" << endl;
+                out  << "export PATH="+pathdir+":$PATH" << endl;
+                out  << "/bin/sh" << endl;
+
+               file.flush();
+               file.close();
+
+
+               cstring = "chmod 0755 " + commstr ;
+               QString command=RunProcess(cstring);
+
+
+
+       }
+
+
+       if (os == 2)
+        {
+       QString cstring = "open -a Terminal.app "+adbdir+"cpath.sh";
+       logfile(cstring);
+       QProcess::startDetached(cstring);
+        }
+
+
+
+
+       if (os == 0)
+        {
+           // cstring = "x-terminal-emulator --working-directory="+adbdir+"/adbfiles";
+            cstring = "gnome-terminal --working-directory="+adbdir;
+           QProcess::startDetached(cstring);
+
+         }
 
 
 }
 
-         else  // connection failed
-            {
-              isConnected=false;
-              ui->device_connected->setText(devstr2);
-              ui->update_status->setText(amazon_update2);
-              ui->usbmode->setChecked(false);
 
-              QMessageBox::critical(0, "","Device not found.",QMessageBox::Cancel);
+////////////////////////////////////////
+
+void MainWindow::on_killServer_clicked()
+{
+    QElapsedTimer rtimer;
+    int nMilliseconds;
+    rtimer.start();
+
+
+    QString cstring = adb + "  disconnect "+daddr+":"+port ;
+    QString command=RunProcess(cstring);
+
+    isConnected=false;
+
+    //ui->device_connected->setText(devstr2);
+     ui->update_status->setText("");
+
+    kill_server();
+
+    if (serverRunning)
+      ui->server_running->setText(adbstr1);
+    else
+     ui->server_running->setText(adbstr2);
+
+  ui->listDevices->clear();
+  ui->listDevicesStatus->clear();
+
+    nMilliseconds = rtimer.elapsed();
+    logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
+}
+
+
+
+///////////////////////////////////////////////////
+void MainWindow::on_refreshConnectedDevices_clicked()
+{
+    int i;
+    QString isdevice;
+    QString usbid;
+    QString cstring = "";
+    QString command = "";
+    QString litem;
+
+      // cstring = getadb() + " kill-server";
+      // command=RunProcess(cstring);
+
+     ui->listDevices->clear();
+     ui->listDevicesStatus->clear();
+
+     cstring = adb + " devices";
+     command=RunProcess(cstring);
+
+    // * daemon not running. starting it now on port 5037 *
+    // * daemon started successfully *
+
+        if (command.contains("device"))
+           {
+              //logfile("device(s) found");
+              //logfile(command);
+
+              serverRunning=true;
+              ui->server_running->setText(adbstr1);
+
+
+
+              QFile file21(adbdir+"temp.txt");
+
+                if(!file21.open(QFile::WriteOnly))
+                  {
+                     QMessageBox::critical(0, "","Error creating daddr file!\n",QMessageBox::Cancel);
+                      logfile(cstring);
+                      logfile(command);
+                      logfile("error creating "+adbdir+ "device file");
+                      return;
+                  }
+
+                QTextStream out1(&file21);
+                out1  << command << endl;
+
+                file21.flush();
+                file21.close();
+
+
+
+                QString tmpstr2 = adbdir+"temp.txt";
+                QString fline2;
+
+                   QFile file32(tmpstr2);
+                     if (!file32.open(QIODevice::ReadOnly | QIODevice::Text))
+                       {QMessageBox::critical(0,"","Error reading file!");
+                          return; }
+
+                     QTextStream in1(&file32);
+                      while (!in1.atEnd())
+                       {
+
+                        fline2 = in1.readLine();
+
+                          if (!fline2.isEmpty()  &&  (!fline2.contains("List of devices") &&
+                                 (!fline2.contains("* daemon"))))
+
+                           {
+
+
+                              i =  fline2.indexOf("\t");
+
+                              usbid =fline2.mid(0,i);
+                              isdevice = fline2.mid(i+1);
+
+
+
+                              logfile(usbid);
+                              logfile(isdevice) ;
+
+                         /*
+                              if (isdevice.contains("device"))
+                                      {  logfile("install busybox "+isdevice );
+                                        daddr=usbid;
+                                        isusb=true;
+                                        busybox_nonroot();
+
+                              }
+*/
+
+
+                              litem = litem+isdevice;
+                              ui->listDevices->addItem(usbid);
+                               ui->listDevicesStatus->addItem(isdevice);
+                          }
+
+                      }
+
+            file32.close();
+
+
+            QFile::remove(tmpstr2);
+
+        }
+
+
+        delay(3);
+
+}
+
+
+
+///////////////////////////////////////////////
+void MainWindow::on_listDevices_doubleClicked()
+    {
+
+
+    // check for port, bail if so.
+    QString checktype = ui->listDevices->currentItem()->text();
+      if (checktype.contains(":"))
+        {  QMessageBox::critical(
+                      this,
+                     "",
+                      "Not a USB device!");
+            return;
+      }
+
+
+
+    QMessageBox::StandardButton reply;
+      reply = QMessageBox::question(0, "", "Create new record with this ID?",
+          QMessageBox::Yes|QMessageBox::No);
+
+      if (reply == QMessageBox::No)
+        return;
+
+
+
+        blank_entry_form();
+        isusb=true;
+       daddr = ui->listDevices->currentItem()->text();
+       dataentry(1);
+       loaddevicebox();
+     }
+
+//////////////////////////////////////////
+void MainWindow::on_newRecord_clicked()
+{
+
+  logfile("go to dataentry -- new record");
+
+  blank_entry_form();
+  dataentry(1);
+  loaddevicebox();
+
+}
+
+
+//////////////////////////////////////////////////
+void MainWindow::dataentry(int flag)
+{
+
+// flag = 0 edit record
+// flag = 1 new record
+
+  deviceboxindex = ui->deviceBox->currentIndex();
+
+logfile("opening preferences dialog");
+
+    QString cstring;
+    QString command;
+    QString oldpass;
+    QString olddaddr;
+    QString olddescription;
+
+
+    QString recnum  = QString::number(ui->deviceBox->currentIndex());
+
+
+    oldpass = sshpassword;
+    olddaddr = daddr;
+    sshcheck = false;
+    mountcheck = false;
+    updatecheck = true;
+    olddescription=description;
+
+    bool sshstate;
+    bool updatestate;
+    bool mountstate;
+
+
+  if (is_su() && isConnected)
+   {
+
+       // check mount status set toggle value
+        cstring = getadb() + " shell ls /system/etc/init.d/02mntdrives";
+        command=RunProcess(cstring);
+
+
+
+     if (command.contains("No such file or directory"))
+         mountcheck = false;
+      else
+      mountcheck = true;
+  }
+
+  else mountcheck = false;
+
+   mountstate = mountcheck;
+
+
+   if (is_su() && isConnected)
+    {
+
+
+
+
+        // check ssh boot status set toggle value
+         cstring = getadb() + " shell ls /system/etc/init.d/03sshd";
+         command=RunProcess(cstring);
+
+
+
+      if (command.contains("No such file or directory"))
+          sshcheck = false;
+       else
+       sshcheck = true;
+   }
+
+   else sshcheck = false;
+
+    sshstate = sshcheck;
+
+       check_update_status();
+       updatestate = updatecheck;
+
+   // QMessageBox::critical(this,"",filepath);
+
+    // bool currentupdate = updatecheck;
+
+    preferencesDialog dialog;
+
+    dialog.setPackagename(xbmcpackage);
+    dialog.setPulldir(pulldir);
+
+    dialog.setftvUpdate(updatecheck);
+    dialog.setsshBoot(sshcheck);
+    dialog.setmountBoot(mountcheck);
+
+    dialog.setversioncheck(versioncheck);
+    dialog.setversionLabel(version);
+
+    dialog.setbuffermode(buffermode);
+    dialog.setbuffersize(buffersize);
+    dialog.setbufferfactor(bufferfactor);
+    dialog.setdescription(description);
+    dialog.setfilepath(filepath);
+
+    if (isusb)
+        dialog.setport("");
+      else
+        dialog.setport(port);
+
+    dialog.setdaddr(daddr);
+
+
+    dialog.setisusb(isusb);
+    dialog.setrecnum(recnum);  //hidden on form
+    dialog.setModal(true);
+
+
+    if(dialog.exec() == QDialog::Accepted)
+    {
+
+
+
+    int x = dialog.returnval1();
+
+//    QString s  = QString::number(x);
+//    QMessageBox::critical(this,"",s);
+
+    xbmcpackage = dialog.xbmcpackageName();
+    pulldir = dialog.pulldir();
+
+    updatecheck = dialog.updatecheck();
+    sshcheck = dialog.sshcheck();
+    mountcheck = dialog.mountcheck();
+
+    versioncheck = dialog.versioncheck();
+    buffermode = dialog.buffermode();
+    buffersize = dialog.buffersize();
+    bufferfactor = dialog.bufferfactor();
+    description = dialog.description();
+    filepath = dialog.filepath();
+    port = dialog.port();
+
+    daddr = dialog.daddr();
+
+    isusb = dialog.isusb();
+
+
+    if (versioncheck)
+        checkversion = 1;
+    else
+        checkversion = 0;
+
+    if (x == 1 && flag == 1)
+    {logfile("go insert a record");
+      insertDevice();
+    }
+
+    if (x == 1 && flag == 0)
+           {
+             logfile("Saving Device Record");
+              updateDevice(olddescription);
+
+           }  // end x1
+
+
+
+
+    if (x == 2)
+          {
+
+          if (!isConnected)
+              return;
+
+           logfile("write advancedsettings.xml");
+
+              QString str1;
+              str1.setNum(buffermode-1);
+
+              QString xpath = "";
+              QString hidden;
+              QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
+
+              QString filename1 = "advancedsettings.xml";
+              QString filename2 = adbdir+filename1;
+
+
+
+             cstring = getadb() + " shell ls "+mcpath;
+             command=RunProcess(cstring);
+
+                     if (command.contains("No such file or directory"))
+                      {
+
+                        mcpath = "/storage/extUsb/"+filepath;
+                        mcpath.replace(QString("file"), QString("mcfile"));
+                     }
+
+
+
+                     cstring = getadb() + " shell ls "+mcpath;
+
+                     command=RunProcess(cstring);
+
+                     if (command.contains("No such file or directory"))
+                      {
+                         QMessageBox::critical(
+                                     this,
+                                    "",
+                                     "Destination path missing");
+                                     return;
+                     }
+
+                 xpath = mcpath+"/userdata/";
+
+                     cstring = getadb() + " shell ls "+xpath+filename1;
+                     command=RunProcess(cstring);
+
+                     logfile(cstring);
+                     logfile(command);
+
+                      if (!command.contains("No such file or directory"))
+                         {
+                          logfile("advancedsettings.xml exists");
+
+                          QMessageBox::StandardButton reply;
+                           reply = QMessageBox::question(this, "XML", "advancedsettings.xml exists. Overwrite?\n(will backup original)",
+                                                         QMessageBox::Yes|QMessageBox::No);
+                           if (reply == QMessageBox::No) {
+                               logfile("abort xml write");
+                               return;
+                              } else {
+                              logfile("continue xml write");
+                              logfile("backup advancedsettings.xml");
+                              cstring = getadb() + " shell cp "+xpath+filename1+" "+xpath+filename1+".old";
+                              command=RunProcess(cstring);
+                              }
+                          }  // end if exists
+
+
+
+          QString line1 ="<advancedsettings>";
+          QString line2 ="  <network>";
+          QString line3 ="    <buffermode>"+str1+"</buffermode>";
+          QString line4 ="    <cachemembuffersize>"+buffersize+"</cachemembuffersize>";
+          QString line5 ="    <readbufferfactor>"+bufferfactor+"</readbufferfactor>";
+          QString line6 ="  </network>";
+          QString line7 ="</advancedsettings>";
+
+          QFile file(filename2);
+
+
+          if(!file.open(QFile::WriteOnly))
+                {
+                  logfile("error creating advancedsettings.xml.");
+                  QMessageBox::critical(this,"","Unknown error creating xml file!");
+                   return;
+                 }
+
+                  QTextStream out(&file);
+
+                  out  << line1 << endl;
+                  out  << line2 << endl;
+                  out  << line3 << endl;
+                  out  << line4 << endl;
+                  out  << line5 << endl;
+                  out  << line6 << endl;
+                  out  << line7 << endl;
+
+                  file.flush();
+                  file.close();
+
+                  cstring = getadb() + " push "+filename2+ " "+xpath+filename1;
+                  command=RunProcess(cstring);
+
+                   if (!command.contains("bytes"))
+                      {
+                        logfile(cstring);
+                        logfile(command);
+                        logfile("error pushing xml script to device!");
+                        QMessageBox::critical(this,"","Error pushing xml from PC to device!");
+                        return;
+                      }
+                    else {
+                       QMessageBox::information(this,"","advancedsettings.xml written");
+                   }
+
+
+
+           }  //end x2
+
+
+
+    if (is_su() && isConnected )  // superuser block
+    {
+
+      if (updatestate != updatecheck)
+       {
+
+         logfile("Amazon update state toggled");
+
+
+         if (updatecheck)  // turn updates on
+                    {
+
+                      if (amazon_updates("enable"))
+                        {
+                          logfile("Amazon updates on, com.amazon.dcp enabled");
+                          cstring = getadb() + " shell pm list packages -d";
+                          command=RunProcess(cstring);
+
+                          logfile(cstring);
+                          logfile(command);
+
+
+                          if (!command.contains("package:com.amazon.dcp"))
+                            {
+                              ui->update_status->setText(amazon_update1);
+
+                            }
+
+                          else { QMessageBox::critical(this,"","Problem: com.amazon.dcp not enabled!");
+                                  logfile("Problem: com.amazon.dcp not enabled!");
+                                  ui->update_status->setText(amazon_update0);
+                               }
+
+                        }  //  if (amazon_updates("enable"))
+
+
+
+             }  // if (updatecheck)
+
+
+         if (!updatecheck)  // turn updates off
+              {
+
+                if (amazon_updates("disable"))
+                              {
+                               logfile("Amazon updates off, com.amazon.dcp disabled");
+                               cstring = getadb() + " shell pm list packages -d";
+                               command=RunProcess(cstring);
+
+                               logfile(cstring);
+                               logfile(command);
+
+                               if (command.contains("package:com.amazon.dcp"))
+                               ui->update_status->setText(amazon_update0);
+
+                           }
+                         else
+                            { QMessageBox::critical(this,"","Problem: com.amazon.dcp not disabled!");
+                               logfile("Problem: com.amazon.dcp not disabled!");
+                               ui->update_status->setText(amazon_update1);
+                             }
+
+             }
          }
 
 
-      }
 
-      else  // unchecked
-         {
-           isConnected=false;
-           ui->device_connected->setText(devstr2);
-           ui->update_status->setText(amazon_update2);
-          }
+      if (sshcheck != sshstate)
+      {
+
+          logfile("SSH at boot toggled");
+
+           if (!is_busybox())
+           {
+               QMessageBox::critical(this,"","System Tools required for ssh");
+               logfile("System Tools required for ssh");
+               return;
+           }
+
+         if (!sshcheck )    // rm ssh at boot
+                 {
+
+                       mount_system("rw");
+                       cstring = getadb() + " shell su -c rm /system/etc/init.d/03sshd";
+                       command=RunProcess(cstring);
+
+                      logfile(cstring);
+                      logfile(command);
+
+                      if (command.isEmpty())
+                          logfile("/system/etc/init.d/03sshd deleted");
+                      else
+                          logfile("/system/etc/init.d/03sshd not deleted");
+
+                 }  // end rm ssh at boot
+
+
+         if (sshcheck )  // start ssh at boot
+               {
+
+                  logfile("write 03sshd");
+                  QString hashbang = "#!/system/bin/sh";
+                  QString filename = adbdir+"03sshd";
+                  QString makepst = "/system/xbin/sshstart";
+
+
+                  QFile file(filename);
+
+                  if(!file.open(QFile::WriteOnly))
+                        {
+                          logfile(cstring);
+                          logfile(command);
+                          logfile("error creating 03sshd file.");
+                          QMessageBox::critical(this,"","Error creating 03sshd file!");
+                          return;
+                       }
+
+
+                      QTextStream out(&file);
+                      out  << hashbang + "\n";
+                      out  << makepst + "\n";
+
+                      file.flush();
+                      file.close();
+
+                      mount_system("rw");
+
+                       cstring = getadb() + " push " +filename+ " /sdcard/";
+                       command=RunProcess(cstring);
+
+                       if (!command.contains("bytes"))
+                            {
+                              logfile(cstring);
+                              logfile(command);
+                              logfile("error pushing shell script to device!");
+                               QMessageBox::critical(this,"","Error pushing file frpm PC to device!");
+                               mount_system("ro");
+                               return;
+                             }
+
+                       cstring = getadb() + " shell cp /sdcard/03sshd /system/etc/init.d/";
+                       command=RunProcess(cstring);
+
+                      if (!command.isEmpty())
+                           {
+                             logfile(cstring);
+                             logfile(command);
+                             logfile("file copy error, sdcard to /system/etc/init.d");
+                             QMessageBox::critical(this,"","Error: cp /sdcard/03sshd /system/etc/init.d failed");
+                              mount_system("ro");
+                              return;
+                            }
+
+
+                      logfile(cstring);
+                      logfile(command);
+
+                      cstring = getadb() + " shell su -c chmod 0755 " + " /system/etc/init.d/03sshd";
+                      command=RunProcess(cstring);
+
+                      if (!command.isEmpty())
+                        {
+                          logfile(cstring);
+                          logfile(command);
+                          logfile("chmod error, system/etc/init.d/03sshd");
+                           QMessageBox::critical(this,"","Error: chmod of /system/etc/init.d/03sshd failed");
+                           mount_system("ro");
+                           return;
+                         }
+
+
+                      logfile(cstring);
+                      logfile(command);
+
+                      cstring = getadb() + " shell rm " + " /sdcard/03sshd";
+                     command=RunProcess(cstring);
+
+                      if (!command.isEmpty())
+                           {
+                          logfile(cstring);
+                          logfile(command);
+                          logfile("error: rm /sdcard/03sshd");
+                            }
+
+
+                      cstring = getadb() + " shell ls /system/etc/init.d/03sshd";
+                      command=RunProcess(cstring);
+
+                      if (!command.contains("/system/etc/init.d/03sshd"))
+                           {
+                             logfile(cstring);
+                             logfile(command);
+                             logfile("Error: /etc/init.d/03sshd not created. SSH is not persistent");
+                             QMessageBox::critical(this,"","Error: /etc/init.d/03sshd not created.SSH is not persistent");
+                            }
+
+                       else
+                            {
+
+                              logfile(cstring);
+                              logfile(command);
+                              logfile("SSH is now persistent");
+                             }
+
+                     mount_system("ro");
+                     QFile::remove(filename);
+
+            } // ssh at boot
+        }
+
+
+      if (mountcheck != mountstate)
+          {
+             logfile("Mount at boot toggled");
+
+             if (!is_busybox())
+             {
+                 QMessageBox::critical(this,"","System Tools required for USB mount.");
+                 logfile("System Tools required for USB mount.");
+                 return;
+             }
+
+             if (!mountcheck )
+                     {
+                      logfile ("Remove init.d/02mntdrives");
+
+                      //
+
+                      mount_system("rw");
+
+                      cstring = getadb() + " shell ls /system/etc/init.d/04mntshares";
+                      command=RunProcess(cstring);
+
+                      if (command.contains("No such file or directory"))
+                           {
+                              cstring = getadb() + " shell su -c rm /system/etc/init.d/01sleep";
+                              command=RunProcess(cstring);
+                            }
 
 
 
+                             cstring = getadb() + " shell su -c rm /system/etc/init.d/02mntdrives";
+                             command=RunProcess(cstring);
+
+                             mount_system("ro");
+
+                             logfile(cstring);
+                             logfile(command);
+
+                             mount_system("ro");
+
+                             logfile(cstring);
+                             logfile(command);
+                             logfile("USB drive is not persistent");
+
+
+             }  // rm mount at boot
+
+
+
+
+             if (mountcheck )  // start mount at boot
+                   {
+                     logfile ("Create init.d/02mntdrives");
+
+
+                     mount_system("rw");
+
+
+                             cstring = getadb() + " shell su -c cp " + " /system/xbin/01sleep /system/etc/init.d";
+                             command=RunProcess(cstring);
+
+                             if (!command.isEmpty())
+                                  {
+                                    logfile(cstring);
+                                    logfile(command);
+                                    logfile("file copy error, xbin to system/etc");
+                                     mount_system("ro");
+                                     return;
+                                   }
+
+                             cstring = getadb() + " shell su -c cp " + " /system/xbin/02mntdrives /system/etc/init.d";
+                             command=RunProcess(cstring);
+
+                             if (!command.isEmpty())
+                                  {
+                                    logfile(cstring);
+                                    logfile(command);
+                                    logfile("file copy error, xbin to system/etc");
+                                     mount_system("ro");
+                                     return;
+                                   }
+
+
+                   } // mount at boot
+            }
+
+
+    }  //  end superuser block
+
+
+
+  }  //end accepted
+
+
+} // end dataentry
+
+////////////////////////////////////////
+void MainWindow::on_delRecord_clicked()
+{
+
+    description = ui->deviceBox->currentText();
+
+    if (!description.isEmpty())
+     {
+
+    QString descrip = description;
+
+    QMessageBox::StandardButton reply;
+     reply = QMessageBox::question(0, "", " Delete "+descrip+"?",
+             QMessageBox::Yes|QMessageBox::No);
+       if (reply == QMessageBox::No)
+        {
+          return;
+         }
+
+       deleteRecord(descrip);
+       loaddevicebox();
+
+
+       logfile(descrip+ " is deleted");
+  }
 }
 
 ///////////////////////////////////////
-void MainWindow::on_override_clicked()
+
+void MainWindow::on_logButton_clicked()
+{
+    on_actionView_Log_triggered();
+}
+
+//////////////////////////////////////////////////
+void MainWindow::on_actionRoot_device_triggered()
 {
 
-    if (ui->usbmode->isChecked() )
-      {
+    QString lookup=daddr;
 
-          QMessageBox::critical(
-               this,
-               tr("adbFire"),
-               tr("Inactive in USB Mode"));
+     if(!isusb)
+      lookup=lookup+":"+port;
 
-          ui->override->setChecked(false);
-          return;
-      }
+    isConnected=find_daddr(lookup);
+
+    if (!isConnected && !isusb)
+          on_connButton_clicked();
+
+     if (!isConnected)
+           { QMessageBox::critical(0,"",devstr2);
+              return;
+           }
+
+     if (!is_amazon())
+           { QMessageBox::critical(0,"","Not an Amazon Device");
+              return;
+           }
 
 
-    QString msg;
-
-      if (ui->override->isChecked() )
+    QMessageBox::StandardButton reply;
+     reply = QMessageBox::question(0, "", "This a depreciated feature since firmware 51.1.3.0 and above can't be rooted at this time. Additionally, the Stick has never been rooted. Continue?",
+             QMessageBox::Yes|QMessageBox::No);
+       if (reply == QMessageBox::No)
         {
-          isConnected=true;
-          ui->device_connected->setText(devstr4);
-          ui->update_status->setText(amazon_update2);
-          getpackage();
-        }
-
-      else
-
-         {
-           isConnected=false;
-           ui->device_connected->setText(devstr2);
-           ui->update_status->setText(amazon_update2);
+           return;
          }
 
 
 
+
+    QString rootfile1 = adbdir+"tr.apk";
+    QString rootfile2 = adbdir+"su.apk";
+
+    bool file1 = false;
+    bool file2 = false;
+
+
+
+                       QElapsedTimer rtimer;
+                       int nMilliseconds;
+                       rtimer.start();
+
+
+
+                       QFile Fout1(rootfile1);
+
+                       if(!Fout1.exists())
+                       {
+
+                           QMessageBox::critical(
+                              this,
+                              tr("adbFire"),
+                              rootfile1+" not found.");
+                              logfile(rootfile1+" not found.");
+
+                              return;
+                       }
+
+
+                       QFile Fout2(rootfile2);
+
+                       if(!Fout2.exists())
+                       {
+
+                           QMessageBox::critical(
+                              this,
+                              tr("adbFire"),
+                              rootfile2+" not found.");
+                              logfile(rootfile2+" not found.");
+                              return;
+                       }
+
+                             ui->progressBar->setHidden(false);
+                             ui->progressBar->setValue(0);
+
+                             QTimer *timer = new QTimer(this);
+                             connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
+                             timer->start(tsvalue);
+
+                             QString cstring = getadb() + " install -r "+rootfile1;
+
+                           QString command=RunProcess(cstring);
+
+                             if (!command.contains("Success"))
+                                {
+                                 logfile(cstring);
+                                 logfile(command);
+                                 QMessageBox::information(
+                                             this,
+                                             "",
+                                             "tr.apk install failed");
+                                  ui->progressBar->setHidden(true);
+                                  return;
+                                }
+
+                             else
+                                 file1 = true;
+
+                             logfile(cstring);
+                             logfile(command);
+
+                             cstring = getadb() + " install -r "+rootfile2;
+
+                             command=RunProcess(cstring);
+
+                                    ui->progressBar->setHidden(true);
+
+                                    if (!command.contains("Success"))
+                                       {
+                                        logfile(cstring);
+                                        logfile(command);
+                                        QMessageBox::information(
+                                                    this,
+                                                    "",
+                                                    "su.apk install failed");
+
+                                       }
+                                    else
+                                   file2 = true;
+
+                                    logfile(cstring);
+                                    logfile(command);
+
+if (file1 && file2)
+{
+
+ QMessageBox::information( this,"","Root software installed.\nRun towelroot on the FireTV\n to finish rooting process.");
+ logfile("Root software installed.\nRun towelroot on the FireTV\n to finish rooting process.");
+
+ nMilliseconds = rtimer.elapsed();
+ logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
+
+
 }
+
+}
+
 

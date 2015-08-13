@@ -4,3 +4,7 @@ adbfire.log.old
 adbfire.db
 *.autosave
 *~
+build
+.qmake.stash
+adbfiles/xbin/
+Makefile

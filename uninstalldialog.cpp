@@ -20,8 +20,12 @@ QString tmpdir;
 QString tmpstr;
 QString commstr;
 QString cstr;
+QString argument;
 QString adb2;
 QString fline;
+
+
+
 
 QString uninstallDialog::packageName() {
 
@@ -35,12 +39,22 @@ bool uninstallDialog::keepBox() {
    return ui->keepBox->isChecked();
 }
 
-uninstallDialog::uninstallDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::uninstallDialog)
+
+void uninstallDialog::setdescription(const QString &description)
 {
+    ui->description->setText(description);
+}
 
 
+
+uninstallDialog::uninstallDialog(const QString &port, const QString &daddr,QWidget *parent) :
+   QDialog(parent),m_port(port),m_daddr(daddr),
+    ui(new Ui::uninstallDialog)
+
+
+
+
+{
 
 
 
@@ -48,7 +62,6 @@ uninstallDialog::uninstallDialog(QWidget *parent) :
        {
         tmpdir = "./";
          adb2 = tmpdir+"adb.exe";
-
        }
 
 
@@ -63,17 +76,27 @@ uninstallDialog::uninstallDialog(QWidget *parent) :
        {
          tmpdir = QCoreApplication::applicationDirPath();
          tmpdir = tmpdir+"/adbfiles/";
-        adb2 = tmpdir+"adb.linux";
+         adb2 = tmpdir+"adb.linux";
        }
 
 
     ui->setupUi(this);
 
 tmpstr = tmpdir+"tempfl";
-
+QString c1;
    QProcess packages;
    packages.setProcessChannelMode(QProcess::MergedChannels);
-   cstr = adb2 + " shell pm list packages";
+
+   if (m_port.isEmpty())
+   argument = " -s "+m_daddr+ " shell pm list packages";
+   else
+   argument = " -s "+m_daddr+":"+m_port+" shell pm list packages";
+
+    cstr = adb2 + argument;
+
+
+   // QMessageBox::critical(0, "",cstr,QMessageBox::Cancel);
+
    packages.start(cstr);
    packages.waitForFinished(-1);
    commstr=packages.readAll();
@@ -116,14 +139,8 @@ tmpstr = tmpdir+"tempfl";
             fline.remove(0,8);
 
 
-            if (!fline.startsWith("com.amazon") &&
-                !fline.startsWith("com.android") &&
-                !fline.startsWith("org.chromium.content") &&
-                !fline.startsWith("com.qualcomm") &&
-                !fline.startsWith("android"))
-                  {
                      ui->unlistWidget->addItem(fline);
-                  }
+
            }
 
         }

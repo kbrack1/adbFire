@@ -20,14 +20,18 @@ public:
 
       void setPackagename(const QString &packagename);
       void setPulldir(const QString &pulldir);
-      void setftvUpdate(const bool &updatecheck);  
+      void setftvUpdate(const bool &updatecheck);
       void setsshBoot(const bool &sshcheck);
       void setmountBoot(const bool &mountcheck);
+
       void setversioncheck(const bool &versioncheck);
+      void setisusb(const bool &isusb);
+
       void setversionLabel(const QString &versiontext);
       void setdaddr(const QString &daddr);
       void setdescription(const QString &description);
       void setfilepath(const QString &filepath);
+      void setport(const QString &port);
       void setbuffermode(const int &buffermode);
       void setbuffersize(const QString &buffersize);
       void setbufferfactor(const QString &bufferfactor);
@@ -44,10 +48,13 @@ public:
    QString daddr();
    QString description();
    QString filepath();
-   bool updatecheck();
-   bool sshcheck();
-   bool mountcheck();
-   bool versioncheck();
+   QString port();
+
+  bool updatecheck();
+  bool sshcheck();
+  bool mountcheck();
+   bool versioncheck();  
+   bool isusb();
 
 int returnval1();
 
@@ -82,6 +89,8 @@ private slots:
    void on_otherButton_clicked();
 
    void on_tvmcButton_clicked();
+
+   void on_isusb_clicked(bool checked);
 
 private:
     Ui::preferencesDialog *ui;

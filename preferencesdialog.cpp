@@ -97,21 +97,36 @@ QString preferencesDialog::description() {
 QString preferencesDialog::filepath() {
    return ui->filepath->text();
 }
+
+QString preferencesDialog::port() {
+   return ui->port->text();
+}
 bool preferencesDialog::updatecheck() {
-   return ui->ftvupdatesBox->isChecked();
+ return ui->ftvupdatesBox->isChecked();
 }
 
+
+//bool preferencesDialog::usbConnection() {
+// return ui->usbConnection->isChecked();
+//}
+
+
 bool preferencesDialog::sshcheck() {
-   return ui->sshbox->isChecked();
+ return ui->sshbox->isChecked();
 }
 
 bool preferencesDialog::mountcheck() {
-   return ui->mountbox->isChecked();
+  return ui->mountbox->isChecked();
 }
 
 
 bool preferencesDialog::versioncheck() {
    return ui->versioncheck->isChecked();
+}
+
+
+bool preferencesDialog::isusb() {
+   return ui->isusb->isChecked();
 }
 
 
@@ -174,7 +189,7 @@ void preferencesDialog::setPulldir(const QString &pulldir)
 
 void preferencesDialog::setftvUpdate(const bool &updatecheck)
 {
-    ui->ftvupdatesBox->setChecked(updatecheck);
+   ui->ftvupdatesBox->setChecked(updatecheck);
 }
 
 
@@ -185,12 +200,17 @@ void preferencesDialog::setsshBoot(const bool &sshcheck)
 
 void preferencesDialog::setmountBoot(const bool &mountcheck)
 {
-    ui->mountbox->setChecked(mountcheck);
+   ui->mountbox->setChecked(mountcheck);
 }
 
 void preferencesDialog::setversioncheck(const bool &versioncheck)
 {
     ui->versioncheck->setChecked(versioncheck);
+}
+
+void preferencesDialog::setisusb(const bool &isusb)
+{
+    ui->isusb->setChecked(isusb);
 }
 
 
@@ -217,9 +237,20 @@ void preferencesDialog::setfilepath(const QString &filepath)
     ui->filepath->setText(filepath);
 
 }
+
+
+void preferencesDialog::setport(const QString &port)
+{
+    ui->port->setText(port);
+
+}
+
+
+
 void preferencesDialog::setrecnum(const QString &recnum)
 {
     ui->recnum->setText(recnum);
+
 
     if (recnum=="0")
        { ui->versioncheck->setVisible(true);
@@ -244,7 +275,7 @@ preferencesDialog::preferencesDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
+    on_isusb_clicked(ui->isusb->isChecked());
 }
 
 preferencesDialog::~preferencesDialog()
@@ -413,3 +444,23 @@ void preferencesDialog::on_tvmcButton_clicked()
     ui->packagename->setText("ag.tvaddons.tvmc");
     ui->filepath->setText("/files/.tvmc");
 }
+
+
+void preferencesDialog::on_isusb_clicked(bool checked)
+{
+    if (checked)
+    {
+        ui->port->setText("");
+        ui->port->setVisible(false);
+        ui->plabel->setVisible(false);
+    }
+
+      else
+    {
+        ui->port->setText("5555");
+        ui->port->setVisible(true);
+        ui->plabel->setVisible(true);
+    }
+}
+
+

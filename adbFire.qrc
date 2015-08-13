@@ -1,12 +1,11 @@
 <RCC>
     <qresource prefix="/">
         <file>assets/donate.png</file>
+        <file>assets/donatel.png</file>
         <file>assets/goat.png</file>
         <file>assets/kodi.png</file>
         <file>assets/kodi.html</file>
         <file>assets/about.html</file>
-        <file>assets/adbfstartup.html</file>
-        <file>assets/adbquit.html</file>
         <file>assets/adbserver.html</file>
         <file>assets/adbshell.html</file>
         <file>assets/atvsetup.html</file>
@@ -15,7 +14,6 @@
         <file>assets/console.html</file>
         <file>assets/filero.html</file>
         <file>assets/filerw.html</file>
-        <file>assets/help.html</file>
         <file>assets/inbusybox.html</file>
         <file>assets/inssh.html</file>
         <file>assets/installapk.html</file>
@@ -24,7 +22,6 @@
         <file>assets/llama.html</file>
         <file>assets/menu.html</file>
         <file>assets/cifs.html</file>
-        <file>assets/multidev.html</file>
         <file>assets/preferences.html</file>
         <file>assets/pushpull.html</file>
         <file>assets/rbreco.html</file>
@@ -36,10 +33,7 @@
         <file>assets/splash.html</file>
         <file>assets/ssh.html</file>
         <file>assets/swap.html</file>
-        <file>assets/unbusy.html</file>
         <file>assets/uninapk.html</file>
-        <file>assets/unssh.html</file>
-        <file>assets/usbmode.html</file>
         <file>assets/usbdrive.html</file>
         <file>assets/vlog.html</file>
         <file>assets/lock.html</file>
