@@ -8,3 +8,4 @@ build
 .qmake.stash
 adbfiles/xbin/
 Makefile
+adbfiles/xbin

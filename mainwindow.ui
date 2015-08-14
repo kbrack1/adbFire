@@ -739,7 +739,7 @@
     <string>Install System Tools</string>
    </property>
    <property name="toolTip">
-    <string>Install busybox and other system tools</string>
+    <string>Install  system tools</string>
    </property>
   </action>
   <action name="actionUninstall_Busybox">
@@ -747,7 +747,7 @@
     <string>Uninstall System Tools</string>
    </property>
    <property name="toolTip">
-    <string>Uninstall busybox and other system tools</string>
+    <string>Uninstall system tools</string>
    </property>
   </action>
   <action name="actionFirmware_install">

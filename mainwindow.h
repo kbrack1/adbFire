@@ -55,7 +55,6 @@ private slots:
 
     void check_update_status();
 
- //   void on_actionPreferences_triggered();
 
     void getpackage();
 
@@ -111,8 +110,6 @@ private slots:
 
     void on_actionUnlock_Bootloader_triggered();
 
-
-    void on_actionConsole_triggered();
 
     void on_actionMount_CIFS_triggered();
 

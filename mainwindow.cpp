@@ -49,7 +49,6 @@
 #include <adblogdialog.h>
 #include <QFileInfo>
 #include <QThread>
-#include <QMediaPlayer>
 
 // #include <QDebug>
 
@@ -121,7 +120,6 @@ QString bufferfactor = "";
 QString dbstring = "";
 QString description = "";
 QString filepath = "";
-QString busypath = "";
 QString ipaddress1;
 QString share1;
 QString mount1;
@@ -306,46 +304,12 @@ QString RunProcess(QString cstring)
  return command;
 }
 
-/////////////////////////////////////////////////////
-void busybox_install()
-{
-
-       QString busybox1 = adbdir+"busybox";
-       QString cstring = getadb() + " push "+busybox1+ " /data/local/tmp/";
-       QString command=RunProcess(cstring);
-
-       if (!command.contains("bytes"))
-         {
-           logfile("busybox install failed ");
-           logfile(cstring);
-            logfile(command);
-           return;
-           }
-
-        logfile(cstring);
-        logfile(command);
-
-        cstring = getadb() + " shell chmod 755 /data/local/tmp/busybox";
-        command=RunProcess(cstring);
-
-        logfile(cstring);
-        logfile(command);
-
-        cstring = getadb() + " shell /data/local/tmp/busybox --install -s /data/local/tmp";
-        command=RunProcess(cstring);
-
-        logfile(cstring);
-        logfile(command);
-
-
-
-}
 
 /////////////////////////////
 bool is_su()
 {
 
-QString cstring = getadb() + " shell ls /system/xbin/su";
+QString cstring = getadb() + " shell ls su";
 QString command=RunProcess(cstring);
 
 
@@ -370,23 +334,16 @@ bool is_busybox()
 
 QString cstring;
 QString command;
-busypath="";
 
-  cstring = getadb() + " shell ls /system/xbin/busybox";
-  command=RunProcess(cstring);
-
-
-  if (!command.contains("No such file or directory"))
-  {
-      busypath="/system/xbin/";
-
-      return true;
-  }
 
 
   cstring = getadb() + " shell ls /data/local/tmp/busybox";
   command=RunProcess(cstring);
 
+  if (!command.contains("No such file or directory"))
+     {
+      return true;
+      }
 
   if (command.contains("No such file or directory"))
      {
@@ -398,7 +355,6 @@ busypath="";
           logfile("busybox install failed ");
           logfile(cstring);
            logfile(command);
-           busypath="";
            QMessageBox::critical(0,"","busybox install failed. See log.");
            return false;
           }
@@ -413,17 +369,12 @@ busypath="";
           logfile(cstring);
           logfile(command);
 
-          cstring = getadb() + " shell /data/local/tmp/busybox --install -s /data/local/tmp";
-          command=RunProcess(cstring);
-
-          logfile(cstring);
-          logfile(command);
       }
 
 
   }
 
-  busypath="/data/local/tmp/";
+
   return true;
 
 
@@ -678,7 +629,7 @@ bool amazon_updates(QString onoff)
 int getShareCount()
 {
 
-   int rowcount;
+   int rowcount=0;
    QString sqlstatement = "SELECT Count(*) FROM netshare";
 
     QSqlQuery query;
@@ -703,7 +654,7 @@ int getShareCount()
 int getRows()
 {
 
-   int rowcount;
+   int rowcount=0;
    QString sqlstatement = "SELECT Count(*) FROM device";
 
     QSqlQuery query;
@@ -2813,8 +2764,6 @@ void MainWindow::on_connButton_clicked()
 
     if (command.contains("connected to"))
     {   isConnected=true;
-        //on_utilityButton_clicked();
-        is_busybox();
         on_refreshConnectedDevices_clicked();
     }
        else
@@ -2823,23 +2772,20 @@ void MainWindow::on_connButton_clicked()
      if(isConnected)
        {
 
-       if (os == 0)
+          if(!is_busybox())
+          {
+           QMessageBox::critical(0,"","Busybox installation failed!");
+           isConnected=false;
+           return;
+          }
+
+
+         if (os == 0)
           QObject().thread()->usleep(1000*1000*.1);
           // patch from superelchi@xda
 
-       if (!is_su())
+       if (is_su())
             {
-
-            //ls /data/local/tmp/busybox
-            // /data/local/tmp/busybox: No such file or directory
-             //busybox();
-             //busypath="/data/local/tmp/";
-             }
-
-
-          else
-
-         {
 
            cstring = getadb() + " shell pm list packages -d";
            command=RunProcess(cstring);
@@ -2849,8 +2795,6 @@ void MainWindow::on_connButton_clicked()
            else
             ui->update_status->setText(amazon_update1);
 
-
-           busypath="/system/xbin/";
          }
 
 
@@ -2863,14 +2807,6 @@ void MainWindow::on_connButton_clicked()
 
          if (is_su() && isConnected)
           {
-
-
-
-             //sambastring = getadb() + "-s firetv2:5555 shell ps | grep smbd";
-            // sambacheck=RunProcess(sambastring);
-            // logfile("zzz");
-            // logfile(sambastring);
-            // logfile(sambacheck);
 
 
               if (!sambacheck.isEmpty())
@@ -3207,7 +3143,7 @@ void MainWindow::on_fpushButton_clicked()
 
     if(!is_busybox())
     {
-        QMessageBox::critical(0,"","Busybox not found");
+        QMessageBox::critical(0,"","Busybox installation failed!");
        return;
  }
 
@@ -3315,25 +3251,6 @@ if (!dirpath.isEmpty())
 
 
 }
-
-/*
-
-
-is_package(xbmcpackage);
-
-
-if (xpath != "/sdcard/")
-   if (!is_packageInstalled)
-     { QMessageBox::critical(
-           this,
-           "",
-           xbmcpackage+" not installed");
-       logfile(xbmcpackage+" not installed. cant push to it.");
-        return;
-     }
-
-*/
-
 
  QString fileName = QFileDialog::getOpenFileName(this,
  "Push file to "+cname, pushdir, tr("Files (*)"));
@@ -4028,7 +3945,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
 
    QMessageBox::StandardButton reply;
-         reply = QMessageBox::question(this, "Busybox", "Install System Tools?",
+         reply = QMessageBox::question(this, "System Tools", "Install System Tools?",
             QMessageBox::Yes|QMessageBox::No);
          if (reply == QMessageBox::No)
          return;
@@ -4045,14 +3962,20 @@ void MainWindow::on_actionInstall_busybox_triggered()
     logfile("starting busybox install");
 
 
-    QString busybox1 = adbdir+"busybox";
+    // QString busybox1 = adbdir+"busybox";
+
     QString busybox3 = adbdir+ "install-recovery-2.sh";
     QString busybox4 = adbdir+"install-recovery.sh";
     QString busybox5 = adbdir+"xbin.tar";
 
+    QString cstring;
+    QString command;
 
+    mount_system("rw");
 
-     QFile Fout1(busybox1);
+/*
+
+    QFile Fout1(busybox1);
 
          if(!Fout1.exists())
             {
@@ -4067,6 +3990,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
             return;
              }
 
+*/
 
        QFile Fout3(busybox3);
 
@@ -4116,7 +4040,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
 
 
-
+/*
       QString cstring = getadb() + " push "+busybox1+ " /sdcard/";
 
       QString command=RunProcess(cstring);
@@ -4137,6 +4061,7 @@ void MainWindow::on_actionInstall_busybox_triggered()
 
          logfile(cstring);
          logfile(command);
+*/
 
 
                cstring = getadb() + " push "+busybox3+ " /sdcard/";
@@ -4146,8 +4071,8 @@ void MainWindow::on_actionInstall_busybox_triggered()
                   { QMessageBox::critical(
                                this,
                                "",
-                               "file3: busybox install failed");
-                   logfile("file3: busybox install failed ");
+                               "file3: system tools install failed");
+                   logfile("file3: system tools install failed ");
                    logfile(cstring);
                    logfile(command);
                    ui->progressBar->setHidden(true);
@@ -4167,9 +4092,9 @@ void MainWindow::on_actionInstall_busybox_triggered()
                    { QMessageBox::critical(
                                 this,
                                 "",
-                                "file4: busybox install failed");
+                                "file4: system tools install failed");
 
-                    logfile("file4: busybox install failed ");
+                    logfile("file4: system tools install failed ");
                     logfile(cstring);
                     logfile(command);
                     ui->progressBar->setHidden(true);
@@ -4188,9 +4113,9 @@ void MainWindow::on_actionInstall_busybox_triggered()
                     { QMessageBox::critical(
                                  this,
                                  "",
-                                 "file5: busybox install failed");
+                                 "file5: system tools install failed");
 
-                     logfile("file5: busybox install failed ");
+                     logfile("file5: system tools install failed ");
                      logfile(cstring);
                      logfile(command);
                      ui->progressBar->setHidden(true);
@@ -4201,24 +4126,11 @@ void MainWindow::on_actionInstall_busybox_triggered()
                  logfile(command);
 
 
-      mount_system("rw");
-
-
-     cstring = getadb() + " shell su -c cp " + " /sdcard/busybox /system/xbin";
-     command=RunProcess(cstring);
-     
-     logfile(cstring);
-     logfile(command);
-
-     cstring = getadb() + " shell su -c chmod 0755 /system/xbin/busybox";
-     command=RunProcess(cstring);
-
-     logfile(cstring);
-     logfile(command);
 
 
 
-     cstring = getadb() + " shell su -c /system/xbin/busybox tar xf /sdcard/xbin.tar -C /system";
+
+     cstring = getadb() + " shell su -c /data/local/tmp/busybox tar xf /sdcard/xbin.tar -C /system";
      command=RunProcess(cstring);
 
      logfile(cstring);
@@ -4258,14 +4170,14 @@ void MainWindow::on_actionInstall_busybox_triggered()
      logfile(cstring);
      logfile(command);
      
-      cstring = getadb() + " shell ls /system/xbin/which";
+      cstring = getadb() + " shell ls /system/xbin/ntfs-3g";
       command=RunProcess(cstring);
       
       logfile(cstring);
       logfile(command);
 
         if (command.contains("No such file or directory"))
-          { logfile("busybox install failed!");
+          { logfile("system tools install failed!");
             QMessageBox::critical( this,"","System Tools not installed!");
         }
 
@@ -4436,8 +4348,7 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
   if (!is_busybox())
   {
-      QMessageBox::critical(this,"","System Tools not installed");
-      logfile("System Tools not installed");
+      QMessageBox::critical(this,"","Busybox installation failed!");
      return;
    }
 
@@ -4445,12 +4356,12 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
    QString command;
    QString cstring;
 
-   QString umntstring = "/system/xbin/umount /storage/usb/drive*/";
+   QString umntstring = "/data/local/tmp/busybox umount /storage/usb/drive*/";
    QString rmsd = "rm -r /storage/usb/drive*/";
    QString rmsh = "rm /system/etc/install-recovery-2.sh";
 
 
-   cstring = getadb() + " shell ls /system/xbin/busybox";
+   cstring = getadb() + " shell ls /system/xbin/mntdrives.sh";
    command=RunProcess(cstring);
 
    logfile(cstring);
@@ -4563,7 +4474,7 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
          logfile(cstring);
          logfile(command);
 
-         cstring = getadb() + " shell ls /system/xbin/busybox";
+         cstring = getadb() + " shell ls /system/xbin/ntfs-3g";
          command=RunProcess(cstring);
          
          logfile(cstring);
@@ -4571,10 +4482,10 @@ void MainWindow::on_actionUninstall_Busybox_triggered()
 
            if (command.contains("No such file or directory"))
             {
-               logfile("busybox uninstalled");
+               logfile("system tools uninstalled");
                QMessageBox::information( this,"","System Tools uninstalled"); }
            else
-           { logfile("busybox uninstall failed");
+           { logfile("system tools uninstall failed");
                QMessageBox::critical( this,"","System Tools not uninstalled!");}
 
 
@@ -4614,7 +4525,7 @@ void MainWindow::on_fdellButton_clicked()
 
     if(!is_busybox())
     {
-        QMessageBox::critical(0,"","Busybox not found");
+        QMessageBox::critical(0,"","Busybox installation failed!");
        return;
  }
 
@@ -4715,21 +4626,6 @@ void MainWindow::on_fdellButton_clicked()
        }
 
 
-/*
-  is_package(xbmcpackage);
-
-  if (xpath != "/sdcard/")
-     if (!is_packageInstalled)
-       { QMessageBox::critical(
-             this,
-             "",
-             "Kodi not installed");
-         logfile(xpath);
-         logfile("xbmc not installed, path not found");
-          return;
-       }
-*/
-
     QString dirpath = ui->customdir->text();
        if (!dirpath.isEmpty())
 
@@ -4747,10 +4643,7 @@ void MainWindow::on_fdellButton_clicked()
 
 
 
-  //cstring = getadb() + " shell su -c find " +xpath+ " -type f ";
-  //QString command=RunProcess(cstring);
-
-  cstring = getadb() + " shell "+busypath+"find " +xpath+ " -type f ";
+  cstring = getadb() + " shell /data/local/tmp/busybox find " +xpath+ " -type f ";
 
   // cstring = getadb() + " shell ls " +xpath;
 
@@ -4847,11 +4740,6 @@ void MainWindow::on_fdellButton_clicked()
 void MainWindow::on_actionFirmware_install_triggered()
 {
 
-
-
-
-
-
     // recovery-stock-51.1.0.img
 
     bool usbstick = false;
@@ -4892,8 +4780,7 @@ void MainWindow::on_actionFirmware_install_triggered()
 
    if (!is_busybox())
    {
-       QMessageBox::critical(this,"","System Tools required");
-       logfile("System Tools required");
+       QMessageBox::critical(this,"","Busybox installation failed!");
        return;
    }
 
@@ -5275,11 +5162,6 @@ void MainWindow::on_mntButton_clicked()
            }
 
 
-
-
-
-  //
-
    if (!is_su())
       { QMessageBox::critical(
             this,
@@ -5288,6 +5170,11 @@ void MainWindow::on_mntButton_clicked()
          return;
    }
 
+   if (!is_busybox())
+   {
+       QMessageBox::critical(this,"","Busybox installation failed!");
+       return;
+   }
 
 
    QElapsedTimer rtimer;
@@ -5308,7 +5195,7 @@ QString sambastring;
    connect(timer, SIGNAL(timeout()), this, SLOT(TimerEvent()));
    timer->start(tsvalue);
 
-   cstring = getadb() + " shell ls /system/xbin/mount";
+   cstring = getadb() + " shell ls /system/xbin/mntdrives.sh";
    command=RunProcess(cstring);
 
 
@@ -5318,6 +5205,7 @@ QString sambastring;
          logfile(cstring);
          logfile(command);
          logfile("System Tools required for USB drive. Install from the menu.");
+         ui->progressBar->setHidden(true);
          return;
      }
 
@@ -5344,12 +5232,8 @@ QString sambastring;
            logfile(sambastring);
            logfile(sambacheck);
 
-                   sambastring = getadb() + " shell ps | grep smbd";
-                   sambacheck=RunProcess(sambastring);
-
-                   logfile("xxx");
-                   logfile(sambastring);
-                   logfile(sambacheck);
+            sambastring = getadb() + " shell ps | grep smbd";
+            sambacheck=RunProcess(sambastring);
 
 
                    if (!sambacheck.isEmpty())
@@ -5366,7 +5250,7 @@ QString sambastring;
                    }
 
 
-
+           ui->progressBar->setHidden(true);
            return;
         }
 
@@ -5379,24 +5263,26 @@ QString sambastring;
            logfile("USB drive already mounted");
            logfile(cstring);
            logfile(command);
-
+           ui->progressBar->setHidden(true);
            return;
         }
 
 
-       if (!command.isEmpty())
+
+        if (!command.isEmpty())
         {
            logfile(cstring);
            logfile(command);
-           logfile("error mounting usb drive");
-           QMessageBox::information( this,"","Error: "+command);
-           return;
+           // QMessageBox::information( this,"","Error: "+command);
+           //ui->progressBar->setHidden(true);
+           //return;
         }
+
 
 
        nMilliseconds = rtimer.elapsed();
        logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
-
+       ui->progressBar->setHidden(true);
 
 
 }
@@ -5433,25 +5319,23 @@ void MainWindow::on_umntButton_clicked()
          return;
    }
 
+   if (!is_busybox())
+   {
+       QMessageBox::critical(this,"","Busybox installation failed!");
+       return;
+   }
+
+
+   QString cstring;
+   QString command;
+
+
    QElapsedTimer rtimer;
    int nMilliseconds;
    rtimer.start();
 
 
 
-
-   QString cstring = getadb() + " shell ls /system/xbin/umount";
-   QString command=RunProcess(cstring);
-
-
-     if (command.contains("No such file or directory"))
-      { QMessageBox::critical( this,"","System Tools required for USB drive. Install from the menu.");
-
-         logfile(cstring);
-         logfile(command);
-         logfile("Busybox required, not found");
-         return;
-     }
 
 
         ui->progressBar->setHidden(false);
@@ -5463,7 +5347,7 @@ void MainWindow::on_umntButton_clicked()
 
 
 
-    QString umntstring = "/system/xbin/umount /storage/usb/*/";
+    QString umntstring = "/data/local/tmp/busybox umount /storage/usb/*/";
     QString rmsd = "rm -r /storage/usb/*/";
 
 
@@ -5663,7 +5547,7 @@ void MainWindow::on_fpullButton_clicked()
 
     if(!is_busybox())
     {
-        QMessageBox::critical(0,"","Busybox not found");
+        QMessageBox::critical(0,"","Busybox installation failed!");
        return;
  }
 
@@ -5766,24 +5650,7 @@ void MainWindow::on_fpullButton_clicked()
        break;
        }
 
-    /*
-      is_package(xbmcpackage);
 
-     if (xpath != "/sdcard/" )
-        if (!is_packageInstalled)
-          { QMessageBox::critical(
-                this,
-                "",
-                "Kodi not installed");
-
-            logfile("xbmc not installed");
-            logfile("install xbmc for "+xpath);
-
-
-
-             return;
-          }
-*/
 
      QString dirpath = ui->customdir->text();
      if (!dirpath.isEmpty())
@@ -5804,7 +5671,7 @@ void MainWindow::on_fpullButton_clicked()
 
 
 
-     cstring = getadb() + " shell "+busypath+"find " +xpath+ " -type f ";
+     cstring = getadb() + " shell /data/local/tmp/busybox find " +xpath+ " -type f ";
 
      // cstring = getadb() + " shell ls " +xpath;
 
@@ -6061,7 +5928,7 @@ void MainWindow::on_llamaButton_clicked()
 
    if(!is_busybox())
    {
-       QMessageBox::critical(0,"","Busybox not found");
+       QMessageBox::critical(0,"","Busybox installation failed!");
       return;
 }
 
@@ -6723,7 +6590,7 @@ void MainWindow::on_actionInstall_Recovery_triggered()
 
    if (!is_busybox())
    {
-       QMessageBox::critical(this,"","System Tools required");
+       QMessageBox::critical(this,"","Busybox installation failed!");
        logfile("System Tools required");
        return;
    }
@@ -6865,9 +6732,24 @@ void MainWindow::on_actionInstall_SSH_triggered()
    QString cstring;
    QString command;
 
+
+   cstring = getadb() + " shell ls /system/xbin/mntdrives.sh";
+   command=RunProcess(cstring);
+
+   logfile(cstring);
+   logfile(command);
+
+     if (command.contains("No such file or directory"))
+       { logfile("system tools not installed!");
+         QMessageBox::critical( this,"","System Tools not installed!");
+         return;
+     }
+
+
+
 // /data/jocala/ssh/dropbear -A root -N root -s -g -R /data/jocala/ssh/.ssh/authorized_keys
 
-   cstring = getadb() + " shell ls /system/xbin/busybox";
+   cstring = getadb() + " shell ls /system/xbin/ntfs-3g";
    command=RunProcess(cstring);
 
 
@@ -6876,7 +6758,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
          logfile(cstring);
          logfile(command);
-         logfile("Busybox required for SSH.");
+         logfile("System tools required for SSH.");
          return;
      }
 
@@ -6926,7 +6808,7 @@ void MainWindow::on_actionInstall_SSH_triggered()
 
    mount_system("rw");
 
-   cstring = getadb() + " shell su -c tar xf /sdcard/ssh.tar -C /data";
+   cstring = getadb() + " shell su -c /data/local/tmp/busybox tar xf /sdcard/ssh.tar -C /data";
    command=RunProcess(cstring);
 
    logfile(cstring);
@@ -7393,7 +7275,7 @@ void MainWindow::on_actionSwap_data_triggered()
 
           logfile("looking for drives");
 
-          cstring = getadb() + " shell su -c blkid /dev/block/sd* | grep ext4";
+          cstring = getadb() + " shell su -c /data/local/tmp/busybox blkid /dev/block/sd* | grep ext4";
           command=RunProcess(cstring);
 
           if (command.isEmpty())
@@ -7518,7 +7400,7 @@ void MainWindow::on_actionSwap_data_triggered()
            logfile(cstring);
            logfile(command);
 
-          cstring = getadb() + " shell su -c busybox umount /system/temp/";
+          cstring = getadb() + " shell su -c /data/local/tmp/busybox umount /system/temp/";
           command=RunProcess(cstring);
 
            logfile(cstring);
@@ -7618,8 +7500,7 @@ void MainWindow::on_actionUnlock_Bootloader_triggered()
 
    if (!is_busybox())
    {
-       QMessageBox::critical(this,"","System Tools required");
-       logfile("System Tools required");
+       QMessageBox::critical(this,"","Busybox installation failed!");
        return;
    }
 
@@ -7852,102 +7733,6 @@ void MainWindow::on_actionBuild_mount_script_triggered()
 */
 
 ///////////////////////////////////////////////////
-void MainWindow::on_actionConsole_triggered()
-{
-
-
-    // set PATH=%PATH%;C:\xampp\php
-
-    logfile("detaching console process");
-
-     QString cstring = "";
-
-
-     if (os == 1)
-
-        {
-
-        QString commstr = adbdir+"cpath.bat";
-        QFile file(commstr);
-
-            if(!file.open(QFile::WriteOnly |
-                          QFile::Text))
-            {
-                logfile("error creating cpath.bat!");
-                QMessageBox::critical(this,"","Error creating bat file!");
-                return;
-            }
-
-
-
-            QTextStream out(&file);
-            out  << "set PATH=%PATH%;"+QDir::currentPath()+";"<< endl;
-
-
-
-            file.flush();
-            file.close();
-
-            cstring = "cmd /k " +QDir::currentPath()+"/cpath.bat";
-            QProcess::startDetached(cstring);
-
-
-
-     }
-
-     QString pathdir = QCoreApplication::applicationDirPath() +"/adbfiles";
-
-       if (os == 2 || os == 0)
-         {
-
-           QString commstr = adbdir+"cpath";
-           QFile file(commstr);
-
-               if(!file.open(QFile::WriteOnly |
-                             QFile::Text))
-               {
-                   logfile("error creating cpath!");
-                   QMessageBox::critical(this,"","Error creating sh file!");
-                   return;
-               }
-
-
-
-               QTextStream out(&file);
-                out  << "#!/bin/sh" << endl;
-                out  << "export PATH="+pathdir+":$PATH" << endl;
-
-
-               file.flush();
-               file.close();
-
-               cstring = "chmod 0755 " + commstr ;
-               QString command=RunProcess(cstring);
-
-
-             // QString cstring = "open -a Terminal.app "+adbdir+"cpath.sh";
-
-              QString cstring = "open -a Terminal.app "+adbdir;
-
-         QProcess::startDetached(cstring);
-
-
-
-       }
-
-       if (os == 0)
-        {
-           // cstring = "x-terminal-emulator --working-directory="+adbdir+"/adbfiles";
-            cstring = "gnome-terminal --working-directory="+adbdir;
-           QProcess::startDetached(cstring);
-
-         }
-
-
-
-}
-
-///////////////////////////////////////////////////
 void MainWindow::on_actionMount_CIFS_triggered()
 
 {
@@ -7980,13 +7765,12 @@ void MainWindow::on_actionMount_CIFS_triggered()
 
    if (!is_busybox())
    {
-       QMessageBox::critical(this,"","System Tools required");
-       logfile("System Tools required");
+       QMessageBox::critical(this,"","Busybox installation failed!");
        return;
    }
 
-   QString nfsString ="/system/xbin/busybox mount -o nolock,ro,hard,intr,vers=3 -t nfs ";
-   QString cifsString = "/system/xbin/busybox mount -t cifs //";
+   QString nfsString ="/data/local/tmp/busybox mount -o nolock,ro,hard,intr,vers=3 -t nfs ";
+   QString cifsString = "/data/local/tmp/busybox mount -t cifs //";
    QString hashbang = "#!/system/bin/sh";
    QString cstring;
    QString command;
@@ -8595,8 +8379,7 @@ void MainWindow::on_actionInstall_Stock_Recovery_triggered()
 
    if (!is_busybox())
    {
-       QMessageBox::critical(this,"","System Tools required");
-       logfile("System Tools required");
+       QMessageBox::critical(this,"","Busybox installation failed!");
        return;
    }
 
@@ -8721,12 +8504,17 @@ void MainWindow::on_actionInstall_Samba_triggered()
    }
 
 
-   if (!is_busybox())
-   {
-       QMessageBox::critical(this,"","System Tools required");
-       logfile("System Tools required");
-       return;
-   }
+   cstring = getadb() + " shell ls /system/xbin/mntdrives.sh";
+   command=RunProcess(cstring);
+
+   logfile(cstring);
+   logfile(command);
+
+     if (command.contains("No such file or directory"))
+       { logfile("system tools not installed!");
+         QMessageBox::critical( this,"","System Tools not installed!");
+         return;
+     }
 
 
    QElapsedTimer rtimer;
@@ -8866,17 +8654,6 @@ void MainWindow::on_actionUninstall_Samba_triggered()
    }
 
 
-cstring = getadb() + " shell ls /system/xbin/which";
-command=RunProcess(cstring);
-
-logfile(cstring);
-logfile(command);
-
-  if (command.contains("No such file or directory"))
-    { logfile("System Tools required");
-      QMessageBox::critical( this,"","System Tools not installed!");
-      return;
-  }
 
   cstring = getadb() + " shell ls /data/data/com.funkyfresh.samba/files/jocala.txt";
   command=RunProcess(cstring);
@@ -9005,8 +8782,7 @@ void MainWindow::on_actionInstallBootmenu_triggered()
 
    if (!is_busybox())
    {
-       QMessageBox::critical(this,"","System Tools required");
-       logfile("System Tools required");
+       QMessageBox::critical(this,"","Busybox installation failed!");
        return;
    }
 
@@ -9193,8 +8969,7 @@ void MainWindow::on_actionUninstall_Boot_Menu_triggered()
 
    if (!is_busybox())
    {
-       QMessageBox::critical(this,"","System Tools required");
-       logfile("System Tools required");
+       QMessageBox::critical(this,"","Busybox installation failed");
        return;
    }
 
@@ -10274,7 +10049,7 @@ void MainWindow::on_doConsole_clicked()
        if (os == 0)
         {
            // cstring = "x-terminal-emulator --working-directory="+adbdir+"/adbfiles";
-            cstring = "gnome-terminal --working-directory="+adbdir;
+            cstring = "gnome-terminal --working-directory="+adbdir+ " -x "+adbdir+"cpath.sh";
            QProcess::startDetached(cstring);
 
          }
@@ -10292,8 +10067,8 @@ void MainWindow::on_killServer_clicked()
     rtimer.start();
 
 
-    QString cstring = adb + "  disconnect "+daddr+":"+port ;
-    QString command=RunProcess(cstring);
+    //QString cstring = adb + "  disconnect "+daddr+":"+port ;
+    //QString command=RunProcess(cstring);
 
     isConnected=false;
 
@@ -10399,15 +10174,7 @@ void MainWindow::on_refreshConnectedDevices_clicked()
                               logfile(usbid);
                               logfile(isdevice) ;
 
-                         /*
-                              if (isdevice.contains("device"))
-                                      {  logfile("install busybox "+isdevice );
-                                        daddr=usbid;
-                                        isusb=true;
-                                        busybox_nonroot();
 
-                              }
-*/
 
 
                               litem = litem+isdevice;
@@ -10839,8 +10606,7 @@ logfile("opening preferences dialog");
 
            if (!is_busybox())
            {
-               QMessageBox::critical(this,"","System Tools required for ssh");
-               logfile("System Tools required for ssh");
+               QMessageBox::critical(this,"","Busybox installation failed!");
                return;
            }
 
@@ -10982,8 +10748,7 @@ logfile("opening preferences dialog");
 
              if (!is_busybox())
              {
-                 QMessageBox::critical(this,"","System Tools required for USB mount.");
-                 logfile("System Tools required for USB mount.");
+                 QMessageBox::critical(this,"","Busybox installation failed!");
                  return;
              }
 
@@ -11129,6 +10894,8 @@ void MainWindow::on_actionRoot_device_triggered()
            { QMessageBox::critical(0,"","Not an Amazon Device");
               return;
            }
+
+
 
 
     QMessageBox::StandardButton reply;

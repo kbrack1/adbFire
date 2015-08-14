@@ -4,10 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql network multimedia
+QT       += core gui sql network
 
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets multimedia
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = adbFire
 TEMPLATE = app
