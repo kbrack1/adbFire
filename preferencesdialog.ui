@@ -144,6 +144,9 @@
     </item>
     <item>
      <widget class="QPushButton" name="resetxml">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reset cache settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>Reset</string>
       </property>
@@ -468,7 +471,7 @@
    </widget>
    <widget class="QLineEdit" name="port">
     <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the file path for your Media Center.  This is combined with Package Name, e.g.  org.xbmc.kodi/files/.kodi&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Port for IP connections. Defaults to 5555&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
@@ -491,6 +494,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="kodiButton">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Kodi media center&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>Kodi</string>
       </property>
@@ -501,6 +507,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="xbmcButton">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;XBMC media center&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>XBMC</string>
       </property>
@@ -508,6 +517,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="spmcButton">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SPMC media center&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>SPMC</string>
       </property>
@@ -515,6 +527,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="tvmcButton">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TVMC media center&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>TVMC</string>
       </property>
@@ -522,6 +537,9 @@
     </item>
     <item>
      <widget class="QRadioButton" name="otherButton">
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fill in file path and package name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>Other</string>
       </property>
@@ -555,7 +573,7 @@
     <item>
      <widget class="QCheckBox" name="sshbox">
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start SSH server at boot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start SSH server at boot. Requires root.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>SSH server at boot</string>
@@ -568,7 +586,7 @@
     <item>
      <widget class="QCheckBox" name="mountbox">
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start SSH server at boot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start SSH server at boot. Requires root.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Mount drives at boot</string>

@@ -1,3 +1,13 @@
+adbFire 1.29 changelog
+
+adbFire database supports unlimited devices
+USB mode now automatic
+See connected devices at a glance
+Ad Hoc directory browsing for push/pull/delete
+Updated hyperlinked help
+Many bug fixes
+
+
 adbFire 1.28 changelog
 
 Busybox non-root install and path fixed
