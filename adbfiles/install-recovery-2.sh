@@ -1,4 +1,4 @@
 #!/system/bin/sh
-/system/xbin/busybox run-parts /etc/init.d
+/data/local/tmp/busybox run-parts /etc/init.d
 
 

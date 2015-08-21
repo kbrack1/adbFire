@@ -1,0 +1,2 @@
+#!/system/bin/sh
+/data/local/tmp/busybox mount -t cifs //192.168.1.200/media/video /sdcard/test -o username=guest
