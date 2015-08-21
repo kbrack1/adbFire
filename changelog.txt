@@ -1,4 +1,14 @@
+adbFire 1.30 changelog
+
+Root users: "Busybox not installed" error fixed
+
+All users: TubiTV no longer works as a Kodi launcher,
+removed from Llama Options.
+
+
+
 adbFire 1.29 changelog
+
 
 adbFire database supports unlimited devices
 USB mode now automatic
