@@ -82,8 +82,6 @@ private slots:
 
     void on_roButton_clicked();
 
-    void on_pushSplash_clicked();
-
     void on_llamaButton_clicked();
 
     void on_donate_clicked();

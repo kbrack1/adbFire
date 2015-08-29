@@ -663,6 +663,7 @@
     <addaction name="actionView_Log"/>
     <addaction name="actionReboot"/>
     <addaction name="actionRecovery"/>
+    <addaction name="actionSplash_Screen"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -893,6 +894,14 @@
    </property>
    <property name="toolTip">
     <string>Root device with Towelroot</string>
+   </property>
+  </action>
+  <action name="actionSplash_Screen">
+   <property name="text">
+    <string>Splash Screen</string>
+   </property>
+   <property name="toolTip">
+    <string>Push splash.png to media directory</string>
    </property>
   </action>
  </widget>

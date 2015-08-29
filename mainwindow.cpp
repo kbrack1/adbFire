@@ -3382,7 +3382,7 @@ void MainWindow::on_restoreButton_clicked()
       { QMessageBox::critical(
             this,
             "",
-            "Kodi not installed");
+            xbmcpackage+" not installed");
          return;
    }
 
@@ -3419,14 +3419,16 @@ void MainWindow::on_restoreButton_clicked()
 
  command=RunProcess(cstring);
 
- if (command.contains("No such file or directory"))
-  {
-     QMessageBox::critical(
-                 this,
-                "",
-                 "Media center files not found");
-                 return;
- }
+
+     if (command.contains("No such file or directory"))
+      {
+         mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath;
+         cstring = cstring =  getadb() +" shell mkdir -p /sdcard/Android/data/"+xbmcpackage;
+         command=RunProcess(cstring);
+
+         // QMessageBox::critical(this,"","Media center files not found");
+         // return;
+       }
 
 
 
@@ -5784,127 +5786,6 @@ void MainWindow::on_fpullButton_clicked()
              nMilliseconds = rtimer.elapsed();
              logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
 
-
-}
-
-
-//////////////////////////////////////////////
-void MainWindow::on_pushSplash_clicked()
-{
-    QString lookup=daddr;
-
-     if(!isusb)
-      lookup=lookup+":"+port;
-
-    isConnected=find_daddr(lookup);
-
-    if (!isConnected && !isusb)
-          on_connButton_clicked();
-
-     if (!isConnected)
-           { QMessageBox::critical(0,"",devstr2);
-              return;
-           }
-
-
-
-
-    is_package(xbmcpackage);
-
-   if (!is_packageInstalled)
-      { QMessageBox::critical(
-            this,
-            "",
-            xbmcpackage+" not installed");
-         return;
-   }
-
-   QString mcpath = "/sdcard/Android/data/"+xbmcpackage+filepath+"/media/";
-
-   QString cstring = getadb() + " shell ls "+mcpath;
-
-   QString command=RunProcess(cstring);
-
-   if (command.contains("No such file or directory"))
-    {
-
-      mcpath = "/storage/extUsb/"+filepath+"/media/";
-      mcpath.replace(QString("file"), QString("mcfile"));
-   }
-
-
-
-   cstring = getadb() + " shell ls "+mcpath;
-
-   command=RunProcess(cstring);
-
-   if (command.contains("No such file or directory"))
-    {
-       QMessageBox::critical(
-                   this,
-                  "",
-                   "Destination path missing");
-                   return;
-   }
-
-
-
-QElapsedTimer rtimer;
-int nMilliseconds;
-rtimer.start();
-
-
-
- QString fileName = QFileDialog::getOpenFileName(this,
- "Choose splash screen file", splashdir, tr("Files (*.png)"));
-
- if (!fileName.isEmpty() )
- {
-
-
-
-
-     QMessageBox::StandardButton reply;
-       reply = QMessageBox::question(this, "Push", fileName+" selected. Continue?",
-           QMessageBox::Yes|QMessageBox::No);
-       if (reply == QMessageBox::Yes) {
-
-
-           cstring = getadb() + " push "+'"'+fileName+'"'+ " "+mcpath+"/splash.png";
-
-           command=RunProcess(cstring);
-
-           logfile(cstring);
-           logfile(command);
-
-           nMilliseconds = rtimer.elapsed();
-           logfile("process time duration: "+ QString::number(nMilliseconds/1000)+ " seconds" );
-
-
-
-           if (command.contains("bytes"))
-
-
-           {
-
-               QMessageBox::information(
-                           this,
-                          "",
-                          "Splash screen installed." );
-           }
-               else
-
-           {
-
-               QMessageBox::critical(
-                           this,
-                           "",
-                        "Splash screen installation failed.");}
-
-
-   }
-
-}
 
 }
 
@@ -9688,8 +9569,6 @@ void MainWindow::on_actionSplash_Screen_triggered()
            { QMessageBox::critical(0,"",devstr2);
               return;
            }
-
-
 
 
     is_package(xbmcpackage);
